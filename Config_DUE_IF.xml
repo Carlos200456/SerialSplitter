@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <Configuration>
+    <SerialPort1>   name="COM1" baudrate="57600" stopbits="One" parity="None" databits="8" </SerialPort1>
+    <SerialPort2>   name="COM7" baudrate="57600" stopbits="One" parity="None" databits="8" </SerialPort2>
+    <SerialPort3>   name="COM8" baudrate="38400" stopbits="One" parity="None" databits="8" </SerialPort3>
+  </Configuration>
+</root>

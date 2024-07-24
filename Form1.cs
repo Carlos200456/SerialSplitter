@@ -14,6 +14,7 @@ using System.IO.Ports;
 using System.Threading;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.ToolBar;
+using System.Diagnostics;
 
 namespace SerialSplitter
 {
@@ -33,7 +34,7 @@ namespace SerialSplitter
         int kvs, mas, mss, Counter, PROK, RXOK;
         float mxs;
 
-        string fileToCopy = "C:\\TechDX\\LogIFDUE.txt";
+        string fileToCopy = "C:\\TechXA\\LogIFDUE.txt";
         string destinationDirectory = "G:\\My Drive\\Logs\\";
         StringBuilder sb = new StringBuilder();
         char LF = (char)10;
@@ -318,6 +319,32 @@ namespace SerialSplitter
                 }
             }
 
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (SerialNumber.Substring(SerialNumber.Length - 1) == "\r")
+                {
+                    SerialNumber = SerialNumber.Substring(0, SerialNumber.Length - 1);
+                }
+                if (File.Exists(destinationDirectory + "DUE_Serial_" + SerialNumber + ".txt"))
+                {
+                    File.Delete(destinationDirectory + "DUE_Serial_" + SerialNumber + ".txt");
+                }
+                File.Copy(fileToCopy, destinationDirectory + "DUE_Serial_" + SerialNumber + ".txt");
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.Message, "GDrive Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            Process.Start("notepad.exe", "C:\\TechXA\\LogIFDUE.txt");
         }
 
         private void Form_FormClosing(object sender, FormClosingEventArgs e)
