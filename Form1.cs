@@ -94,13 +94,38 @@ namespace SerialSplitter
                     Serial3StopBits = getBetween(s1, "stopbits=", 3);
                     Serial3Parity = getBetween(s1, "parity=", 4);
                 }
-
+                
             }
-
-            OpenSerial1();
-            OpenSerial2();
-            OpenSerial3();
+            CheckPortsNames();
             this.TopMost = true;
+        }
+
+        void CheckPortsNames()
+        {
+            string[] ports = SerialPort.GetPortNames();
+            for (int i = 0; i < ports.Length; i++)
+            {
+                if (Serial1PortName == ports[i])
+                {
+                    OpenSerial1();
+                    radioButton1.Checked = true;
+                    radioButton1.BackColor = Color.Green;
+                    radioButton1.ForeColor = Color.Green;
+                }
+                if (Serial2PortName == ports[i])
+                {
+                    OpenSerial2();
+                    radioButton2.Checked = true;
+                    radioButton2.BackColor = Color.Green;
+                    radioButton2.ForeColor = Color.Green;
+                }
+                if (Serial3PortName == ports[i])
+                {
+                    OpenSerial3();
+                    radioButton3.Checked = true;
+                    radioButton3.BackColor = Color.Red;
+                }
+            }
         }
 
         public static string getBetween(string strSource, string strStart, int largo)
@@ -130,9 +155,6 @@ namespace SerialSplitter
             Thread.Sleep(50);
             serialPort1.DtrEnable = true;
             Thread.Sleep(100);
-            radioButton1.Checked = true;
-            radioButton1.BackColor = Color.Green;
-            radioButton1.ForeColor = Color.Green;
         }
 
         public void OpenSerial2()     // Serial Port para la comunicacion con el Generador
@@ -149,9 +171,6 @@ namespace SerialSplitter
             Thread.Sleep(50);
             serialPort2.DtrEnable = true;
             Thread.Sleep(800);
-            radioButton2.Checked = true;
-            radioButton2.BackColor = Color.Green;
-            radioButton2.ForeColor = Color.Green;
         }
 
         public void OpenSerial3()     // Serial Port para la comunicacion con el Generador
@@ -169,8 +188,6 @@ namespace SerialSplitter
             serialPort3.DtrEnable = true;
             Thread.Sleep(800);
             StartTimer();
-            radioButton3.Checked = true;
-            radioButton3.BackColor = Color.Red;
         }
 
         private void StartTimer()
@@ -650,7 +667,7 @@ namespace SerialSplitter
                     if (msg == "1\r")
                     {
                         dataOUT3 = "DB0";
-                        serialPort2.WriteLine(dataOUT3);   // Send data to Generator to turn off Calibration
+                        serialPort3.WriteLine(dataOUT3);   // Send data to Generator to turn off Calibration
                     }
                     break;
                 case "VCC:":
