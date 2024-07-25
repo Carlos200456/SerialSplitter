@@ -72,6 +72,18 @@
             this.label13 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
+            // serialPort1
+            // 
+            this.serialPort1.DataReceived += new System.IO.Ports.SerialDataReceivedEventHandler(this.serialPort1_DataReceived);
+            // 
+            // serialPort2
+            // 
+            this.serialPort2.DataReceived += new System.IO.Ports.SerialDataReceivedEventHandler(this.serialPort2_DataReceived);
+            // 
+            // serialPort3
+            // 
+            this.serialPort3.DataReceived += new System.IO.Ports.SerialDataReceivedEventHandler(this.serialPort3_DataReceived);
+            // 
             // textBoxDI
             // 
             this.textBoxDI.Location = new System.Drawing.Point(147, 140);
@@ -275,6 +287,7 @@
             this.textBoxKV.Name = "textBoxKV";
             this.textBoxKV.Size = new System.Drawing.Size(55, 20);
             this.textBoxKV.TabIndex = 22;
+            this.textBoxKV.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // label7
             // 
@@ -300,6 +313,7 @@
             this.textBoxMA.Name = "textBoxMA";
             this.textBoxMA.Size = new System.Drawing.Size(55, 20);
             this.textBoxMA.TabIndex = 24;
+            this.textBoxMA.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // label9
             // 
@@ -316,6 +330,7 @@
             this.textBoxMS.Name = "textBoxMS";
             this.textBoxMS.Size = new System.Drawing.Size(55, 20);
             this.textBoxMS.TabIndex = 26;
+            this.textBoxMS.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // label10
             // 
@@ -332,6 +347,7 @@
             this.textBoxKVF.Name = "textBoxKVF";
             this.textBoxKVF.Size = new System.Drawing.Size(55, 20);
             this.textBoxKVF.TabIndex = 28;
+            this.textBoxKVF.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // label11
             // 
@@ -348,6 +364,7 @@
             this.textBoxMAF.Name = "textBoxMAF";
             this.textBoxMAF.Size = new System.Drawing.Size(55, 20);
             this.textBoxMAF.TabIndex = 30;
+            this.textBoxMAF.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // buttonExit
             // 
@@ -365,6 +382,7 @@
             this.textBoxET.Name = "textBoxET";
             this.textBoxET.Size = new System.Drawing.Size(55, 20);
             this.textBoxET.TabIndex = 33;
+            this.textBoxET.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // label12
             // 
@@ -383,6 +401,7 @@
             this.buttonFM.TabIndex = 35;
             this.buttonFM.Text = "Fluoro Mode";
             this.buttonFM.UseVisualStyleBackColor = true;
+            this.buttonFM.Click += new System.EventHandler(this.buttonFM_Click);
             // 
             // buttonRM
             // 

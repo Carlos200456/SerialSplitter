@@ -207,6 +207,7 @@ namespace SerialSplitter
             }
             dataOUT3 = "HS";
             serialPort3.WriteLine(dataOUT3);
+            DisplayData(6, dataOUT3);
             if (WaitForACK())
             {
                 buttonPW.BackColor = Color.LightGreen;
@@ -241,6 +242,33 @@ namespace SerialSplitter
             }
             if (ACK) return true; else return false;
         }
+
+        private void DisplayData(int port, string data)
+        {
+            switch (port)
+            {
+                case 1:
+                    textBoxDO.Text = data;
+                    break;
+                case 2:
+                    textBoxNO.Text = data;
+                    break;
+                case 3:
+                    textBoxGO.Text = data;
+                    break;
+                case 4:
+                    textBoxDI.Text = data;
+                    break;
+                case 5:
+                    textBoxNI.Text = data;
+                    break;
+                case 6:
+                    textBoxGI.Text = data;
+                    break;
+                default:
+                    break;
+            }
+        }   
 
         private void buttonNRST_Click(object sender, EventArgs e)
         {
@@ -314,12 +342,16 @@ namespace SerialSplitter
                     {
                         dataOUT3 = "PW1";
                         serialPort3.WriteLine(dataOUT3);
-                        this.Size = new Size(350, 98);
+                        DisplayData(6, dataOUT3);
+                        // Omitir la siguiente linea en Debug
+#if !DEBUG
+                        this.Size = new Size(488,120);
                         this.Left = 680;
-                        this.Top = 1016;
+                        this.Top = 968;
                         this.ControlBox = false;
                         this.Text = "";
-                        // logger.LogInfo("Turn On by Operator");
+#endif                        
+                        logger.LogInfo("Turn On by Operator");
                         AutoON = true;
                     }
                     else
@@ -331,6 +363,7 @@ namespace SerialSplitter
                 {
                     dataOUT3 = "PW0";
                     serialPort3.WriteLine(dataOUT3);
+                    DisplayData(6, dataOUT3);
                     logger.LogInfo("Turn Off by Operator");
                     AutoON = false;
                 }
@@ -395,6 +428,71 @@ namespace SerialSplitter
             this.Close(); //now close the form
         }
 
+        private void buttonFM_Click(object sender, EventArgs e)
+        {
+            if (serialPort3.IsOpen)
+            {
+                if (buttonFM.Text == "No Fluoro")
+                {
+                    dataOUT3 = "TF1";
+                }
+                if (buttonFM.Text == "Fluoro C")
+                {
+                    dataOUT3 = "TF2";
+                }
+                if (buttonFM.Text == "Fluoro P") dataOUT3 = "TF0";
+                serialPort3.WriteLine(dataOUT3);
+                DisplayData(6, dataOUT3);
+            }
+
+        }
+
+        private void buttonRM_Click(object sender, EventArgs e)
+        {
+            if (serialPort3.IsOpen)
+            {
+                if (buttonRM.Text == "No Potter")
+                {
+                    dataOUT3 = "TE1";
+                }
+                if (buttonRM.Text == "Potter 1")
+                {
+                    dataOUT3 = "TE2";
+                }
+                if (buttonRM.Text == "Potter 2")
+                {
+                    dataOUT3 = "TE3"; 
+                }
+                if (buttonRM.Text == "CINE") dataOUT3 = "TE0";       // TODO Service Mode in Generator
+                // if (buttonSPot1.Text == "Service") dataOUT = "TE0";
+                serialPort3.WriteLine(dataOUT3);
+                DisplayData(6, dataOUT3);
+            }
+        }
+
+        private void serialPort1_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
+        {
+            dataIN1 = serialPort1.ReadLine();
+            this.Invoke(new EventHandler(ShowData1));
+        }
+
+        private void ShowData1(object sender, EventArgs e)
+        {
+            DisplayData(1, dataIN1);
+        }
+
+        private void serialPort2_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
+        {
+            dataIN2 = serialPort2.ReadLine();
+            this.Invoke(new EventHandler(ShowData2));
+        }
+
+        private void ShowData2(object sender, EventArgs e)
+        {
+            DisplayData(2, dataIN2);
+        }
+
+
         private void serialPort3_DataReceived(object sender, SerialDataReceivedEventArgs e)    // Data received from Generator
         {
             dataIN3 = serialPort3.ReadLine();
@@ -422,6 +520,7 @@ namespace SerialSplitter
         private void ShowData3(object sender, EventArgs e)
         {
             DoubleBuffered = true;
+            DisplayData(3, dataIN3);
             string msg;
             if (dataIN3.Length > 4) msg = dataIN3.Remove(0, 4); else msg = "";
             // ACK = false;
@@ -668,6 +767,7 @@ namespace SerialSplitter
                     {
                         dataOUT3 = "DB0";
                         serialPort3.WriteLine(dataOUT3);   // Send data to Generator to turn off Calibration
+                        DisplayData(6, dataOUT3);
                     }
                     break;
                 case "VCC:":
