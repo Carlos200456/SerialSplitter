@@ -70,6 +70,11 @@
             this.buttonFM = new System.Windows.Forms.Button();
             this.buttonRM = new System.Windows.Forms.Button();
             this.label13 = new System.Windows.Forms.Label();
+            this.textBoxCms = new System.Windows.Forms.TextBox();
+            this.textBoxSms = new System.Windows.Forms.TextBox();
+            this.buttonSV = new System.Windows.Forms.Button();
+            this.label14 = new System.Windows.Forms.Label();
+            this.label15 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // serialPort1
@@ -86,42 +91,42 @@
             // 
             // textBoxDI
             // 
-            this.textBoxDI.Location = new System.Drawing.Point(147, 140);
+            this.textBoxDI.Location = new System.Drawing.Point(147, 175);
             this.textBoxDI.Name = "textBoxDI";
             this.textBoxDI.Size = new System.Drawing.Size(100, 20);
             this.textBoxDI.TabIndex = 0;
             // 
             // textBoxNI
             // 
-            this.textBoxNI.Location = new System.Drawing.Point(147, 195);
+            this.textBoxNI.Location = new System.Drawing.Point(147, 230);
             this.textBoxNI.Name = "textBoxNI";
             this.textBoxNI.Size = new System.Drawing.Size(100, 20);
             this.textBoxNI.TabIndex = 1;
             // 
             // textBoxGI
             // 
-            this.textBoxGI.Location = new System.Drawing.Point(147, 250);
+            this.textBoxGI.Location = new System.Drawing.Point(147, 285);
             this.textBoxGI.Name = "textBoxGI";
             this.textBoxGI.Size = new System.Drawing.Size(100, 20);
             this.textBoxGI.TabIndex = 2;
             // 
             // textBoxGO
             // 
-            this.textBoxGO.Location = new System.Drawing.Point(284, 250);
+            this.textBoxGO.Location = new System.Drawing.Point(284, 285);
             this.textBoxGO.Name = "textBoxGO";
             this.textBoxGO.Size = new System.Drawing.Size(100, 20);
             this.textBoxGO.TabIndex = 5;
             // 
             // textBoxNO
             // 
-            this.textBoxNO.Location = new System.Drawing.Point(284, 195);
+            this.textBoxNO.Location = new System.Drawing.Point(284, 230);
             this.textBoxNO.Name = "textBoxNO";
             this.textBoxNO.Size = new System.Drawing.Size(100, 20);
             this.textBoxNO.TabIndex = 4;
             // 
             // textBoxDO
             // 
-            this.textBoxDO.Location = new System.Drawing.Point(284, 140);
+            this.textBoxDO.Location = new System.Drawing.Point(284, 175);
             this.textBoxDO.Name = "textBoxDO";
             this.textBoxDO.Size = new System.Drawing.Size(100, 20);
             this.textBoxDO.TabIndex = 3;
@@ -130,7 +135,7 @@
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(185, 108);
+            this.label1.Location = new System.Drawing.Point(185, 143);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(25, 20);
             this.label1.TabIndex = 6;
@@ -140,7 +145,7 @@
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(313, 108);
+            this.label2.Location = new System.Drawing.Point(313, 143);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(42, 20);
             this.label2.TabIndex = 7;
@@ -150,7 +155,7 @@
             // 
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label3.Location = new System.Drawing.Point(12, 140);
+            this.label3.Location = new System.Drawing.Point(12, 175);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(59, 20);
             this.label3.TabIndex = 8;
@@ -160,7 +165,7 @@
             // 
             this.label4.AutoSize = true;
             this.label4.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label4.Location = new System.Drawing.Point(12, 195);
+            this.label4.Location = new System.Drawing.Point(12, 230);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(71, 20);
             this.label4.TabIndex = 9;
@@ -170,7 +175,7 @@
             // 
             this.label5.AutoSize = true;
             this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label5.Location = new System.Drawing.Point(12, 250);
+            this.label5.Location = new System.Drawing.Point(12, 285);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(86, 20);
             this.label5.TabIndex = 10;
@@ -180,7 +185,7 @@
             // 
             this.radioButton1.AutoCheck = false;
             this.radioButton1.AutoSize = true;
-            this.radioButton1.Location = new System.Drawing.Point(114, 144);
+            this.radioButton1.Location = new System.Drawing.Point(114, 179);
             this.radioButton1.Name = "radioButton1";
             this.radioButton1.Size = new System.Drawing.Size(14, 13);
             this.radioButton1.TabIndex = 11;
@@ -190,7 +195,7 @@
             // 
             this.radioButton2.AutoCheck = false;
             this.radioButton2.AutoSize = true;
-            this.radioButton2.Location = new System.Drawing.Point(114, 199);
+            this.radioButton2.Location = new System.Drawing.Point(114, 234);
             this.radioButton2.Name = "radioButton2";
             this.radioButton2.Size = new System.Drawing.Size(14, 13);
             this.radioButton2.TabIndex = 12;
@@ -200,7 +205,7 @@
             // 
             this.radioButton3.AutoCheck = false;
             this.radioButton3.AutoSize = true;
-            this.radioButton3.Location = new System.Drawing.Point(114, 254);
+            this.radioButton3.Location = new System.Drawing.Point(114, 289);
             this.radioButton3.Name = "radioButton3";
             this.radioButton3.Size = new System.Drawing.Size(14, 13);
             this.radioButton3.TabIndex = 13;
@@ -209,7 +214,7 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(105, 121);
+            this.label6.Location = new System.Drawing.Point(105, 156);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(32, 13);
             this.label6.TabIndex = 14;
@@ -227,7 +232,7 @@
             // 
             // buttonNRST
             // 
-            this.buttonNRST.Location = new System.Drawing.Point(399, 195);
+            this.buttonNRST.Location = new System.Drawing.Point(399, 230);
             this.buttonNRST.Name = "buttonNRST";
             this.buttonNRST.Size = new System.Drawing.Size(56, 23);
             this.buttonNRST.TabIndex = 16;
@@ -276,7 +281,7 @@
             // 
             // textBoxER
             // 
-            this.textBoxER.Location = new System.Drawing.Point(11, 79);
+            this.textBoxER.Location = new System.Drawing.Point(11, 118);
             this.textBoxER.Name = "textBoxER";
             this.textBoxER.Size = new System.Drawing.Size(239, 20);
             this.textBoxER.TabIndex = 21;
@@ -360,6 +365,7 @@
             // 
             // textBoxMAF
             // 
+            this.textBoxMAF.BackColor = System.Drawing.SystemColors.Info;
             this.textBoxMAF.Location = new System.Drawing.Point(256, 53);
             this.textBoxMAF.Name = "textBoxMAF";
             this.textBoxMAF.Size = new System.Drawing.Size(55, 20);
@@ -368,7 +374,7 @@
             // 
             // buttonExit
             // 
-            this.buttonExit.Location = new System.Drawing.Point(399, 91);
+            this.buttonExit.Location = new System.Drawing.Point(399, 126);
             this.buttonExit.Name = "buttonExit";
             this.buttonExit.Size = new System.Drawing.Size(56, 23);
             this.buttonExit.TabIndex = 32;
@@ -415,17 +421,67 @@
             // label13
             // 
             this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(256, 82);
+            this.label13.Location = new System.Drawing.Point(256, 121);
             this.label13.Name = "label13";
             this.label13.Size = new System.Drawing.Size(29, 13);
             this.label13.TabIndex = 37;
             this.label13.Text = "Error";
             // 
+            // textBoxCms
+            // 
+            this.textBoxCms.Location = new System.Drawing.Point(143, 79);
+            this.textBoxCms.Name = "textBoxCms";
+            this.textBoxCms.Size = new System.Drawing.Size(37, 20);
+            this.textBoxCms.TabIndex = 38;
+            this.textBoxCms.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            // 
+            // textBoxSms
+            // 
+            this.textBoxSms.BackColor = System.Drawing.SystemColors.Info;
+            this.textBoxSms.Location = new System.Drawing.Point(264, 79);
+            this.textBoxSms.Name = "textBoxSms";
+            this.textBoxSms.Size = new System.Drawing.Size(38, 20);
+            this.textBoxSms.TabIndex = 39;
+            this.textBoxSms.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            // 
+            // buttonSV
+            // 
+            this.buttonSV.Location = new System.Drawing.Point(316, 76);
+            this.buttonSV.Name = "buttonSV";
+            this.buttonSV.Size = new System.Drawing.Size(56, 23);
+            this.buttonSV.TabIndex = 40;
+            this.buttonSV.Text = "Set Val";
+            this.buttonSV.UseVisualStyleBackColor = true;
+            this.buttonSV.Click += new System.EventHandler(this.buttonSV_Click);
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.Location = new System.Drawing.Point(230, 82);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(32, 13);
+            this.label14.TabIndex = 41;
+            this.label14.Text = "F ms.";
+            // 
+            // label15
+            // 
+            this.label15.AutoSize = true;
+            this.label15.Location = new System.Drawing.Point(94, 82);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(47, 13);
+            this.label15.TabIndex = 42;
+            this.label15.Text = "Cine ms.";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(472, 321);
+            this.ClientSize = new System.Drawing.Size(472, 372);
+            this.Controls.Add(this.label15);
+            this.Controls.Add(this.label14);
+            this.Controls.Add(this.buttonSV);
+            this.Controls.Add(this.textBoxSms);
+            this.Controls.Add(this.textBoxCms);
             this.Controls.Add(this.label13);
             this.Controls.Add(this.buttonRM);
             this.Controls.Add(this.buttonFM);
@@ -514,6 +570,11 @@
         private System.Windows.Forms.Button buttonFM;
         private System.Windows.Forms.Button buttonRM;
         private System.Windows.Forms.Label label13;
+        private System.Windows.Forms.TextBox textBoxCms;
+        private System.Windows.Forms.TextBox textBoxSms;
+        private System.Windows.Forms.Button buttonSV;
+        private System.Windows.Forms.Label label14;
+        private System.Windows.Forms.Label label15;
     }
 }
 

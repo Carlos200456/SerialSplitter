@@ -32,6 +32,7 @@ namespace SerialSplitter
         Boolean AutoON = true;
         Boolean SW_Ready = false;
         int kvs, mas, mss, Counter, PROK, RXOK;
+
         float mxs;
 
         string fileToCopy = "C:\\TechXA\\LogIFDUE.txt";
@@ -268,7 +269,47 @@ namespace SerialSplitter
                 default:
                     break;
             }
-        }   
+        }
+
+        private void AnalyzeDataABC(string data)
+        {
+            int value = Convert.ToInt32(data.Substring(2));
+            if (value < 50)
+            {
+                dataOUT3 = "K+1";
+            }
+            if (value > 200)
+            {
+                dataOUT3 = "K-1";
+            }
+            serialPort3.Write(dataOUT3);
+            DisplayData(6, dataOUT3);
+            serialPort1.WriteLine("ACK");
+            DisplayData(4, "ACK");
+        }
+
+        private void AnalyzeDataTime(string data)
+        {
+            int value = Convert.ToInt32(data.Substring(2));
+            if ((value > 2) && (value < 110))
+            {
+                dataOUT3 = "TC" + data.Substring(2);
+                serialPort3.WriteLine(dataOUT3);
+                DisplayData(6, dataOUT3);
+            }
+            Thread.Sleep(100);
+            if (value > 21)
+            {
+                dataOUT3 = "MA100";
+                serialPort3.WriteLine(dataOUT3);
+                DisplayData(6, dataOUT3);
+            } else {
+                dataOUT3 = "MA200";
+                serialPort3.WriteLine(dataOUT3);
+                DisplayData(6, dataOUT3);
+            }
+        }
+
 
         private void buttonNRST_Click(object sender, EventArgs e)
         {
@@ -296,6 +337,8 @@ namespace SerialSplitter
             textBoxMS.Text = "";
             textBoxKVF.Text = "";
             textBoxMAF.Text = "";
+            textBoxCms.Text = "";
+            textBoxSms.Text = "";
             Refresh();
         }
 
@@ -461,12 +504,24 @@ namespace SerialSplitter
                 }
                 if (buttonRM.Text == "Potter 2")
                 {
-                    dataOUT3 = "TE3"; 
+                    dataOUT3 = "TE3";
                 }
                 if (buttonRM.Text == "CINE") dataOUT3 = "TE0";       // TODO Service Mode in Generator
                 // if (buttonSPot1.Text == "Service") dataOUT = "TE0";
                 serialPort3.WriteLine(dataOUT3);
                 DisplayData(6, dataOUT3);
+            }
+        }
+
+        private void buttonSV_Click(object sender, EventArgs e)
+        {
+            if (serialPort3.IsOpen)
+            {
+                dataOUT3 = "MZ" + textBoxMAF.Text;
+                serialPort3.WriteLine(dataOUT3);
+                Thread.Sleep(300);
+                dataOUT3 = "TX" + textBoxSms.Text;
+                serialPort3.WriteLine(dataOUT3);
             }
         }
 
@@ -479,6 +534,20 @@ namespace SerialSplitter
         private void ShowData1(object sender, EventArgs e)
         {
             DisplayData(1, dataIN1);
+            if (dataIN1.Contains("Ax"))
+            {
+                AnalyzeDataABC(dataIN1);
+            }
+            else
+            {
+                if (dataIN1.Contains("IU"))
+                {
+                    AnalyzeDataTime(dataIN1);
+                }
+                dataOUT2 = dataIN1;
+                serialPort2.WriteLine(dataOUT2);
+                DisplayData(5, dataOUT2);
+            }
         }
 
         private void serialPort2_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
@@ -490,6 +559,8 @@ namespace SerialSplitter
         private void ShowData2(object sender, EventArgs e)
         {
             DisplayData(2, dataIN2);
+            serialPort1.WriteLine(dataIN2);
+            DisplayData(4, dataIN2);
         }
 
 
@@ -715,6 +786,18 @@ namespace SerialSplitter
                         textBoxMS.Text = dataIN3.Remove(0, 4);
                     }
                     mss = Int32.Parse(textBoxMS.Text);
+                    break;
+                case "mf: ":
+                    if (textBoxSms.Text != dataIN3.Remove(0, 4))
+                    {
+                        textBoxSms.Text = dataIN3.Remove(0, 4);
+                    }
+                    break;
+                case "mc: ":
+                    if (textBoxCms.Text != dataIN3.Remove(0, 4))
+                    {
+                        textBoxCms.Text = dataIN3.Remove(0, 4);
+                    }
                     break;
                 case "Kv+:":
                     textKVP = dataIN3.Remove(0, 4);
