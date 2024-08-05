@@ -1,8 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <root>
   <Configuration>
-    <SerialPort1>   name="COM1" baudrate="57600" stopbits="One" parity="None" databits="8" </SerialPort1>
-    <SerialPort2>   name="COM7" baudrate="57600" stopbits="One" parity="None" databits="8" </SerialPort2>
-    <SerialPort3>   name="COM8" baudrate="38400" stopbits="One" parity="None" databits="8" </SerialPort3>
+    <SerialPort1>   	name="COM6" baudrate="57600" stopbits="One" parity="None" databits="8" </SerialPort1>
+    <SerialPort2>   	name="COM7" baudrate="57600" stopbits="One" parity="None" databits="8" </SerialPort2>
+    <SerialPort3>   	name="COM1" baudrate="38400" stopbits="One" parity="None" databits="8" </SerialPort3>
+    <VascularHead>	Name="CABEZA"       Kv="075" mA="100" ms="100" </VascularHead>
+    <VascularAbdomen>   Name="ABDOMEN"      Kv="075" mA="200" ms="080" </VascularAbdomen>
+    <VascularExtremity> Name="EXTREMIDADES" Kv="055" mA="100" ms="050" </VascularExtremity>
+    <Cine>              Name="CINE"         Kv="070" mA="300" ms="010" </Cine>
+    <FLUOROMAP>         Name="FLUOROR"      Kv="070" mA="30" ms="15" </FLUOROMAP>
+    <FLUORO1>		Name="FLUORO1"      Kv="070" mA="40" ms="10" </FLUORO1>
+    <FLUORO2>		Name="FLUORO2"      Kv="070" mA="50" ms="12" </FLUORO2>
+    <FLUORO3>		Name="FLUORO3"      Kv="070" mA="30" ms="10" </FLUORO3>
+    <FLUORO4>		Name="FLUORO4"      Kv="070" mA="25" ms="15" </FLUORO4>
   </Configuration>
 </root>

@@ -75,6 +75,8 @@
             this.buttonSV = new System.Windows.Forms.Button();
             this.label14 = new System.Windows.Forms.Label();
             this.label15 = new System.Windows.Forms.Label();
+            this.textBoxUDP = new System.Windows.Forms.TextBox();
+            this.label16 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // serialPort1
@@ -472,11 +474,29 @@
             this.label15.TabIndex = 42;
             this.label15.Text = "Cine ms.";
             // 
+            // textBoxUDP
+            // 
+            this.textBoxUDP.Location = new System.Drawing.Point(147, 197);
+            this.textBoxUDP.Name = "textBoxUDP";
+            this.textBoxUDP.Size = new System.Drawing.Size(100, 20);
+            this.textBoxUDP.TabIndex = 43;
+            // 
+            // label16
+            // 
+            this.label16.AutoSize = true;
+            this.label16.Location = new System.Drawing.Point(117, 200);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(30, 13);
+            this.label16.TabIndex = 44;
+            this.label16.Text = "UDP";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(472, 372);
+            this.Controls.Add(this.label16);
+            this.Controls.Add(this.textBoxUDP);
             this.Controls.Add(this.label15);
             this.Controls.Add(this.label14);
             this.Controls.Add(this.buttonSV);
@@ -575,6 +595,8 @@
         private System.Windows.Forms.Button buttonSV;
         private System.Windows.Forms.Label label14;
         private System.Windows.Forms.Label label15;
+        private System.Windows.Forms.TextBox textBoxUDP;
+        private System.Windows.Forms.Label label16;
     }
 }
 

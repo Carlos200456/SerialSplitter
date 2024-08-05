@@ -79,5 +79,11 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\VISUB_Control\SimpleUDP\SimpleUDP.csproj">
+      <Project>{e7c84bfe-d841-434c-b773-5fcc5bdaae65}</Project>
+      <Name>SimpleUDP</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

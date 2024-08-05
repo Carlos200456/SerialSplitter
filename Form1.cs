@@ -15,13 +15,15 @@ using System.Threading;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.ToolBar;
 using System.Diagnostics;
+using UDP;
+
 
 namespace SerialSplitter
 {
     public partial class Form1 : Form
     {
         string SW_Version = "3.0\r";        // =======> Version de software para compatibilidad
-        string SerialNumber = "";
+        string VHKV, VHMA, VHMS, VAKV, VAMA, VAMS, VEKV, VEMA, VEMS, CIKV, CIMA, CIMS, FMMA, FMMS, F1MA, F1MS, F2MA, F2MS, F3MA, F3MS, F4MA, F4MS, SerialNumber = "";
         string dataIN1 = "", dataIN2 = "", dataIN3 = "", dataOUT1 = "", dataOUT2 = "", dataOUT3 = "", path, textKVP, textKVN, textmAReal, textRmA, LastER, textSFI, textSRE, textSCC, textSIC, textSUC, textUPW, textHU, textVCC, message;
         string Serial1PortName, Serial1BaudRate, Serial1DataBits, Serial1StopBits, Serial1Parity, Serial2PortName, Serial2BaudRate, Serial2DataBits, Serial2StopBits, Serial2Parity, Serial3PortName, Serial3BaudRate, Serial3DataBits, Serial3StopBits, Serial3Parity;
 
@@ -44,6 +46,12 @@ namespace SerialSplitter
         System.Windows.Forms.Timer t = null;
 
         Logger logger = new Logger("C:\\TechXA\\LogIFDUE.txt");    // Ruta del archivo de log
+
+        // Create an isntance of IPC with DRAXA
+        SimpleUDP u = new SimpleUDP(45000);
+        // ...
+        // string s = u.Read();
+        // u.Write("Welcome App1");
 
         public Form1()
         {
@@ -95,7 +103,68 @@ namespace SerialSplitter
                     Serial3StopBits = getBetween(s1, "stopbits=", 3);
                     Serial3Parity = getBetween(s1, "parity=", 4);
                 }
-                
+                if (configReader.NodeType == XmlNodeType.Element && configReader.Name == "VascularHead")
+                {
+                    string s1 = configReader.ReadElementContentAsString();
+                    VHKV = getBetween(s1, "Kv=", 3);
+                    VHMA = getBetween(s1, "mA=", 3);
+                    VHMS = getBetween(s1, "ms=", 3);
+                }
+                if (configReader.NodeType == XmlNodeType.Element && configReader.Name == "VascularAbdomen")
+                {
+                    string s1 = configReader.ReadElementContentAsString();
+                    VAKV = getBetween(s1, "Kv=", 3);
+                    VAMA = getBetween(s1, "mA=", 3);
+                    VAMS = getBetween(s1, "ms=", 3);
+                }
+                if (configReader.NodeType == XmlNodeType.Element && configReader.Name == "VascularExtremity")
+                {
+                    string s1 = configReader.ReadElementContentAsString();
+                    VEKV = getBetween(s1, "Kv=", 3);
+                    VEMA = getBetween(s1, "mA=", 3);
+                    VEMS = getBetween(s1, "ms=", 3);
+                }
+                if (configReader.NodeType == XmlNodeType.Element && configReader.Name == "Cine")
+                {
+                    string s1 = configReader.ReadElementContentAsString();
+                    CIKV = getBetween(s1, "Kv=", 3);
+                    CIMA = getBetween(s1, "mA=", 3);
+                    CIMS = getBetween(s1, "ms=", 3);
+                }
+                if (configReader.NodeType == XmlNodeType.Element && configReader.Name == "FLUOROMAP")
+                {
+                    string s1 = configReader.ReadElementContentAsString();
+                    FMMA = getBetween(s1, "mA=", 2);
+                    FMMS = getBetween(s1, "ms=", 2);
+                }
+
+                if (configReader.NodeType == XmlNodeType.Element && configReader.Name == "FLUORO1")
+                {
+                    string s1 = configReader.ReadElementContentAsString();
+                    F1MA = getBetween(s1, "mA=", 2);
+                    F1MS = getBetween(s1, "ms=", 2);
+                }
+
+                if (configReader.NodeType == XmlNodeType.Element && configReader.Name == "FLUORO2")
+                {
+                    string s1 = configReader.ReadElementContentAsString();
+                    F2MA = getBetween(s1, "mA=", 2);
+                    F2MS = getBetween(s1, "ms=", 2);
+                }
+
+                if (configReader.NodeType == XmlNodeType.Element && configReader.Name == "FLUORO3")
+                {
+                    string s1 = configReader.ReadElementContentAsString();
+                    F3MA = getBetween(s1, "mA=", 2);
+                    F3MS = getBetween(s1, "ms=", 2);
+                }
+
+                if (configReader.NodeType == XmlNodeType.Element && configReader.Name == "FLUORO4")
+                {
+                    string s1 = configReader.ReadElementContentAsString();
+                    F4MA = getBetween(s1, "mA=", 2);
+                    F4MS = getBetween(s1, "ms=", 2);
+                }
             }
             CheckPortsNames();
             this.TopMost = true;
@@ -225,6 +294,7 @@ namespace SerialSplitter
                     LastER = "Hand Shake Error";
                 }
             }
+            ReadUPD_Data(e);
         }
 
         Boolean WaitForACK()
@@ -287,29 +357,6 @@ namespace SerialSplitter
             serialPort1.WriteLine("ACK");
             DisplayData(4, "ACK");
         }
-
-        private void AnalyzeDataTime(string data)
-        {
-            int value = Convert.ToInt32(data.Substring(2));
-            if ((value > 2) && (value < 110))
-            {
-                dataOUT3 = "TC" + data.Substring(2);
-                serialPort3.WriteLine(dataOUT3);
-                DisplayData(6, dataOUT3);
-            }
-            Thread.Sleep(100);
-            if (value > 21)
-            {
-                dataOUT3 = "MA100";
-                serialPort3.WriteLine(dataOUT3);
-                DisplayData(6, dataOUT3);
-            } else {
-                dataOUT3 = "MA200";
-                serialPort3.WriteLine(dataOUT3);
-                DisplayData(6, dataOUT3);
-            }
-        }
-
 
         private void buttonNRST_Click(object sender, EventArgs e)
         {
@@ -525,6 +572,118 @@ namespace SerialSplitter
             }
         }
 
+        void ReadUPD_Data(EventArgs e)
+        {
+            string s = u.Read();
+            if (s != "")  //  Para Pruebas  eliminar ==>  && GeneratorReady)
+            {
+                textBoxUDP.Text = s;
+                if (textBoxUDP.Text == "Head")
+                {
+                    // Head Set
+                    dataOUT3 = "KV" + VHKV;
+                    serialPort3.WriteLine(dataOUT3);
+                    Thread.Sleep(300);
+                    dataOUT3 = "MA" + VHMA;
+                    serialPort3.WriteLine(dataOUT3);
+                    Thread.Sleep(300);
+                    dataOUT3 = "TC" + VHMS;
+                    serialPort3.WriteLine(dataOUT3);
+                }
+                if (textBoxUDP.Text == "Abdomen")
+                {
+                    // Abdomen Set
+                    dataOUT3 = "KV" + VAKV;
+                    serialPort3.WriteLine(dataOUT3);
+                    Thread.Sleep(300);
+                    dataOUT3 = "MA" + VAMA;
+                    serialPort3.WriteLine(dataOUT3);
+                    Thread.Sleep(300);
+                    dataOUT3 = "TC" + VAMS;
+                    serialPort3.WriteLine(dataOUT3);
+                }
+                if (textBoxUDP.Text == "Extremity")
+                {
+                    // Extremity Set
+                    dataOUT3 = "KV" + VEKV;
+                    serialPort3.WriteLine(dataOUT3);
+                    Thread.Sleep(300);
+                    dataOUT3 = "MA" + VEMA;
+                    serialPort3.WriteLine(dataOUT3);
+                    Thread.Sleep(300);
+                    dataOUT3 = "TC" + VEMS;
+                    serialPort3.WriteLine(dataOUT3);
+                }
+                if (textBoxUDP.Text == "Cine")
+                {
+                    // Cine Set
+                    dataOUT3 = "KV" + CIKV;
+                    serialPort3.WriteLine(dataOUT3);
+                    Thread.Sleep(300);
+                    dataOUT3 = "MA" + CIMA;
+                    serialPort3.WriteLine(dataOUT3);
+                    Thread.Sleep(300);
+                    dataOUT3 = "TC" + CIMS;
+                    serialPort3.WriteLine(dataOUT3);
+                }
+                if (textBoxUDP.Text == "FluoroOff")
+                {
+                    // Fluoro Off
+                }
+                if (textBoxUDP.Text == "CineOff") 
+                {
+                    // Cine Off
+                }
+                if (textBoxUDP.Text == "FLUOROMAP")
+                {
+                    // Road Map
+                    dataOUT3 = "MZ" + FMMA;
+                    serialPort3.WriteLine(dataOUT3);
+                    Thread.Sleep(300);
+                    dataOUT3 = "TX" + FMMS;
+                    serialPort3.WriteLine(dataOUT3);
+                }
+                if (textBoxUDP.Text == "FLUORO1")
+                {
+                    // "F1 Set";
+                    dataOUT3 = "MZ" + F1MA;
+                    serialPort3.WriteLine(dataOUT3);
+                    Thread.Sleep(300);
+                    dataOUT3 = "TX" + F1MS;
+                    serialPort3.WriteLine(dataOUT3);
+                }
+                if (textBoxUDP.Text == "FLUORO2")
+                {
+                    // "F2 Set";
+                    dataOUT3 = "MZ" + F2MA;
+                    serialPort3.WriteLine(dataOUT3);
+                    Thread.Sleep(300);
+                    dataOUT3 = "TX" + F2MS;
+                    serialPort3.WriteLine(dataOUT3);
+                }
+                if (textBoxUDP.Text == "FLUORO3")
+                {
+                    // "F3 Set";
+                    dataOUT3 = "MZ" + F3MA;
+                    serialPort3.WriteLine(dataOUT3);
+                    Thread.Sleep(300);
+                    dataOUT3 = "TX" + F3MS;
+                    serialPort3.WriteLine(dataOUT3);
+                }
+                if (textBoxUDP.Text == "FLUORO4")
+                {
+                    // "F4 Set";
+                    dataOUT3 = "MZ" + F4MA;
+                    serialPort3.WriteLine(dataOUT3);
+                    Thread.Sleep(300);
+                    dataOUT3 = "TX" + F4MS;
+                    serialPort3.WriteLine(dataOUT3);
+                }
+            }
+        }
+
+
+
         private void serialPort1_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
         {
             dataIN1 = serialPort1.ReadLine();
@@ -540,10 +699,6 @@ namespace SerialSplitter
             }
             else
             {
-                if (dataIN1.Contains("IU"))
-                {
-                    AnalyzeDataTime(dataIN1);
-                }
                 dataOUT2 = dataIN1;
                 serialPort2.WriteLine(dataOUT2);
                 DisplayData(5, dataOUT2);
