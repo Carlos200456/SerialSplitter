@@ -419,6 +419,7 @@
             this.buttonRM.TabIndex = 36;
             this.buttonRM.Text = "RAD Mode";
             this.buttonRM.UseVisualStyleBackColor = true;
+            this.buttonRM.Click += new System.EventHandler(this.buttonRM_Click);
             // 
             // label13
             // 

@@ -22,7 +22,7 @@ namespace SerialSplitter
 {
     public partial class Form1 : Form
     {
-        string SW_Version = "3.0\r";        // =======> Version de software para compatibilidad
+        string SW_Version = "3.3\r";        // =======> Version de software para compatibilidad
         string VHKV, VHMA, VHMS, VAKV, VAMA, VAMS, VEKV, VEMA, VEMS, CIKV, CIMA, CIMS, FMMA, FMMS, F1MA, F1MS, F2MA, F2MS, F3MA, F3MS, F4MA, F4MS, SerialNumber = "";
         string dataIN1 = "", dataIN2 = "", dataIN3 = "", dataOUT1 = "", dataOUT2 = "", dataOUT3 = "", path, textKVP, textKVN, textmAReal, textRmA, LastER, textSFI, textSRE, textSCC, textSIC, textSUC, textUPW, textHU, textVCC, message;
         string Serial1PortName, Serial1BaudRate, Serial1DataBits, Serial1StopBits, Serial1Parity, Serial2PortName, Serial2BaudRate, Serial2DataBits, Serial2StopBits, Serial2Parity, Serial3PortName, Serial3BaudRate, Serial3DataBits, Serial3StopBits, Serial3Parity;
@@ -33,6 +33,8 @@ namespace SerialSplitter
         Boolean NACK = false;
         Boolean AutoON = true;
         Boolean SW_Ready = false;
+        Boolean DEBUG = false;
+        public static float VCC = 0.0f;
         int kvs, mas, mss, Counter, PROK, RXOK;
 
         float mxs;
@@ -165,6 +167,12 @@ namespace SerialSplitter
                     F4MA = getBetween(s1, "mA=", 2);
                     F4MS = getBetween(s1, "ms=", 2);
                 }
+
+                if (configReader.NodeType == XmlNodeType.Element && configReader.Name == "Power")
+                {
+                    string s1 = configReader.ReadElementContentAsString();
+                    VCC = Convert.ToSingle(getBetween(s1, "VCC=", 5));
+                }
             }
             CheckPortsNames();
             this.TopMost = true;
@@ -180,20 +188,18 @@ namespace SerialSplitter
                     OpenSerial1();
                     radioButton1.Checked = true;
                     radioButton1.BackColor = Color.Green;
-                    radioButton1.ForeColor = Color.Green;
-                }
+               }
                 if (Serial2PortName == ports[i])
                 {
                     OpenSerial2();
                     radioButton2.Checked = true;
                     radioButton2.BackColor = Color.Green;
-                    radioButton2.ForeColor = Color.Green;
                 }
                 if (Serial3PortName == ports[i])
                 {
                     OpenSerial3();
                     radioButton3.Checked = true;
-                    radioButton3.BackColor = Color.Red;
+                    radioButton3.BackColor = Color.Green;
                 }
             }
         }
@@ -277,7 +283,7 @@ namespace SerialSplitter
             }
             dataOUT3 = "HS";
             serialPort3.WriteLine(dataOUT3);
-            DisplayData(6, dataOUT3);
+            if (DEBUG) DisplayData(6, dataOUT3);
             if (WaitForACK())
             {
                 buttonPW.BackColor = Color.LightGreen;
@@ -353,9 +359,9 @@ namespace SerialSplitter
                 dataOUT3 = "K-1";
             }
             serialPort3.Write(dataOUT3);
-            DisplayData(6, dataOUT3);
+            if (DEBUG) DisplayData(6, dataOUT3);
             serialPort1.WriteLine("ACK");
-            DisplayData(4, "ACK");
+            if (DEBUG) DisplayData(4, "ACK");
         }
 
         private void buttonNRST_Click(object sender, EventArgs e)
@@ -375,6 +381,7 @@ namespace SerialSplitter
             Thread.Sleep(100);
             serialPort3.DtrEnable = false;
             buttonPW.BackColor = Color.LightGray;
+            button1.BackColor = Color.LightGray;
             button2.BackColor = Color.LightGray;
             button3.BackColor = Color.LightGray;
             buttonPW.BackColor = Color.LightGray;
@@ -432,7 +439,7 @@ namespace SerialSplitter
                     {
                         dataOUT3 = "PW1";
                         serialPort3.WriteLine(dataOUT3);
-                        DisplayData(6, dataOUT3);
+                        if (DEBUG) DisplayData(6, dataOUT3);
                         // Omitir la siguiente linea en Debug
 #if !DEBUG
                         this.Size = new Size(488,120);
@@ -453,7 +460,7 @@ namespace SerialSplitter
                 {
                     dataOUT3 = "PW0";
                     serialPort3.WriteLine(dataOUT3);
-                    DisplayData(6, dataOUT3);
+                    if (DEBUG) DisplayData(6, dataOUT3);
                     logger.LogInfo("Turn Off by Operator");
                     AutoON = false;
                 }
@@ -532,7 +539,7 @@ namespace SerialSplitter
                 }
                 if (buttonFM.Text == "Fluoro P") dataOUT3 = "TF0";
                 serialPort3.WriteLine(dataOUT3);
-                DisplayData(6, dataOUT3);
+                if (DEBUG) DisplayData(6, dataOUT3);
             }
 
         }
@@ -541,22 +548,22 @@ namespace SerialSplitter
         {
             if (serialPort3.IsOpen)
             {
-                if (buttonRM.Text == "No Potter")
+                if (buttonRM.Text == "RAD0")
                 {
                     dataOUT3 = "TE1";
                 }
-                if (buttonRM.Text == "Potter 1")
+                if (buttonRM.Text == "RAD1")
                 {
                     dataOUT3 = "TE2";
                 }
-                if (buttonRM.Text == "Potter 2")
+                if (buttonRM.Text == "RAD2")
                 {
                     dataOUT3 = "TE3";
                 }
                 if (buttonRM.Text == "CINE") dataOUT3 = "TE0";       // TODO Service Mode in Generator
                 // if (buttonSPot1.Text == "Service") dataOUT = "TE0";
                 serialPort3.WriteLine(dataOUT3);
-                DisplayData(6, dataOUT3);
+                if (DEBUG) DisplayData(6, dataOUT3);
             }
         }
 
@@ -692,7 +699,7 @@ namespace SerialSplitter
 
         private void ShowData1(object sender, EventArgs e)
         {
-            DisplayData(1, dataIN1);
+            if (DEBUG) DisplayData(1, dataIN1);
             if (dataIN1.Contains("Ax"))
             {
                 AnalyzeDataABC(dataIN1);
@@ -701,7 +708,7 @@ namespace SerialSplitter
             {
                 dataOUT2 = dataIN1;
                 serialPort2.WriteLine(dataOUT2);
-                DisplayData(5, dataOUT2);
+                if (DEBUG) DisplayData(5, dataOUT2);
             }
         }
 
@@ -713,9 +720,9 @@ namespace SerialSplitter
 
         private void ShowData2(object sender, EventArgs e)
         {
-            DisplayData(2, dataIN2);
+            if (DEBUG) DisplayData(2, dataIN2);
             serialPort1.WriteLine(dataIN2);
-            DisplayData(4, dataIN2);
+            if (DEBUG) DisplayData(4, dataIN2);
         }
 
 
@@ -746,7 +753,7 @@ namespace SerialSplitter
         private void ShowData3(object sender, EventArgs e)
         {
             DoubleBuffered = true;
-            DisplayData(3, dataIN3);
+            if (DEBUG) DisplayData(3, dataIN3);
             string msg;
             if (dataIN3.Length > 4) msg = dataIN3.Remove(0, 4); else msg = "";
             // ACK = false;
@@ -1005,7 +1012,7 @@ namespace SerialSplitter
                     {
                         dataOUT3 = "DB0";
                         serialPort3.WriteLine(dataOUT3);   // Send data to Generator to turn off Calibration
-                        DisplayData(6, dataOUT3);
+                        if (DEBUG) DisplayData(6, dataOUT3);
                     }
                     break;
                 case "VCC:":
@@ -1015,13 +1022,13 @@ namespace SerialSplitter
                         try
                         {
                             float Test = float.Parse(textVCC);
-                            if (Test < 15.0 || Test > 15.6) radioButton3.BackColor = Color.Red;
+                            if (Test < (VCC - 0.3) || Test > (VCC + 0.3)) radioButton3.BackColor = Color.Red;
                             else
                             {
-                                if (Test < 15.2 || Test > 15.4) radioButton3.BackColor = Color.Yellow;
+                                if (Test < (VCC - 0.1) || Test > (VCC + 0.1)) radioButton3.BackColor = Color.Yellow;
                                 else
                                 {
-                                    if (Test > 15.19 || Test < 15.39) radioButton3.BackColor = Color.LightGreen;
+                                    if (Test > (VCC - 0.11) || Test < (VCC + 0.09)) radioButton3.BackColor = Color.LightGreen;
                                 }
                             }
                         }
@@ -1060,17 +1067,17 @@ namespace SerialSplitter
                     if (msg == "0\r")
                     {
                         buttonRM.BackColor = Color.LightYellow;
-                        buttonRM.Text = "RAD";
+                        buttonRM.Text = "RAD0";
                     }
                     if (msg == "1\r")
                     {
                         buttonRM.BackColor = Color.LightGreen;
-                        buttonRM.Text = "RAD 1";
+                        buttonRM.Text = "RAD1";
                     }
                     if (msg == "2\r")
                     {
                         buttonRM.BackColor = Color.LightGreen;
-                        buttonRM.Text = "RAD 2";
+                        buttonRM.Text = "RAD2";
                     }
                     if (msg == "3\r")
                     {
