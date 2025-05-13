@@ -35,7 +35,7 @@ namespace SerialSplitter
         Boolean SW_Ready = false;
         Boolean DEBUG = false;
         public static float VCC = 0.0f;
-        int kvs, mas, mss, Counter, PROK, RXOK;
+        int Counter, LOW_Limit, HI_Limit;
 
         float mxs;
 
@@ -64,8 +64,6 @@ namespace SerialSplitter
             XmlTextReader configReader = new XmlTextReader("C:\\TechXA\\Config_DUE_IF.xml");
 
             LastER = "";
-            PROK = 0;
-            RXOK = 0;
 
             try
             {
@@ -172,6 +170,8 @@ namespace SerialSplitter
                 {
                     string s1 = configReader.ReadElementContentAsString();
                     VCC = Convert.ToSingle(getBetween(s1, "VCC=", 5));
+                    LOW_Limit = Convert.ToInt32(getBetween(s1, "LOW_Limit=", 3));
+                    HI_Limit = Convert.ToInt32(getBetween(s1, "HI_Limit=", 3));
                 }
             }
             CheckPortsNames();
@@ -350,15 +350,16 @@ namespace SerialSplitter
         private void AnalyzeDataABC(string data)
         {
             int value = Convert.ToInt32(data.Substring(2));
-            if (value < 50)
+            if (value < LOW_Limit)
             {
                 dataOUT3 = "K+1";
+                serialPort3.Write(dataOUT3);
             }
-            if (value > 200)
+            if (value > HI_Limit)
             {
                 dataOUT3 = "K-1";
+                serialPort3.Write(dataOUT3);
             }
-            serialPort3.Write(dataOUT3);
             if (DEBUG) DisplayData(6, dataOUT3);
             serialPort1.WriteLine("ACK");
             if (DEBUG) DisplayData(4, "ACK");
@@ -443,7 +444,7 @@ namespace SerialSplitter
                         // Omitir la siguiente linea en Debug
 #if !DEBUG
                         this.Size = new Size(488,120);
-                        this.Left = 680;
+                        this.Left = 100;  // 680;   // Centrado
                         this.Top = 968;
                         this.ControlBox = false;
                         this.Text = "";
@@ -927,14 +928,14 @@ namespace SerialSplitter
                     {
                         textBoxKV.Text = dataIN3.Remove(0, 4);
                     }
-                    kvs = Int32.Parse(textBoxKV.Text);
+                    // kvs = Int32.Parse(textBoxKV.Text);
                     break;
                 case "mA: ":
                     if (textBoxMA.Text != dataIN3.Remove(0, 4))
                     {
                         textBoxMA.Text = dataIN3.Remove(0, 4);
                     }
-                    mas = Int32.Parse(textBoxMA.Text);
+                    // mas = Int32.Parse(textBoxMA.Text);
                     break;
                 case "SKv:":
                     textBoxKVF.Text = dataIN3.Remove(0, 4);
@@ -947,7 +948,7 @@ namespace SerialSplitter
                     {
                         textBoxMS.Text = dataIN3.Remove(0, 4);
                     }
-                    mss = Int32.Parse(textBoxMS.Text);
+                    // mss = Int32.Parse(textBoxMS.Text);
                     break;
                 case "mf: ":
                     if (textBoxSms.Text != dataIN3.Remove(0, 4))
@@ -1017,7 +1018,7 @@ namespace SerialSplitter
                     break;
                 case "VCC:":
                     textVCC = dataIN3.Remove(0, 4);
-                    if (textVCC != "")
+                 /* if (textVCC != "")
                     {
                         try
                         {
@@ -1036,7 +1037,7 @@ namespace SerialSplitter
                         {
                             //   MessageBox.Show(err.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         }
-                    }
+                    } */
                     break;
                 case "HU: ":
                     textHU = dataIN3.Remove(0, 4);
@@ -1093,7 +1094,7 @@ namespace SerialSplitter
                 case "CL: ":
                     break;
                 case "POK:":
-                    if (msg == "0\r")
+                 /* if (msg == "0\r")
                     {
                         PROK = 0;
                     }
@@ -1104,10 +1105,10 @@ namespace SerialSplitter
                     if (msg == "2\r")
                     {
                         PROK = 2;
-                    }
+                    } */
                     break;
                 case "XOK:":
-                    if (msg == "0\r")
+                 /* if (msg == "0\r")
                     {
                         // buttonPrep
                         RXOK = 0;
@@ -1115,7 +1116,7 @@ namespace SerialSplitter
                     if (msg == "1\r")
                     {
                         RXOK = 1;
-                    }
+                    } */
                     break;
                 case "EEP:":
                     // ConfigSize = Convert.ToInt32(dataIN.Remove(0, 4));
