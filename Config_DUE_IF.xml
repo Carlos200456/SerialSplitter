@@ -13,6 +13,6 @@
     <FLUORO2>           Name="FLUORO2"      Kv="070" mA="50"  ms="12" </FLUORO2>
     <FLUORO3>           Name="FLUORO3"      Kv="070" mA="30"  ms="10" </FLUORO3>
     <FLUORO4>           Name="FLUORO4"      Kv="070" mA="25"  ms="15" </FLUORO4>
-    <Power>             VCC="12.50"         LOW_Limit="050"   HI_Limit="070"</Power>
+    <Power>             VCC="12.50"         LOW_Limit="015"   HI_Limit="025"   Cine_LOW_Limit="030"   Cine_HI_Limit="040" </Power>
   </Configuration>
 </root>

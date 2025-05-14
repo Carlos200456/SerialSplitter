@@ -23,7 +23,7 @@ namespace SerialSplitter
     public partial class Form1 : Form
     {
         string SW_Version = "3.3\r";        // =======> Version de software para compatibilidad
-        string VHKV, VHMA, VHMS, VAKV, VAMA, VAMS, VEKV, VEMA, VEMS, CIKV, CIMA, CIMS, FMMA, FMMS, F1MA, F1MS, F2MA, F2MS, F3MA, F3MS, F4MA, F4MS, SerialNumber = "";
+        string VHKV, VHMA, VHMS, VAKV, VAMA, VAMS, VEKV, VEMA, VEMS, CIKV, CIMA, CIMS, FMKV, FMMA, FMMS, F1KV, F1MA, F1MS, F2KV, F2MA, F2MS, F3KV, F3MA, F3MS, F4KV, F4MA, F4MS, SerialNumber = "";
         string dataIN1 = "", dataIN2 = "", dataIN3 = "", dataOUT1 = "", dataOUT2 = "", dataOUT3 = "", path, textKVP, textKVN, textmAReal, textRmA, LastER, textSFI, textSRE, textSCC, textSIC, textSUC, textUPW, textHU, textVCC, message;
         string Serial1PortName, Serial1BaudRate, Serial1DataBits, Serial1StopBits, Serial1Parity, Serial2PortName, Serial2BaudRate, Serial2DataBits, Serial2StopBits, Serial2Parity, Serial3PortName, Serial3BaudRate, Serial3DataBits, Serial3StopBits, Serial3Parity;
 
@@ -34,8 +34,10 @@ namespace SerialSplitter
         Boolean AutoON = true;
         Boolean SW_Ready = false;
         Boolean DEBUG = false;
+        Boolean DisplayInibit = false;
+        Boolean Cine = false;
         public static float VCC = 0.0f;
-        int Counter, LOW_Limit, HI_Limit;
+        int Counter, LOW_Limit, HI_Limit, Cine_LOW_Limit, Cine_HI_Limit;
 
         float mxs;
 
@@ -134,6 +136,7 @@ namespace SerialSplitter
                 if (configReader.NodeType == XmlNodeType.Element && configReader.Name == "FLUOROMAP")
                 {
                     string s1 = configReader.ReadElementContentAsString();
+                    FMKV = getBetween(s1, "Kv=", 3);
                     FMMA = getBetween(s1, "mA=", 2);
                     FMMS = getBetween(s1, "ms=", 2);
                 }
@@ -141,6 +144,7 @@ namespace SerialSplitter
                 if (configReader.NodeType == XmlNodeType.Element && configReader.Name == "FLUORO1")
                 {
                     string s1 = configReader.ReadElementContentAsString();
+                    F1KV = getBetween(s1, "Kv=", 3);
                     F1MA = getBetween(s1, "mA=", 2);
                     F1MS = getBetween(s1, "ms=", 2);
                 }
@@ -148,6 +152,7 @@ namespace SerialSplitter
                 if (configReader.NodeType == XmlNodeType.Element && configReader.Name == "FLUORO2")
                 {
                     string s1 = configReader.ReadElementContentAsString();
+                    F2KV = getBetween(s1, "Kv=", 3);
                     F2MA = getBetween(s1, "mA=", 2);
                     F2MS = getBetween(s1, "ms=", 2);
                 }
@@ -155,6 +160,7 @@ namespace SerialSplitter
                 if (configReader.NodeType == XmlNodeType.Element && configReader.Name == "FLUORO3")
                 {
                     string s1 = configReader.ReadElementContentAsString();
+                    F3KV = getBetween(s1, "Kv=", 3);
                     F3MA = getBetween(s1, "mA=", 2);
                     F3MS = getBetween(s1, "ms=", 2);
                 }
@@ -162,6 +168,7 @@ namespace SerialSplitter
                 if (configReader.NodeType == XmlNodeType.Element && configReader.Name == "FLUORO4")
                 {
                     string s1 = configReader.ReadElementContentAsString();
+                    F4KV = getBetween(s1, "Kv=", 3);
                     F4MA = getBetween(s1, "mA=", 2);
                     F4MS = getBetween(s1, "ms=", 2);
                 }
@@ -172,6 +179,8 @@ namespace SerialSplitter
                     VCC = Convert.ToSingle(getBetween(s1, "VCC=", 5));
                     LOW_Limit = Convert.ToInt32(getBetween(s1, "LOW_Limit=", 3));
                     HI_Limit = Convert.ToInt32(getBetween(s1, "HI_Limit=", 3));
+                    Cine_LOW_Limit = Convert.ToInt32(getBetween(s1, "Cine_LOW_Limit=", 3));
+                    Cine_HI_Limit = Convert.ToInt32(getBetween(s1, "Cine_HI_Limit=", 3));
                 }
             }
             CheckPortsNames();
@@ -269,7 +278,7 @@ namespace SerialSplitter
         private void StartTimer()
         {
             t = new System.Windows.Forms.Timer();
-            t.Interval = 2000;
+            t.Interval = 3000;
             t.Tick += new EventHandler(t_Tick);
             t.Enabled = true;
         }
@@ -280,6 +289,10 @@ namespace SerialSplitter
             if (Counter == 10)
             {
                 buttonGRST_Click(sender, e);
+            }
+            if (Counter > 1)
+            {
+                DisplayInibit = false;
             }
             dataOUT3 = "HS";
             serialPort3.WriteLine(dataOUT3);
@@ -350,15 +363,69 @@ namespace SerialSplitter
         private void AnalyzeDataABC(string data)
         {
             int value = Convert.ToInt32(data.Substring(2));
-            if (value < LOW_Limit)
+            if (!Cine)
             {
-                dataOUT3 = "K+1";
-                serialPort3.Write(dataOUT3);
-            }
-            if (value > HI_Limit)
+                if (value < (LOW_Limit - 10))
+                {
+                    dataOUT3 = "K+5";
+                    serialPort3.Write(dataOUT3);
+                    DisplayInibit = true;
+                } else
+                {
+                    if (value < LOW_Limit)
+                    {
+                        dataOUT3 = "K+1";
+                        serialPort3.Write(dataOUT3);
+                        DisplayInibit = true;
+                    }
+                }
+                if (value > (HI_Limit + 10))
+                {
+                    dataOUT3 = "K-5";
+                    serialPort3.Write(dataOUT3);
+                    DisplayInibit = true;
+                } else
+                {
+                    if (value > HI_Limit)
+                    {
+                        dataOUT3 = "K-1";
+                        serialPort3.Write(dataOUT3);
+                        DisplayInibit = true;
+                    }
+                }
+            } else
             {
-                dataOUT3 = "K-1";
-                serialPort3.Write(dataOUT3);
+                if (value < (Cine_LOW_Limit - 10))
+                {
+                    dataOUT3 = "K+5";
+                    serialPort3.Write(dataOUT3);
+                    DisplayInibit = true;
+                }
+                else
+                {
+                    if (value < Cine_LOW_Limit)
+                    {
+                        dataOUT3 = "K+1";
+                        serialPort3.Write(dataOUT3);
+                        DisplayInibit = true;
+                    }
+                }
+                if (value > (Cine_HI_Limit + 10))
+                {
+                    dataOUT3 = "K-5";
+                    serialPort3.Write(dataOUT3);
+                    DisplayInibit = true;
+                }
+                else
+                {
+                    if (value > Cine_HI_Limit)
+                    {
+                        dataOUT3 = "K-1";
+                        serialPort3.Write(dataOUT3);
+                        DisplayInibit = true;
+                    }
+                }
+
             }
             if (DEBUG) DisplayData(6, dataOUT3);
             serialPort1.WriteLine("ACK");
@@ -445,7 +512,7 @@ namespace SerialSplitter
 #if !DEBUG
                         this.Size = new Size(488,120);
                         this.Left = 100;  // 680;   // Centrado
-                        this.Top = 968;
+                        this.Top = 948;
                         this.ControlBox = false;
                         this.Text = "";
 #endif                        
@@ -645,6 +712,9 @@ namespace SerialSplitter
                 if (textBoxUDP.Text == "FLUOROMAP")
                 {
                     // Road Map
+                    dataOUT3 = "KZ" + FMKV;
+                    serialPort3.WriteLine(dataOUT3);
+                    Thread.Sleep(300);
                     dataOUT3 = "MZ" + FMMA;
                     serialPort3.WriteLine(dataOUT3);
                     Thread.Sleep(300);
@@ -654,6 +724,9 @@ namespace SerialSplitter
                 if (textBoxUDP.Text == "FLUORO1")
                 {
                     // "F1 Set";
+                    dataOUT3 = "KZ" + F1KV;
+                    serialPort3.WriteLine(dataOUT3);
+                    Thread.Sleep(300);
                     dataOUT3 = "MZ" + F1MA;
                     serialPort3.WriteLine(dataOUT3);
                     Thread.Sleep(300);
@@ -663,6 +736,9 @@ namespace SerialSplitter
                 if (textBoxUDP.Text == "FLUORO2")
                 {
                     // "F2 Set";
+                    dataOUT3 = "KZ" + F2KV;
+                    serialPort3.WriteLine(dataOUT3);
+                    Thread.Sleep(300);
                     dataOUT3 = "MZ" + F2MA;
                     serialPort3.WriteLine(dataOUT3);
                     Thread.Sleep(300);
@@ -672,6 +748,9 @@ namespace SerialSplitter
                 if (textBoxUDP.Text == "FLUORO3")
                 {
                     // "F3 Set";
+                    dataOUT3 = "KZ" + F3KV;
+                    serialPort3.WriteLine(dataOUT3);
+                    Thread.Sleep(300);
                     dataOUT3 = "MZ" + F3MA;
                     serialPort3.WriteLine(dataOUT3);
                     Thread.Sleep(300);
@@ -681,6 +760,9 @@ namespace SerialSplitter
                 if (textBoxUDP.Text == "FLUORO4")
                 {
                     // "F4 Set";
+                    dataOUT3 = "KZ" + F4KV;
+                    serialPort3.WriteLine(dataOUT3);
+                    Thread.Sleep(300);
                     dataOUT3 = "MZ" + F4MA;
                     serialPort3.WriteLine(dataOUT3);
                     Thread.Sleep(300);
@@ -703,6 +785,7 @@ namespace SerialSplitter
             if (DEBUG) DisplayData(1, dataIN1);
             if (dataIN1.Contains("Ax"))
             {
+                DisplayData(1, dataIN1);
                 AnalyzeDataABC(dataIN1);
             }
             else
@@ -743,7 +826,7 @@ namespace SerialSplitter
             Counter = 0;
             try
             {
-                this.Invoke(new EventHandler(ShowData3));
+                if (!DisplayInibit) this.Invoke(new EventHandler(ShowData3)); else this.Invoke(new EventHandler(ShowDataReduced));
             }
             catch (Exception err)
             {
@@ -908,6 +991,7 @@ namespace SerialSplitter
                     break;
                 case "ET: ":
                     textBoxET.Text = dataIN3.Remove(0, 4);
+                    if (textBoxET.Text == "CINE\r") Cine = true; else Cine = false;
                     break;
                 case "SN: ":
                     SerialNumber = dataIN3.Remove(0, 4);
@@ -1155,9 +1239,161 @@ namespace SerialSplitter
                 buttonPW.BackColor = Color.LightGreen;
             }
         }
+
+        private void ShowDataReduced(object sender, EventArgs e)
+        {
+            DoubleBuffered = true;
+            if (DEBUG) DisplayData(3, dataIN3);
+            string msg;
+            if (dataIN3.Length > 4) msg = dataIN3.Remove(0, 4); else msg = "";
+            // ACK = false;
+            // NACK = false;
+            switch (message)
+            {
+                case "ER: ":
+                    if (msg != "\r")
+                    {
+                        textBoxER.Text = "";
+                    }
+                    switch (msg)
+                    {
+                        case "LHB\r":
+                            textBoxER.Text = "Falla de Lampara Testigo Calefaccion";
+                            LoggearError();
+                            break;
+
+                        case "CAP\r":
+                            textBoxER.Text = "Falla de Estator (UCap)";
+                            LoggearError();
+                            break;
+
+                        case "COM\r":
+                            textBoxER.Text = "Falla de Estator (ICom)";
+                            LoggearError();
+                            break;
+
+                        case "IBE\r":
+                            button1.BackColor = Color.Red;
+                            textBoxER.Text = "Falla de Inversor";
+                            LoggearError();
+                            break;
+
+                        case "IBZ\r":
+                            button1.BackColor = Color.Red;  // Inverter error
+                            textBoxER.Text = "GAT Desconectado";
+                            LoggearError();
+                            break;
+
+                        case "FIL\r":
+                            button2.BackColor = Color.Red;
+                            textBoxER.Text = "Falla de Filamento";
+                            LoggearError();
+                            break;
+
+                        case "FCC\r":
+                            textBoxER.Text = "Filamento en Corto Circuito";
+                            button2.BackColor = Color.Red;
+                            LoggearError();
+                            break;
+
+                        case "TMP\r":
+                            button3.BackColor = Color.Red;        // Temperatura Tubo
+                            textBoxER.Text = "Temperatura de Tubo Exedida";
+                            LoggearError();
+                            break;
+
+                        case "EEE\r":
+                            textBoxER.Text = "Falla de Memoria EEPROM";
+                            LoggearError();
+                            break;
+
+                        case "SYM\r":
+                            textBoxER.Text = "Simulador Activado";
+                            break;
+
+                        case "UPW\r":
+                            button1.BackColor = Color.Red;
+                            textBoxER.Text = "Baja Tension en UPower";
+                            LoggearError();
+                            break;
+
+                        case "CPM\r":
+                            // Error Stator Boar Missing
+                            textBoxER.Text = "Falta Placa Estator";
+                            button3.BackColor = Color.Red;
+                            LoggearError();
+                            break;
+
+                        case "FPE1\r":
+                            // Fin Prep Board Missing o Relay Pegado
+                            textBoxER.Text = "Verificar Relay Preparacion";
+                            LoggearError();
+                            break;
+
+                        case "ESF0\r":
+                            textBoxER.Text = "Falla de Relay Foco Fino";
+                            LoggearError();
+                            break;
+
+                        case "ESF1\r":
+                            textBoxER.Text = "Falla de Relay Foco Grueso";
+                            LoggearError();
+                            break;
+
+
+                        default:
+                            if (msg != "\r") textBoxER.Text = msg;
+                            break;
+                    }
+                    // buttonCal.BackColor = Color.RosyBrown;
+                    break;
+                case "ET: ":
+                    textBoxET.Text = dataIN3.Remove(0, 4);
+                    break;
+                case "Kv: ":
+                    if (textBoxKV.Text != dataIN3.Remove(0, 4))
+                    {
+                        textBoxKV.Text = dataIN3.Remove(0, 4);
+                    }
+                    // kvs = Int32.Parse(textBoxKV.Text);
+                    break;
+                case "SKv:":
+                    textBoxKVF.Text = dataIN3.Remove(0, 4);
+                    break;
+                case "CL: ":
+                    break;
+
+                case "LOG:":
+                    // GUI_Sound(4);
+                    logger.LogInfo("VCC:" + textVCC.Substring(0, textVCC.Length - 1) +
+                                   " Kv:" + textBoxKV.Text.Substring(0, textBoxKV.Text.Length - 1) +
+                                   " mA:" + textBoxMA.Text.Substring(0, textBoxMA.Text.Length - 1) +
+                                   " ms:" + textBoxMS.Text.Substring(0, textBoxMS.Text.Length - 1) +
+                                   " Kv+:" + textKVP.Substring(0, textKVP.Length - 1) +
+                                   " Kv-:" + textKVN.Substring(0, textKVN.Length - 1) +
+                                   " mA:" + textmAReal + " %HU:" + textHU);
+
+                    // logger.LogWarning("Este es un mensaje de advertencia.");
+                    // logger.LogError("Este es un mensaje de error.");
+                    break;
+
+                default:
+                    break;
+            }
+
+            if ((textBoxET.Text == "OFF\r") || (textBoxET.Text == "ERROR\r") || (textBoxET.Text == "\r"))
+            {
+                buttonPW.BackColor = Color.LightSkyBlue;
+            }
+
+            if ((textBoxET.Text == "IDLE\r")) // || (textBox1.Text == "ERROR\r") || (textBox1.Text == "\r")
+            {
+                buttonPW.BackColor = Color.LightGreen;
+            }
+        }
     }
 
-    // Add a public class logger to the project
+// Add a public class logger to the project
     public class Logger
     {
         private string logFilePath;
@@ -1190,5 +1426,4 @@ namespace SerialSplitter
             File.AppendAllText(logFilePath, logEntry);
         }
     }
-
 }
