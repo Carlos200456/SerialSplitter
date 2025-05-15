@@ -24,20 +24,26 @@ namespace SerialSplitter
     {
         string SW_Version = "3.3\r";        // =======> Version de software para compatibilidad
         string VHKV, VHMA, VHMS, VAKV, VAMA, VAMS, VEKV, VEMA, VEMS, CIKV, CIMA, CIMS, FMKV, FMMA, FMMS, F1KV, F1MA, F1MS, F2KV, F2MA, F2MS, F3KV, F3MA, F3MS, F4KV, F4MA, F4MS, SerialNumber = "";
-        string dataIN1 = "", dataIN2 = "", dataIN3 = "", dataOUT1 = "", dataOUT2 = "", dataOUT3 = "", path, textKVP, textKVN, textmAReal, textRmA, LastER, textSFI, textSRE, textSCC, textSIC, textSUC, textUPW, textHU, textVCC, message;
+        string dataIN1 = "", dataIN2 = "", dataIN3 = "", dataOUT1 = "", dataOUT2 = "", dataOUT3 = "", path, textKVP, textKVN, textmAReal, textRmA, LastER, textSFI, textSRE, textSCC, textSIC, textSUC, textUPW, textHU, textVCC = "12.2", message;
         string Serial1PortName, Serial1BaudRate, Serial1DataBits, Serial1StopBits, Serial1Parity, Serial2PortName, Serial2BaudRate, Serial2DataBits, Serial2StopBits, Serial2Parity, Serial3PortName, Serial3BaudRate, Serial3DataBits, Serial3StopBits, Serial3Parity;
 
         readonly string[] mA_Table = new string[8] { "50\r", "100\r", "200\r", "300\r", "400\r", "500\r", "600\r", "700\r" };
         readonly string[] ms_Table = new string[30] { "2\r", "5\r", "8\r", "10\r", "20\r", "30\r", "40\r", "50\r", "60\r", "80\r", "100\r", "120\r", "150\r", "200\r", "250\r", "300\r", "400\r", "500\r", "600\r", "800\r", "1000\r", "1200\r", "1500\r", "2000\r", "2500\r", "3000\r", "3500\r", "4000\r", "4500\r", "5000\r" };
-        Boolean ACK = false;
-        Boolean NACK = false;
-        Boolean AutoON = true;
-        Boolean SW_Ready = false;
-        Boolean DEBUG = false;
-        Boolean DisplayInibit = false;
-        Boolean Cine = false;
+        bool ACK = false;
+        bool NACK = false;
+        bool AutoON = true;
+        bool SW_Ready = false;
+#if !DEBUG
+        bool DEBUG = false;
+#else
+        bool DEBUG = true;
+#endif
+        bool DisplayInibit = false;
+        bool Cine = false;
+        bool AEC_Lock = true;
+        bool RX_On = false;
         public static float VCC = 0.0f;
-        int Counter, LOW_Limit, HI_Limit, Cine_LOW_Limit, Cine_HI_Limit;
+        int Counter, LOW_Limit, HI_Limit, Cine_LOW_Limit, Cine_HI_Limit, pasos, AnalogData, ValorMedioCine, ValorMedioFluoro;
 
         float mxs;
 
@@ -48,6 +54,7 @@ namespace SerialSplitter
         char CR = (char)13;
 
         System.Windows.Forms.Timer t = null;
+        System.Windows.Forms.Timer f = null;
 
         Logger logger = new Logger("C:\\TechXA\\LogIFDUE.txt");    // Ruta del archivo de log
 
@@ -281,18 +288,24 @@ namespace SerialSplitter
             t.Interval = 3000;
             t.Tick += new EventHandler(t_Tick);
             t.Enabled = true;
+            f = new System.Windows.Forms.Timer();
+            f.Interval = 200;
+            f.Tick += new EventHandler(f_Tick);
+            f.Enabled = true;
         }
 
         void t_Tick(object sender, EventArgs e)
         {
             Counter += 1;
+            pasos += 1;
             if (Counter == 10)
             {
                 buttonGRST_Click(sender, e);
             }
-            if (Counter > 1)
+            if (pasos > 1)
             {
                 DisplayInibit = false;
+                pasos = 0;
             }
             dataOUT3 = "HS";
             serialPort3.WriteLine(dataOUT3);
@@ -314,6 +327,11 @@ namespace SerialSplitter
                 }
             }
             ReadUPD_Data(e);
+        }
+
+        void f_Tick(object sender, EventArgs e)
+        {
+            if (!AEC_Lock) AnalyzeDataABC(AnalogData);
         }
 
         Boolean WaitForACK()
@@ -360,76 +378,65 @@ namespace SerialSplitter
             }
         }
 
-        private void AnalyzeDataABC(string data)
+        private void AnalyzeDataABC(int value)
         {
-            int value = Convert.ToInt32(data.Substring(2));
-            if (!Cine)
+            int kvaec = 0;
+            ValorMedioCine = (Cine_HI_Limit - Cine_LOW_Limit / 2) + Cine_LOW_Limit;
+            ValorMedioFluoro = (HI_Limit - LOW_Limit / 2) + LOW_Limit;
+            if (!Cine)   // If Fluoroscopia
             {
-                if (value < (LOW_Limit - 10))
+                if (value < LOW_Limit)
                 {
-                    dataOUT3 = "K+5";
+                    kvaec = (ValorMedioFluoro - value) / 2;
+                    if (kvaec > 10) kvaec = 10;
+                    if (kvaec < 1) kvaec = 1;
+                    dataOUT3 = "K+" + kvaec.ToString();
                     serialPort3.Write(dataOUT3);
                     DisplayInibit = true;
-                } else
+                    AEC_Lock = false;
+                } 
+                if (value > HI_Limit)
                 {
-                    if (value < LOW_Limit)
-                    {
-                        dataOUT3 = "K+1";
-                        serialPort3.Write(dataOUT3);
-                        DisplayInibit = true;
-                    }
-                }
-                if (value > (HI_Limit + 10))
-                {
-                    dataOUT3 = "K-5";
+                    kvaec = (value - ValorMedioFluoro) / 2;
+                    if (kvaec > 10) kvaec = 10;
+                    if (kvaec < 1) kvaec = 1;
+                    dataOUT3 = "K-" + kvaec.ToString();
                     serialPort3.Write(dataOUT3);
                     DisplayInibit = true;
-                } else
+                    AEC_Lock = false;
+                } 
+                if (value > LOW_Limit && value < HI_Limit)
                 {
-                    if (value > HI_Limit)
-                    {
-                        dataOUT3 = "K-1";
-                        serialPort3.Write(dataOUT3);
-                        DisplayInibit = true;
-                    }
+                    AEC_Lock = true;
                 }
-            } else
+                if (value > LOW_Limit && value < HI_Limit) AEC_Lock = true;
+            } 
+            else    // If Cine
             {
-                if (value < (Cine_LOW_Limit - 10))
+                if (value < Cine_LOW_Limit)
                 {
-                    dataOUT3 = "K+5";
+                    kvaec = (ValorMedioCine - value) / 2;
+                    if (kvaec > 10) kvaec = 10;
+                    if (kvaec < 1) kvaec = 1;
+                    dataOUT3 = "K+" + kvaec.ToString();
                     serialPort3.Write(dataOUT3);
                     DisplayInibit = true;
+                    AEC_Lock = false;
                 }
-                else
+                if (value > Cine_HI_Limit)
                 {
-                    if (value < Cine_LOW_Limit)
-                    {
-                        dataOUT3 = "K+1";
-                        serialPort3.Write(dataOUT3);
-                        DisplayInibit = true;
-                    }
-                }
-                if (value > (Cine_HI_Limit + 10))
-                {
-                    dataOUT3 = "K-5";
+                    kvaec = (value - ValorMedioCine) / 2;
+                    if (kvaec > 10) kvaec = 10;
+                    if (kvaec < 1) kvaec = 1;
+                    dataOUT3 = "K-" + kvaec.ToString();
                     serialPort3.Write(dataOUT3);
                     DisplayInibit = true;
+                    AEC_Lock = false;
                 }
-                else
-                {
-                    if (value > Cine_HI_Limit)
-                    {
-                        dataOUT3 = "K-1";
-                        serialPort3.Write(dataOUT3);
-                        DisplayInibit = true;
-                    }
-                }
-
+                if (value > Cine_LOW_Limit && value < Cine_HI_Limit) AEC_Lock = true;
             }
             if (DEBUG) DisplayData(6, dataOUT3);
-            serialPort1.WriteLine("ACK");
-            if (DEBUG) DisplayData(4, "ACK");
+            WaitForACK();
         }
 
         private void buttonNRST_Click(object sender, EventArgs e)
@@ -515,7 +522,7 @@ namespace SerialSplitter
                         this.Top = 948;
                         this.ControlBox = false;
                         this.Text = "";
-#endif                        
+#endif
                         logger.LogInfo("Turn On by Operator");
                         AutoON = true;
                     }
@@ -785,8 +792,15 @@ namespace SerialSplitter
             if (DEBUG) DisplayData(1, dataIN1);
             if (dataIN1.Contains("Ax"))
             {
-                DisplayData(1, dataIN1);
-                AnalyzeDataABC(dataIN1);
+                if (RX_On)
+                {
+                    AnalogData = Convert.ToInt32(dataIN1.Substring(2));
+                    if (DEBUG) DisplayData(1, dataIN1);
+                    serialPort1.WriteLine("ACK");
+                    if (DEBUG) DisplayData(4, "ACK");
+                    AEC_Lock = false;
+                }
+                else AEC_Lock = true;
             }
             else
             {
@@ -806,6 +820,19 @@ namespace SerialSplitter
         {
             if (DEBUG) DisplayData(2, dataIN2);
             serialPort1.WriteLine(dataIN2);
+            if (dataIN2.Contains("FluoroOff") || dataIN2.Contains("CineOff"))
+            {
+                AEC_Lock = true;
+                RX_On = false;
+                dataOUT3 = "KV" + textBoxKVF.Text;
+                serialPort3.WriteLine(dataOUT3);
+                if (DEBUG) DisplayData(6, dataOUT3);
+            }
+            if (dataIN2.Contains("FluoroOn") || dataIN2.Contains("CineOn"))
+            {
+                RX_On = true;
+            }
+
             if (DEBUG) DisplayData(4, dataIN2);
         }
 
@@ -826,6 +853,7 @@ namespace SerialSplitter
             Counter = 0;
             try
             {
+                // DisplayInibit = false;
                 if (!DisplayInibit) this.Invoke(new EventHandler(ShowData3)); else this.Invoke(new EventHandler(ShowDataReduced));
             }
             catch (Exception err)
@@ -1365,13 +1393,13 @@ namespace SerialSplitter
 
                 case "LOG:":
                     // GUI_Sound(4);
-                    logger.LogInfo("VCC:" + textVCC.Substring(0, textVCC.Length - 1) +
+                /*   logger.LogInfo("VCC:" + textVCC.Substring(0, textVCC.Length - 1) +
                                    " Kv:" + textBoxKV.Text.Substring(0, textBoxKV.Text.Length - 1) +
                                    " mA:" + textBoxMA.Text.Substring(0, textBoxMA.Text.Length - 1) +
                                    " ms:" + textBoxMS.Text.Substring(0, textBoxMS.Text.Length - 1) +
                                    " Kv+:" + textKVP.Substring(0, textKVP.Length - 1) +
                                    " Kv-:" + textKVN.Substring(0, textKVN.Length - 1) +
-                                   " mA:" + textmAReal + " %HU:" + textHU);
+                                   " mA:" + textmAReal + " %HU:" + textHU);   */
 
                     // logger.LogWarning("Este es un mensaje de advertencia.");
                     // logger.LogError("Este es un mensaje de error.");
