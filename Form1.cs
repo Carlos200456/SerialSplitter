@@ -226,7 +226,7 @@ namespace SerialSplitter
             return "";
         }
 
-        public void OpenSerial1()     // Serial Port para la comunicacion con el Software Vieworks
+        public async void OpenSerial1()     // Serial Port para la comunicacion con el Software Vieworks
         {
             serialPort1.PortName = Serial1PortName;
             serialPort1.BaudRate = int.Parse(Serial1BaudRate);  // 115200  Valid values are 110, 300, 1200, 2400, 4800, 9600, 19200, 38400, 57600, or 115200.
@@ -237,12 +237,12 @@ namespace SerialSplitter
             // Encoding = Encoding.GetEncoding("Windows-1252");
             serialPort1.Open();
             serialPort1.DtrEnable = false;
-            Thread.Sleep(50);
+            await Task.Delay(50);
             serialPort1.DtrEnable = true;
-            Thread.Sleep(100);
+            await Task.Delay(100);
         }
 
-        public void OpenSerial2()     // Serial Port para la comunicacion con el Generador
+        public async void OpenSerial2()     // Serial Port para la comunicacion con el Generador
         {
             serialPort2.PortName = Serial2PortName;
             serialPort2.BaudRate = int.Parse(Serial2BaudRate);  // 115200  Valid values are 110, 300, 1200, 2400, 4800, 9600, 19200, 38400, 57600, or 115200.
@@ -253,12 +253,12 @@ namespace SerialSplitter
             // Encoding = Encoding.GetEncoding("Windows-1252");
             serialPort2.Open();
             serialPort2.DtrEnable = false;
-            Thread.Sleep(50);
+            await Task.Delay(50);
             serialPort2.DtrEnable = true;
-            Thread.Sleep(800);
+            await Task.Delay(800);
         }
 
-        public void OpenSerial3()     // Serial Port para la comunicacion con el Generador
+        public async void OpenSerial3()     // Serial Port para la comunicacion con el Generador
         {
             serialPort3.PortName = Serial3PortName;
             serialPort3.BaudRate = int.Parse(Serial3BaudRate);  // 115200  Valid values are 110, 300, 1200, 2400, 4800, 9600, 19200, 38400, 57600, or 115200.
@@ -269,9 +269,9 @@ namespace SerialSplitter
             // Encoding = Encoding.GetEncoding("Windows-1252");
             serialPort3.Open();
             serialPort3.DtrEnable = false;
-            Thread.Sleep(50);
+            await Task.Delay(50);
             serialPort3.DtrEnable = true;
-            Thread.Sleep(800);
+            await Task.Delay(800);
             StartTimer();
         }
 
