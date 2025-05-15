@@ -40,8 +40,10 @@ namespace SerialSplitter
 #endif
         bool DisplayInibit = false;
         bool Cine = false;
-        bool AEC_Lock = true;
+        bool AEC_Locked = true;
         bool RX_On = false;
+        bool AEC_Lock = true;
+        int AEC_Lock_Quantity = 0;
         public static float VCC = 0.0f;
         int Counter, LOW_Limit, HI_Limit, Cine_LOW_Limit, Cine_HI_Limit, pasos, AnalogData, ValorMedioCine, ValorMedioFluoro;
 
@@ -331,7 +333,19 @@ namespace SerialSplitter
 
         void f_Tick(object sender, EventArgs e)
         {
-            if (!AEC_Lock) AnalyzeDataABC(AnalogData);
+            if (AEC_Lock_Quantity > 0)
+            {
+                if (AEC_Lock_Quantity == 1)
+                {
+                    AEC_Locked = true;
+                    AEC_Lock_Quantity = 0;
+                }
+                else
+                {
+                    AEC_Lock_Quantity -= 1;
+                }
+            }
+            if (!AEC_Locked && RX_On) AnalyzeDataABC(AnalogData);
         }
 
         Boolean WaitForACK()
@@ -380,63 +394,58 @@ namespace SerialSplitter
 
         private void AnalyzeDataABC(int value)
         {
-            int kvaec = 0;
-            ValorMedioCine = (Cine_HI_Limit - Cine_LOW_Limit / 2) + Cine_LOW_Limit;
-            ValorMedioFluoro = (HI_Limit - LOW_Limit / 2) + LOW_Limit;
-            if (!Cine)   // If Fluoroscopia
+            int dif_aec = 0;
+            ValorMedioCine = ((Cine_HI_Limit - Cine_LOW_Limit) / 2) + Cine_LOW_Limit;
+            ValorMedioFluoro = ((HI_Limit - LOW_Limit) / 2) + LOW_Limit;
+            if (!Cine)   // AEC Fluoroscopia
             {
                 if (value < LOW_Limit)
                 {
-                    kvaec = (ValorMedioFluoro - value) / 2;
-                    if (kvaec > 10) kvaec = 10;
-                    if (kvaec < 1) kvaec = 1;
-                    dataOUT3 = "K+" + kvaec.ToString();
+                    dif_aec = (ValorMedioFluoro - value) / 2;
+                    if (dif_aec > 10) dif_aec = 10;
+                    if (dif_aec < 1) dif_aec = 1;
+                    dataOUT3 = "K+" + dif_aec.ToString();
                     serialPort3.Write(dataOUT3);
                     DisplayInibit = true;
-                    AEC_Lock = false;
+                    AEC_Locked = false;
                 } 
                 if (value > HI_Limit)
                 {
-                    kvaec = (value - ValorMedioFluoro) / 2;
-                    if (kvaec > 10) kvaec = 10;
-                    if (kvaec < 1) kvaec = 1;
-                    dataOUT3 = "K-" + kvaec.ToString();
+                    dif_aec = (value - ValorMedioFluoro) / 2;
+                    if (dif_aec > 10) dif_aec = 10;
+                    if (dif_aec < 1) dif_aec = 1;
+                    dataOUT3 = "K-" + dif_aec.ToString();
                     serialPort3.Write(dataOUT3);
                     DisplayInibit = true;
-                    AEC_Lock = false;
+                    AEC_Locked = false;
                 } 
-                if (value > LOW_Limit && value < HI_Limit)
-                {
-                    AEC_Lock = true;
-                }
-                if (value > LOW_Limit && value < HI_Limit) AEC_Lock = true;
+                if ((value > LOW_Limit) && (value < HI_Limit)) AEC_Locked = true;
             } 
-            else    // If Cine
+            else    // AEC Cine
             {
                 if (value < Cine_LOW_Limit)
                 {
-                    kvaec = (ValorMedioCine - value) / 2;
-                    if (kvaec > 10) kvaec = 10;
-                    if (kvaec < 1) kvaec = 1;
-                    dataOUT3 = "K+" + kvaec.ToString();
+                    dif_aec = (ValorMedioCine - value) / 2;
+                    if (dif_aec > 10) dif_aec = 10;
+                    if (dif_aec < 1) dif_aec = 1;
+                    dataOUT3 = "K+" + dif_aec.ToString();
                     serialPort3.Write(dataOUT3);
                     DisplayInibit = true;
-                    AEC_Lock = false;
+                    AEC_Locked = false;
                 }
                 if (value > Cine_HI_Limit)
                 {
-                    kvaec = (value - ValorMedioCine) / 2;
-                    if (kvaec > 10) kvaec = 10;
-                    if (kvaec < 1) kvaec = 1;
-                    dataOUT3 = "K-" + kvaec.ToString();
+                    dif_aec = (value - ValorMedioCine) / 2;
+                    if (dif_aec > 10) dif_aec = 10;
+                    if (dif_aec < 1) dif_aec = 1;
+                    dataOUT3 = "K-" + dif_aec.ToString();
                     serialPort3.Write(dataOUT3);
                     DisplayInibit = true;
-                    AEC_Lock = false;
+                    AEC_Locked = false;
                 }
-                if (value > Cine_LOW_Limit && value < Cine_HI_Limit) AEC_Lock = true;
+                if ((value > Cine_LOW_Limit) && (value < Cine_HI_Limit)) AEC_Locked = true;
             }
             if (DEBUG) DisplayData(6, dataOUT3);
-            WaitForACK();
         }
 
         private void buttonNRST_Click(object sender, EventArgs e)
@@ -584,15 +593,32 @@ namespace SerialSplitter
         {
             try
             {
-                serialPort1.Close(); //close the serial port
-                serialPort2.Close();
-                serialPort3.Close();
+                // Close serial ports if open, suppress exceptions to avoid blocking shutdown
+                if (serialPort1 != null && serialPort1.IsOpen)
+                {
+                    try { serialPort1.Close(); } catch { /* Ignore */ }
+                }
+                if (serialPort2 != null && serialPort2.IsOpen)
+                {
+                    try { serialPort2.Close(); } catch { /* Ignore */ }
+                }
+                if (serialPort3 != null && serialPort3.IsOpen)
+                {
+                    try { serialPort3.Close(); } catch { /* Ignore */ }
+                }
             }
-            catch (Exception ex)
+            catch
             {
-                MessageBox.Show(ex.Message); //catch any serial port closing error messages
+                // Suppress all exceptions to ensure shutdown continues
             }
-            this.Invoke(new EventHandler(NowClose)); //now close back in the main thread
+            finally
+            {
+                // Ensure form close is invoked on UI thread, but only if not disposed
+                if (this.IsHandleCreated && !this.IsDisposed)
+                {
+                    this.Invoke(new EventHandler(NowClose));
+                }
+            }
         }
 
         private void NowClose(object sender, EventArgs e)
@@ -790,17 +816,21 @@ namespace SerialSplitter
         private void ShowData1(object sender, EventArgs e)
         {
             if (DEBUG) DisplayData(1, dataIN1);
+            if (dataIN1.Contains("LK"))
+            {
+                AEC_Lock = true;
+                AEC_Lock_Quantity = Convert.ToInt32(dataIN1.Substring(2));
+                if (DEBUG) DisplayData(4, dataIN1);
+                serialPort1.WriteLine("ACK");
+                if (DEBUG) DisplayData(4, "ACK");
+            }
             if (dataIN1.Contains("Ax"))
             {
-                if (RX_On)
-                {
-                    AnalogData = Convert.ToInt32(dataIN1.Substring(2));
-                    if (DEBUG) DisplayData(1, dataIN1);
-                    serialPort1.WriteLine("ACK");
-                    if (DEBUG) DisplayData(4, "ACK");
-                    AEC_Lock = false;
-                }
-                else AEC_Lock = true;
+                AnalogData = Convert.ToInt32(dataIN1.Substring(2));
+                if (DEBUG) DisplayData(1, dataIN1);
+                serialPort1.WriteLine("ACK");
+                if (DEBUG) DisplayData(4, "ACK");
+                AEC_Locked = false;
             }
             else
             {
@@ -822,7 +852,7 @@ namespace SerialSplitter
             serialPort1.WriteLine(dataIN2);
             if (dataIN2.Contains("FluoroOff") || dataIN2.Contains("CineOff"))
             {
-                AEC_Lock = true;
+                AEC_Lock = false;
                 RX_On = false;
                 dataOUT3 = "KV" + textBoxKVF.Text;
                 serialPort3.WriteLine(dataOUT3);
