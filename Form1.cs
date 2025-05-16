@@ -368,6 +368,7 @@ namespace SerialSplitter
             ValorMedioFluoro = ((HI_Limit - LOW_Limit) / 2) + LOW_Limit;
             if (!Cine)   // AEC Fluoroscopia
             {
+                if ((value > LOW_Limit) && (value < HI_Limit)) AEC_Locked = true;
                 if (value < LOW_Limit)
                 {
                     dif_aec = (ValorMedioFluoro - value) / 2;
@@ -388,10 +389,10 @@ namespace SerialSplitter
                     DisplayInibit = true;
                     AEC_Locked = false;
                 } 
-                if ((value > LOW_Limit) && (value < HI_Limit)) AEC_Locked = true;
             } 
             else    // AEC Cine
             {
+                if ((value > Cine_LOW_Limit) && (value < Cine_HI_Limit)) AEC_Locked = true;
                 if (value < Cine_LOW_Limit)
                 {
                     dif_aec = (ValorMedioCine - value) / 2;
@@ -412,7 +413,6 @@ namespace SerialSplitter
                     DisplayInibit = true;
                     AEC_Locked = false;
                 }
-                if ((value > Cine_LOW_Limit) && (value < Cine_HI_Limit)) AEC_Locked = true;
             }
             if (DEBUG) DisplayData(6, dataOUT3);
         }
