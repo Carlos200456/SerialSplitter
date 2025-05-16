@@ -229,19 +229,6 @@ namespace SerialSplitter
             }
         }
 
-        public static string getBetween(string strSource, string strStart, int largo)
-        {
-            if (strSource.Contains(strStart))
-            {
-                int Start, End;
-                Start = strSource.IndexOf(strStart, 0) + strStart.Length;
-                End = Start + largo;
-                return strSource.Substring((Start + 1), End - Start);
-            }
-
-            return "";
-        }
-
         public async void OpenSerial1()     // Serial Port para la comunicacion con el Software Digirad
         {
             serialPort1.PortName = Serial1PortName;
@@ -304,7 +291,7 @@ namespace SerialSplitter
         }
 
         // Make t_Tick async
-        private async void t_Tick(object sender, EventArgs e)
+        private void t_Tick(object sender, EventArgs e)
         {
             Counter += 1;
             pasos += 1;
@@ -372,33 +359,6 @@ namespace SerialSplitter
                 }
             }
             if (ACK) return true; else return false;
-        }
-
-        private void DisplayData(int port, string data)
-        {
-            switch (port)
-            {
-                case 1:
-                    textBoxDO.Text = data;
-                    break;
-                case 2:
-                    textBoxNO.Text = data;
-                    break;
-                case 3:
-                    textBoxGO.Text = data;
-                    break;
-                case 4:
-                    textBoxDI.Text = data;
-                    break;
-                case 5:
-                    textBoxNI.Text = data;
-                    break;
-                case 6:
-                    textBoxGI.Text = data;
-                    break;
-                default:
-                    break;
-            }
         }
 
         private void AnalyzeDataABC(int value)
@@ -489,44 +449,6 @@ namespace SerialSplitter
             Refresh();
         }
 
-        private void LoggearError()
-        {
-            if (LastER != textBoxER.Text)
-            {
-                try
-                {
-                    logger.LogError(textBoxER.Text);
-
-                    // Helper to safely trim trailing \r, \n, or whitespace
-                    string SafeTrim(string s)
-                    {
-                        return string.IsNullOrEmpty(s) ? "?" : s.TrimEnd('\r', '\n', ' ');
-                    }
-
-                    logger.LogWarning(
-                        "VCC:" + SafeTrim(textVCC) +
-                        " ,Sense Ref:" + SafeTrim(textSRE) +
-                        " ,Sense Fil:" + SafeTrim(textSFI) +
-                        " ,Sense CC:" + SafeTrim(textSCC) +
-                        " ,U Cap:" + SafeTrim(textSUC) +
-                        " ,I Com:" + SafeTrim(textSIC) +
-                        " ,U Power:" + SafeTrim(textUPW) +
-                        " ,%HU:" + SafeTrim(textHU)
-                    );
-
-                    LastER = textBoxER.Text;
-                }
-                catch (Exception ex)
-                {
-                    // Optionally log to a fallback location or show a message in DEBUG mode
-#if DEBUG
-                    Debug.WriteLine("LoggearError exception: " + ex.Message);
-#endif
-                    // Do not show MessageBox to avoid UI blocking in production
-                }
-            }
-        }
-
         private void buttonExit_Click(object sender, EventArgs e)
         {
             logger.LogInfo("Salida de la Aplicación por el operador");
@@ -576,17 +498,19 @@ namespace SerialSplitter
 
         private void button1_Click(object sender, EventArgs e)
         {
+            string SafeTrim(string s)
+            {
+                return string.IsNullOrEmpty(s) ? "N" : s.TrimEnd('\r', '\n', ' ');
+            }
+
             try
             {
-                if (SerialNumber.Substring(SerialNumber.Length - 1) == "\r")
+                SerialNumber = SafeTrim(SerialNumber);
+                if (File.Exists(destinationDirectory + "Aspor_Serial_" + SerialNumber + ".txt"))
                 {
-                    SerialNumber = SerialNumber.Substring(0, SerialNumber.Length - 1);
+                    File.Delete(destinationDirectory + "Aspor_Serial_" + SerialNumber + ".txt");
                 }
-                if (File.Exists(destinationDirectory + "DUE_Serial_" + SerialNumber + ".txt"))
-                {
-                    File.Delete(destinationDirectory + "DUE_Serial_" + SerialNumber + ".txt");
-                }
-                File.Copy(logFilePath, destinationDirectory + "DUE_Serial_" + SerialNumber + ".txt");
+                File.Copy(logFilePath, destinationDirectory + "Aspor_Serial_" + SerialNumber + ".txt");
             }
             catch (Exception err)
             {
@@ -598,54 +522,6 @@ namespace SerialSplitter
         private void button2_Click(object sender, EventArgs e)
         {
             Process.Start("notepad.exe", logFilePath);
-        }
-
-        private void Form_FormClosing(object sender, FormClosingEventArgs e)
-        {
-
-            if (serialPort1.IsOpen || serialPort2.IsOpen || serialPort3.IsOpen)
-            {
-                e.Cancel = true; //cancel the fom closing
-                Thread CloseDown = new Thread(new ThreadStart(CloseSerialOnExit)); //close port in new thread to avoid hang
-                CloseDown.Start(); //close port in new thread to avoid hang
-            }
-        }
-
-        private void CloseSerialOnExit()
-        {
-            try
-            {
-                // Close serial ports if open, suppress exceptions to avoid blocking shutdown
-                if (serialPort1 != null && serialPort1.IsOpen)
-                {
-                    try { serialPort1.Close(); } catch { /* Ignore */ }
-                }
-                if (serialPort2 != null && serialPort2.IsOpen)
-                {
-                    try { serialPort2.Close(); } catch { /* Ignore */ }
-                }
-                if (serialPort3 != null && serialPort3.IsOpen)
-                {
-                    try { serialPort3.Close(); } catch { /* Ignore */ }
-                }
-            }
-            catch
-            {
-                // Suppress all exceptions to ensure shutdown continues
-            }
-            finally
-            {
-                // Ensure form close is invoked on UI thread, but only if not disposed
-                if (this.IsHandleCreated && !this.IsDisposed)
-                {
-                    this.Invoke(new EventHandler(NowClose));
-                }
-            }
-        }
-
-        private void NowClose(object sender, EventArgs e)
-        {
-            this.Close(); //now close the form
         }
 
         private void buttonFM_Click(object sender, EventArgs e)
@@ -698,21 +574,6 @@ namespace SerialSplitter
                 serialPort3.WriteLine(dataOUT3);
                 Thread.Sleep(300);
                 dataOUT3 = "TX" + textBoxSms.Text;
-                serialPort3.WriteLine(dataOUT3);
-            }
-        }
-
-        void SendCommands(string command1, string command2, string command3)
-        {
-            if (serialPort3.IsOpen)
-            {
-                dataOUT3 = command1;
-                serialPort3.WriteLine(dataOUT3);
-                Thread.Sleep(300);
-                dataOUT3 = command2;
-                serialPort3.WriteLine(dataOUT3);
-                Thread.Sleep(300);
-                dataOUT3 = command3;
                 serialPort3.WriteLine(dataOUT3);
             }
         }
@@ -778,603 +639,122 @@ namespace SerialSplitter
             }
         }
 
-        private void serialPort1_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
+        void SendCommands(string command1, string command2, string command3)
         {
-            dataIN1 = serialPort1.ReadLine();
-            this.Invoke(new EventHandler(ShowData1));
-        }
-
-        private void ShowData1(object sender, EventArgs e)
-        {
-            if (DEBUG) DisplayData(1, dataIN1);
-            if (dataIN1.Contains("LK"))
+            if (serialPort3.IsOpen)
             {
-                AEC_Lock = true;
-                AEC_Lock_Quantity = Convert.ToInt32(dataIN1.Substring(2));
-                if (DEBUG) DisplayData(4, dataIN1);
-                serialPort1.WriteLine("ACK");
-                if (DEBUG) DisplayData(4, "ACK");
-            }
-            if (dataIN1.Contains("Ax"))
-            {
-                AnalogData = Convert.ToInt32(dataIN1.Substring(2));
-                if (DEBUG) DisplayData(1, dataIN1);
-                serialPort1.WriteLine("ACK");
-                if (DEBUG) DisplayData(4, "ACK");
-                AEC_Locked = false;
-            }
-            else
-            {
-                dataOUT2 = dataIN1;
-                serialPort2.WriteLine(dataOUT2);
-                if (DEBUG) DisplayData(5, dataOUT2);
-            }
-        }
-
-        private void serialPort2_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
-        {
-            dataIN2 = serialPort2.ReadLine();
-            this.Invoke(new EventHandler(ShowData2));
-        }
-
-        private void ShowData2(object sender, EventArgs e)
-        {
-            if (string.IsNullOrEmpty(dataIN2))
-                return;
-
-            if (DEBUG) DisplayData(2, dataIN2);
-
-            // Always forward data to serialPort1
-            serialPort1.WriteLine(dataIN2);
-
-            // Handle specific commands
-            if (dataIN2.Contains("FluoroOff") || dataIN2.Contains("CineOff"))
-            {
-                AEC_Lock = false;
-                RX_On = false;
-                dataOUT3 = "KV" + textBoxKVF.Text;
+                dataOUT3 = command1;
                 serialPort3.WriteLine(dataOUT3);
-                if (DEBUG) DisplayData(6, dataOUT3);
-                // Early return since this is a terminal action
-                return;
+                Thread.Sleep(300);
+                dataOUT3 = command2;
+                serialPort3.WriteLine(dataOUT3);
+                Thread.Sleep(300);
+                dataOUT3 = command3;
+                serialPort3.WriteLine(dataOUT3);
             }
-            if (dataIN2.Contains("FluoroOn") || dataIN2.Contains("CineOn"))
-            {
-                RX_On = true;
-            }
-
-            if (DEBUG) DisplayData(4, dataIN2);
         }
 
-
-        private void serialPort3_DataReceived(object sender, SerialDataReceivedEventArgs e)    // Data received from Generator
+        public static string getBetween(string strSource, string strStart, int largo)
         {
-            dataIN3 = serialPort3.ReadLine();
-            if (dataIN3.Length > 4) message = dataIN3.Remove(4); else message = "";
-            if (dataIN3.Contains("ACK"))
+            if (strSource.Contains(strStart))
             {
-                ACK = true;
-                // GUI_Sound(1);
+                int Start, End;
+                Start = strSource.IndexOf(strStart, 0) + strStart.Length;
+                End = Start + largo;
+                return strSource.Substring((Start + 1), End - Start);
             }
-            if (dataIN3.Contains("NACK"))
+
+            return "";
+        }
+
+        private void LoggearError()
+        {
+            if (LastER != textBoxER.Text)
             {
-                NACK = true;
+                try
+                {
+                    logger.LogError(textBoxER.Text);
+
+                    // Helper to safely trim trailing \r, \n, or whitespace
+                    string SafeTrim(string s)
+                    {
+                        return string.IsNullOrEmpty(s) ? "?" : s.TrimEnd('\r', '\n', ' ');
+                    }
+
+                    logger.LogWarning(
+                        "VCC:" + SafeTrim(textVCC) +
+                        " ,Sense Ref:" + SafeTrim(textSRE) +
+                        " ,Sense Fil:" + SafeTrim(textSFI) +
+                        " ,Sense CC:" + SafeTrim(textSCC) +
+                        " ,U Cap:" + SafeTrim(textSUC) +
+                        " ,I Com:" + SafeTrim(textSIC) +
+                        " ,U Power:" + SafeTrim(textUPW) +
+                        " ,%HU:" + SafeTrim(textHU)
+                    );
+
+                    LastER = textBoxER.Text;
+                }
+                catch (Exception ex)
+                {
+                    // Optionally log to a fallback location or show a message in DEBUG mode
+#if DEBUG
+                    Debug.WriteLine("LoggearError exception: " + ex.Message);
+#endif
+                    // Do not show MessageBox to avoid UI blocking in production
+                }
             }
-            Counter = 0;
+        }
+
+        private void CloseSerialOnExit()
+        {
             try
             {
-                // DisplayInibit = false;
-                if (!DisplayInibit) this.Invoke(new EventHandler(ShowData3)); else this.Invoke(new EventHandler(ShowDataReduced));
+                // Close serial ports if open, suppress exceptions to avoid blocking shutdown
+                if (serialPort1 != null && serialPort1.IsOpen)
+                {
+                    try { serialPort1.Close(); } catch { /* Ignore */ }
+                }
+                if (serialPort2 != null && serialPort2.IsOpen)
+                {
+                    try { serialPort2.Close(); } catch { /* Ignore */ }
+                }
+                if (serialPort3 != null && serialPort3.IsOpen)
+                {
+                    try { serialPort3.Close(); } catch { /* Ignore */ }
+                }
             }
-            catch (Exception err)
+            catch
             {
-                // MessageBox.Show(err.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                // Suppress all exceptions to ensure shutdown continues
             }
-        }
-
-        private void ShowData3(object sender, EventArgs e)
-        {
-            DoubleBuffered = true;
-
-            if (string.IsNullOrEmpty(dataIN3))
-                return;
-
-            // Helper to safely trim trailing \r, \n, or whitespace
-            string SafeTrim(string s)
+            finally
             {
-                return string.IsNullOrEmpty(s) ? "?" : s.TrimEnd('\r', '\n', ' ');
-            }
-
-            if (DEBUG) DisplayData(3, dataIN3);
-
-            // Extract message type and payload
-            string msgType = dataIN3.Length > 4 ? dataIN3.Substring(0, 4) : dataIN3;
-            string msg = dataIN3.Length > 4 ? dataIN3.Substring(4) : "";
-
-            // Remove trailing whitespace for easier comparison
-            string msgTrimmed = msg.Trim();
-
-            switch (msgType)
-            {
-                case "EZ: ":
-                    HandleEZ(msgTrimmed);
-                    break;
-
-                case "ER: ":
-                    HandleER(msgTrimmed);
-                    break;
-
-                case "ET: ":
-                    textBoxET.Text = msg;
-                    Cine = (msgTrimmed == "CINE");
-                    break;
-
-                case "SN: ":
-                    SerialNumber = msg;
-                    break;
-
-                case "SW: ":
-                    if (msg != SW_Version)
-                    {
-                        MessageBox.Show("Error de Software, Versiones incompatibles de Generador y GUI");
-                        SW_Ready = false;
-                        textBoxER.Text = "Software error (DUE != GUI)";
-                        LoggearError();
-                    }
-                    else
-                    {
-                        SW_Ready = true;
-                    }
-                    break;
-
-                case "Kv: ":
-                    if (textBoxKV.Text != msg)
-                        textBoxKV.Text = msg;
-                    break;
-
-                case "mA: ":
-                    if (textBoxMA.Text != msg)
-                        textBoxMA.Text = msg;
-                    break;
-
-                case "SKv:":
-                    textBoxKVF.Text = msg;
-                    break;
-
-                case "SmA:":
-                    textBoxMAF.Text = msg;
-                    break;
-
-                case "ms: ":
-                    if (textBoxMS.Text != msg)
-                        textBoxMS.Text = msg;
-                    break;
-
-                case "mf: ":
-                    if (textBoxSms.Text != msg)
-                        textBoxSms.Text = msg;
-                    break;
-
-                case "mc: ":
-                    if (textBoxCms.Text != msg)
-                        textBoxCms.Text = msg;
-                    break;
-
-                case "Kv+:":
-                    textKVP = msg;
-                    break;
-
-                case "Kv-:":
-                    textKVN = msg;
-                    break;
-
-                case "RmA:":
-                    textRmA = msg;
-                    try
-                    {
-                        decimal mARead = Convert.ToDecimal(textRmA);
-                        int mASet = Convert.ToInt32(textBoxMA.Text);
-                        int mAReal = (int)(mARead * mASet) / 1000;
-                        textmAReal = mAReal.ToString();
-                    }
-                    catch
-                    {
-                        textmAReal = "???";
-                    }
-                    break;
-
-                case "SFI:":
-                    textSFI = msg;
-                    break;
-
-                case "SRE:":
-                    textSRE = msg;
-                    break;
-
-                case "SCC:":
-                    textSCC = msg;
-                    break;
-
-                case "SIC:":
-                    textSIC = msg;
-                    break;
-
-                case "SUC:":
-                    textSUC = msg;
-                    break;
-
-                case "UPW:":
-                    textUPW = msg;
-                    break;
-
-                case "CAL:":
-                    if (msgTrimmed == "1")
-                    {
-                        dataOUT3 = "DB0";
-                        serialPort3.WriteLine(dataOUT3);
-                        if (DEBUG) DisplayData(6, dataOUT3);
-                    }
-                    break;
-
-                case "VCC:":
-                    textVCC = msg;
-                    break;
-
-                case "HU: ":
-                    textHU = msg;
-                    break;
-
-                case "FT: ":
-                    UpdateFluoroButton(msgTrimmed);
-                    break;
-
-                case "RD: ":
-                    if ((buttonPW.BackColor == Color.LightSkyBlue) && AutoON)
-                    {
-                        buttonPW_Click(sender, e);
-                    }
-                    UpdateRadButton(msgTrimmed);
-                    break;
-
-                case "LOG:":
-                    logger.LogInfo("VCC:" + SafeTrim(textVCC) +
-                                   " Kv:" + SafeTrim(textBoxKV.Text) +
-                                   " mA:" + SafeTrim(textBoxMA.Text) +
-                                   " ms:" + SafeTrim(textBoxMS.Text) +
-                                   " Kv+:" + SafeTrim(textKVP) +
-                                   " Kv-:" + SafeTrim(textKVN) +
-                                   " mA:" + SafeTrim(textmAReal) + " %HU:" + SafeTrim(textHU));
-                    break;
-
-                // Add other cases as needed
-
-                default:
-                    // Optionally handle unknown message types
-                    break;
-            }
-
-            // Update Power button color based on equipment state
-            if (textBoxET.Text == "OFF\r" || textBoxET.Text == "ERROR\r" || textBoxET.Text == "\r")
-            {
-                buttonPW.BackColor = Color.LightSkyBlue;
-            }
-            else if (textBoxET.Text == "IDLE\r")
-            {
-                buttonPW.BackColor = Color.LightGreen;
+                // Ensure form close is invoked on UI thread, but only if not disposed
+                if (this.IsHandleCreated && !this.IsDisposed)
+                {
+                    this.Invoke(new EventHandler(NowClose));
+                }
             }
         }
 
-        // Helper for EZ: errors
-        private void HandleEZ(string msg)
+        private void NowClose(object sender, EventArgs e)
         {
-            switch (msg)
-            {
-                case "SBE1":
-                    textBoxER.Text = "Falla de tarjeta de Estator";
-                    LoggearError();
-                    break;
-                case "HBE1":
-                    textBoxER.Text = "Falla de tarjeta de Calefaccion";
-                    LoggearError();
-                    break;
-                case "IBM1":
-                    textBoxER.Text = "Falla de tarjeta de Inversor";
-                    LoggearError();
-                    break;
-                case "FPE1":
-                    textBoxER.Text = "Verificar Relay Preparacion";
-                    LoggearError();
-                    break;
-                case "TMP1":
-                    textBoxER.Text = "Temperatura de Tubo Exedida";
-                    LoggearError();
-                    break;
-                    // Add more as needed
-            }
+            this.Close(); //now close the form
         }
 
-        // Helper for ER: errors
-        private void HandleER(string msg)
+        private void Form_FormClosing(object sender, FormClosingEventArgs e)
         {
-            if (msg != "")
-                textBoxER.Text = "";
 
-            switch (msg)
+            if (serialPort1.IsOpen || serialPort2.IsOpen || serialPort3.IsOpen)
             {
-                case "LHB":
-                    textBoxER.Text = "Falla de Lampara Testigo Calefaccion";
-                    LoggearError();
-                    break;
-                case "CAP":
-                    textBoxER.Text = "Falla de Estator (UCap)";
-                    LoggearError();
-                    break;
-                case "COM":
-                    textBoxER.Text = "Falla de Estator (ICom)";
-                    LoggearError();
-                    break;
-                case "IBE":
-                    button1.BackColor = Color.Red;
-                    textBoxER.Text = "Falla de Inversor";
-                    LoggearError();
-                    break;
-                case "IBZ":
-                    button1.BackColor = Color.Red;
-                    textBoxER.Text = "GAT Desconectado";
-                    LoggearError();
-                    break;
-                case "FIL":
-                    button2.BackColor = Color.Red;
-                    textBoxER.Text = "Falla de Filamento";
-                    LoggearError();
-                    break;
-                case "FCC":
-                    textBoxER.Text = "Filamento en Corto Circuito";
-                    button2.BackColor = Color.Red;
-                    LoggearError();
-                    break;
-                case "TMP":
-                    button3.BackColor = Color.Red;
-                    textBoxER.Text = "Temperatura de Tubo Exedida";
-                    LoggearError();
-                    break;
-                case "EEE":
-                    textBoxER.Text = "Falla de Memoria EEPROM";
-                    LoggearError();
-                    break;
-                case "SYM":
-                    textBoxER.Text = "Simulador Activado";
-                    break;
-                case "UPW":
-                    button1.BackColor = Color.Red;
-                    textBoxER.Text = "Baja Tension en UPower";
-                    LoggearError();
-                    break;
-                case "CPM":
-                    textBoxER.Text = "Falta Placa Estator";
-                    button3.BackColor = Color.Red;
-                    LoggearError();
-                    break;
-                case "FPE1":
-                    textBoxER.Text = "Verificar Relay Preparacion";
-                    LoggearError();
-                    break;
-                case "ESF0":
-                    textBoxER.Text = "Falla de Relay Foco Fino";
-                    LoggearError();
-                    break;
-                case "ESF1":
-                    textBoxER.Text = "Falla de Relay Foco Grueso";
-                    LoggearError();
-                    break;
-                default:
-                    if (msg != "") textBoxER.Text = msg;
-                    break;
-            }
-        }
-
-        // Helper for FT: (Fluoro Type) button
-        private void UpdateFluoroButton(string msg)
-        {
-            switch (msg)
-            {
-                case "0":
-                    buttonFM.BackColor = Color.LightGray;
-                    buttonFM.Text = "No Fluoro";
-                    break;
-                case "1":
-                    buttonFM.BackColor = Color.LightYellow;
-                    buttonFM.Text = "Fluoro C";
-                    break;
-                case "2":
-                    buttonFM.BackColor = Color.LightGreen;
-                    buttonFM.Text = "Fluoro P";
-                    break;
-            }
-        }
-
-        // Helper for RD: (Rad Mode) button
-        private void UpdateRadButton(string msg)
-        {
-            switch (msg)
-            {
-                case "0":
-                    buttonRM.BackColor = Color.LightYellow;
-                    buttonRM.Text = "RAD0";
-                    break;
-                case "1":
-                    buttonRM.BackColor = Color.LightGreen;
-                    buttonRM.Text = "RAD1";
-                    break;
-                case "2":
-                    buttonRM.BackColor = Color.LightGreen;
-                    buttonRM.Text = "RAD2";
-                    break;
-                case "3":
-                    buttonRM.BackColor = Color.LightGreen;
-                    buttonRM.Text = "CINE";
-                    break;
-                case "4":
-                    buttonRM.BackColor = Color.Red;
-                    buttonRM.Text = "Service";
-                    break;
-            }
-        }
-
-        private void ShowDataReduced(object sender, EventArgs e)
-        {
-            DoubleBuffered = true;
-            if (DEBUG) DisplayData(3, dataIN3);
-            string msg;
-            if (dataIN3.Length > 4) msg = dataIN3.Remove(0, 4); else msg = "";
-            // ACK = false;
-            // NACK = false;
-            switch (message)
-            {
-                case "ER: ":
-                    if (msg != "\r")
-                    {
-                        textBoxER.Text = "";
-                    }
-                    switch (msg)
-                    {
-                        case "LHB\r":
-                            textBoxER.Text = "Falla de Lampara Testigo Calefaccion";
-                            LoggearError();
-                            break;
-
-                        case "CAP\r":
-                            textBoxER.Text = "Falla de Estator (UCap)";
-                            LoggearError();
-                            break;
-
-                        case "COM\r":
-                            textBoxER.Text = "Falla de Estator (ICom)";
-                            LoggearError();
-                            break;
-
-                        case "IBE\r":
-                            button1.BackColor = Color.Red;
-                            textBoxER.Text = "Falla de Inversor";
-                            LoggearError();
-                            break;
-
-                        case "IBZ\r":
-                            button1.BackColor = Color.Red;  // Inverter error
-                            textBoxER.Text = "GAT Desconectado";
-                            LoggearError();
-                            break;
-
-                        case "FIL\r":
-                            button2.BackColor = Color.Red;
-                            textBoxER.Text = "Falla de Filamento";
-                            LoggearError();
-                            break;
-
-                        case "FCC\r":
-                            textBoxER.Text = "Filamento en Corto Circuito";
-                            button2.BackColor = Color.Red;
-                            LoggearError();
-                            break;
-
-                        case "TMP\r":
-                            button3.BackColor = Color.Red;        // Temperatura Tubo
-                            textBoxER.Text = "Temperatura de Tubo Exedida";
-                            LoggearError();
-                            break;
-
-                        case "EEE\r":
-                            textBoxER.Text = "Falla de Memoria EEPROM";
-                            LoggearError();
-                            break;
-
-                        case "SYM\r":
-                            textBoxER.Text = "Simulador Activado";
-                            break;
-
-                        case "UPW\r":
-                            button1.BackColor = Color.Red;
-                            textBoxER.Text = "Baja Tension en UPower";
-                            LoggearError();
-                            break;
-
-                        case "CPM\r":
-                            // Error Stator Boar Missing
-                            textBoxER.Text = "Falta Placa Estator";
-                            button3.BackColor = Color.Red;
-                            LoggearError();
-                            break;
-
-                        case "FPE1\r":
-                            // Fin Prep Board Missing o Relay Pegado
-                            textBoxER.Text = "Verificar Relay Preparacion";
-                            LoggearError();
-                            break;
-
-                        case "ESF0\r":
-                            textBoxER.Text = "Falla de Relay Foco Fino";
-                            LoggearError();
-                            break;
-
-                        case "ESF1\r":
-                            textBoxER.Text = "Falla de Relay Foco Grueso";
-                            LoggearError();
-                            break;
-
-
-                        default:
-                            if (msg != "\r") textBoxER.Text = msg;
-                            break;
-                    }
-                    // buttonCal.BackColor = Color.RosyBrown;
-                    break;
-                case "ET: ":
-                    textBoxET.Text = dataIN3.Remove(0, 4);
-                    break;
-                case "Kv: ":
-                    if (textBoxKV.Text != dataIN3.Remove(0, 4))
-                    {
-                        textBoxKV.Text = dataIN3.Remove(0, 4);
-                    }
-                    // kvs = Int32.Parse(textBoxKV.Text);
-                    break;
-                case "SKv:":
-                    textBoxKVF.Text = dataIN3.Remove(0, 4);
-                    break;
-                case "CL: ":
-                    break;
-
-                case "LOG:":
-                    // GUI_Sound(4);
-                /*   logger.LogInfo("VCC:" + textVCC.Substring(0, textVCC.Length - 1) +
-                                   " Kv:" + textBoxKV.Text.Substring(0, textBoxKV.Text.Length - 1) +
-                                   " mA:" + textBoxMA.Text.Substring(0, textBoxMA.Text.Length - 1) +
-                                   " ms:" + textBoxMS.Text.Substring(0, textBoxMS.Text.Length - 1) +
-                                   " Kv+:" + textKVP.Substring(0, textKVP.Length - 1) +
-                                   " Kv-:" + textKVN.Substring(0, textKVN.Length - 1) +
-                                   " mA:" + textmAReal + " %HU:" + textHU);   */
-
-                    // logger.LogWarning("Este es un mensaje de advertencia.");
-                    // logger.LogError("Este es un mensaje de error.");
-                    break;
-
-                default:
-                    break;
-            }
-
-            if ((textBoxET.Text == "OFF\r") || (textBoxET.Text == "ERROR\r") || (textBoxET.Text == "\r"))
-            {
-                buttonPW.BackColor = Color.LightSkyBlue;
-            }
-
-            if ((textBoxET.Text == "IDLE\r")) // || (textBox1.Text == "ERROR\r") || (textBox1.Text == "\r")
-            {
-                buttonPW.BackColor = Color.LightGreen;
+                e.Cancel = true; //cancel the fom closing
+                Thread CloseDown = new Thread(new ThreadStart(CloseSerialOnExit)); //close port in new thread to avoid hang
+                CloseDown.Start(); //close port in new thread to avoid hang
             }
         }
     }
 
-// Add a public class logger to the project
+    // Add a public class logger to the project
     public class Logger
     {
         private string logFilePath;
