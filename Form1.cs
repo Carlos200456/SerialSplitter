@@ -24,7 +24,7 @@ namespace SerialSplitter
     {
         string SW_Version = "3.3\r";        // =======> Version de software para compatibilidad
         string VHKV, VHMA, VHMS, VAKV, VAMA, VAMS, VEKV, VEMA, VEMS, CIKV, CIMA, CIMS, FMKV, FMMA, FMMS, F1KV, F1MA, F1MS, F2KV, F2MA, F2MS, F3KV, F3MA, F3MS, F4KV, F4MA, F4MS, SerialNumber = "";
-        string dataIN1 = "", dataIN2 = "", dataIN3 = "", dataOUT1 = "", dataOUT2 = "", dataOUT3 = "", path, textKVP, textKVN, textmAReal, textRmA, LastER, textSFI, textSRE, textSCC, textSIC, textSUC, textUPW, textHU, textVCC = "12.2", message;
+        string dataIN1 = "", dataIN2 = "", dataIN3 = "", dataOUT1 = "", dataOUT2 = "", dataOUT3 = "", path, textKVP, textKVN, textmAReal, textRmA, LastER, textSFI, textSRE, textSCC, textSIC, textSUC, textUPW, textHU, textVCC, message;
         string Serial1PortName, Serial1BaudRate, Serial1DataBits, Serial1StopBits, Serial1Parity, Serial2PortName, Serial2BaudRate, Serial2DataBits, Serial2StopBits, Serial2Parity, Serial3PortName, Serial3BaudRate, Serial3DataBits, Serial3StopBits, Serial3Parity;
 
         readonly string[] mA_Table = new string[8] { "50\r", "100\r", "200\r", "300\r", "400\r", "500\r", "600\r", "700\r" };
@@ -49,8 +49,6 @@ namespace SerialSplitter
 
         float mxs;
 
-        string fileToCopy = "C:\\TechXA\\LogIFDUE.txt";
-        string destinationDirectory = "G:\\My Drive\\Logs\\";
         StringBuilder sb = new StringBuilder();
         char LF = (char)10;
         char CR = (char)13;
@@ -58,7 +56,28 @@ namespace SerialSplitter
         System.Windows.Forms.Timer t = null;
         System.Windows.Forms.Timer f = null;
 
-        Logger logger = new Logger("C:\\TechXA\\LogIFDUE.txt");    // Ruta del archivo de log
+        // Lock for app path
+        private static readonly object _lock = new object();
+        private static string _appPath;
+        public static string AppPath
+        {
+            get
+            {
+                lock (_lock)
+                {
+                    if (string.IsNullOrEmpty(_appPath))
+                    {
+                        _appPath = AppDomain.CurrentDomain.BaseDirectory;
+                    }
+                    return _appPath;
+                }
+            }
+        }
+
+        static string logFilePath = AppPath + "LogIFDUE.txt";
+        static string destinationDirectory = "G:\\My Drive\\Logs\\";
+
+        Logger logger = new Logger(logFilePath);    // Ruta del archivo de log
 
         // Create an isntance of IPC with DRAXA
         SimpleUDP u = new SimpleUDP(45000);
@@ -69,129 +88,117 @@ namespace SerialSplitter
         public Form1()
         {
             InitializeComponent();
-            path = AppDomain.CurrentDomain.BaseDirectory;
-            // SetImage(path + "About.png");
-            // Create an isntance of XmlTextReader and call Read method to read the file  
-            XmlTextReader configReader = new XmlTextReader("C:\\TechXA\\Config_DUE_IF.xml");
-
             LastER = "";
 
             try
             {
-                configReader.Read();
+                using (XmlTextReader configReader = new XmlTextReader(AppPath + "Config_DUE_IF.xml"))
+                {
+                    // Move to <Configuration>
+                    while (configReader.Read())
+                    {
+                        if (configReader.NodeType == XmlNodeType.Element && configReader.Name == "Configuration")
+                            break;
+                    }
+
+                    // Now read the configuration elements inside <Configuration>
+                    while (configReader.Read())
+                    {
+                        if (configReader.NodeType == XmlNodeType.Element)
+                        {
+                            string elementName = configReader.Name;
+                            string s1 = configReader.ReadElementContentAsString();
+
+                            switch (elementName)
+                            {
+                                case "SerialPort1":
+                                    Serial1PortName = getBetween(s1, "name=", 4);
+                                    Serial1BaudRate = getBetween(s1, "baudrate=", 5);
+                                    Serial1DataBits = getBetween(s1, "databits=", 1);
+                                    Serial1StopBits = getBetween(s1, "stopbits=", 3);
+                                    Serial1Parity = getBetween(s1, "parity=", 4);
+                                    break;
+                                case "SerialPort2":
+                                    Serial2PortName = getBetween(s1, "name=", 4);
+                                    Serial2BaudRate = getBetween(s1, "baudrate=", 5);
+                                    Serial2DataBits = getBetween(s1, "databits=", 1);
+                                    Serial2StopBits = getBetween(s1, "stopbits=", 3);
+                                    Serial2Parity = getBetween(s1, "parity=", 4);
+                                    break;
+                                case "SerialPort3":
+                                    Serial3PortName = getBetween(s1, "name=", 4);
+                                    Serial3BaudRate = getBetween(s1, "baudrate=", 5);
+                                    Serial3DataBits = getBetween(s1, "databits=", 1);
+                                    Serial3StopBits = getBetween(s1, "stopbits=", 3);
+                                    Serial3Parity = getBetween(s1, "parity=", 4);
+                                    break;
+                                case "VascularHead":
+                                    VHKV = getBetween(s1, "Kv=", 3);
+                                    VHMA = getBetween(s1, "mA=", 3);
+                                    VHMS = getBetween(s1, "ms=", 3);
+                                    break;
+                                case "VascularAbdomen":
+                                    VAKV = getBetween(s1, "Kv=", 3);
+                                    VAMA = getBetween(s1, "mA=", 3);
+                                    VAMS = getBetween(s1, "ms=", 3);
+                                    break;
+                                case "VascularExtremity":
+                                    VEKV = getBetween(s1, "Kv=", 3);
+                                    VEMA = getBetween(s1, "mA=", 3);
+                                    VEMS = getBetween(s1, "ms=", 3);
+                                    break;
+                                case "Cine":
+                                    CIKV = getBetween(s1, "Kv=", 3);
+                                    CIMA = getBetween(s1, "mA=", 3);
+                                    CIMS = getBetween(s1, "ms=", 3);
+                                    break;
+                                case "FLUOROMAP":
+                                    FMKV = getBetween(s1, "Kv=", 3);
+                                    FMMA = getBetween(s1, "mA=", 2);
+                                    FMMS = getBetween(s1, "ms=", 2);
+                                    break;
+                                case "FLUORO1":
+                                    F1KV = getBetween(s1, "Kv=", 3);
+                                    F1MA = getBetween(s1, "mA=", 2);
+                                    F1MS = getBetween(s1, "ms=", 2);
+                                    break;
+                                case "FLUORO2":
+                                    F2KV = getBetween(s1, "Kv=", 3);
+                                    F2MA = getBetween(s1, "mA=", 2);
+                                    F2MS = getBetween(s1, "ms=", 2);
+                                    break;
+                                case "FLUORO3":
+                                    F3KV = getBetween(s1, "Kv=", 3);
+                                    F3MA = getBetween(s1, "mA=", 2);
+                                    F3MS = getBetween(s1, "ms=", 2);
+                                    break;
+                                case "FLUORO4":
+                                    F4KV = getBetween(s1, "Kv=", 3);
+                                    F4MA = getBetween(s1, "mA=", 2);
+                                    F4MS = getBetween(s1, "ms=", 2);
+                                    break;
+                                case "Power":
+                                    VCC = Convert.ToSingle(getBetween(s1, "VCC=", 5));
+                                    LOW_Limit = Convert.ToInt32(getBetween(s1, "LOW_Limit=", 3));
+                                    HI_Limit = Convert.ToInt32(getBetween(s1, "HI_Limit=", 3));
+                                    Cine_LOW_Limit = Convert.ToInt32(getBetween(s1, "Cine_LOW_Limit=", 3));
+                                    Cine_HI_Limit = Convert.ToInt32(getBetween(s1, "Cine_HI_Limit=", 3));
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                        // Stop if we reach the end of <Configuration>
+                        if (configReader.NodeType == XmlNodeType.EndElement && configReader.Name == "Configuration")
+                            break;
+                    }
+                }
             }
             catch (Exception err)
             {
                 MessageBox.Show(err.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            // If the node has value  
-            while (configReader.Read())
-            {
-                if (configReader.NodeType == XmlNodeType.Element && configReader.Name == "SerialPort1")
-                {
-                    string s1 = configReader.ReadElementContentAsString();
-                    Serial1PortName = getBetween(s1, "name=", 4);
-                    Serial1BaudRate = getBetween(s1, "baudrate=", 5);
-                    Serial1DataBits = getBetween(s1, "databits=", 1);
-                    Serial1StopBits = getBetween(s1, "stopbits=", 3);
-                    Serial1Parity = getBetween(s1, "parity=", 4);
-                }
-                if (configReader.NodeType == XmlNodeType.Element && configReader.Name == "SerialPort2")
-                {
-                    string s1 = configReader.ReadElementContentAsString();
-                    Serial2PortName = getBetween(s1, "name=", 4);
-                    Serial2BaudRate = getBetween(s1, "baudrate=", 5);
-                    Serial2DataBits = getBetween(s1, "databits=", 1);
-                    Serial2StopBits = getBetween(s1, "stopbits=", 3);
-                    Serial2Parity = getBetween(s1, "parity=", 4);
-                }
-                if (configReader.NodeType == XmlNodeType.Element && configReader.Name == "SerialPort3")
-                {
-                    string s1 = configReader.ReadElementContentAsString();
-                    Serial3PortName = getBetween(s1, "name=", 4);
-                    Serial3BaudRate = getBetween(s1, "baudrate=", 5);
-                    Serial3DataBits = getBetween(s1, "databits=", 1);
-                    Serial3StopBits = getBetween(s1, "stopbits=", 3);
-                    Serial3Parity = getBetween(s1, "parity=", 4);
-                }
-                if (configReader.NodeType == XmlNodeType.Element && configReader.Name == "VascularHead")
-                {
-                    string s1 = configReader.ReadElementContentAsString();
-                    VHKV = getBetween(s1, "Kv=", 3);
-                    VHMA = getBetween(s1, "mA=", 3);
-                    VHMS = getBetween(s1, "ms=", 3);
-                }
-                if (configReader.NodeType == XmlNodeType.Element && configReader.Name == "VascularAbdomen")
-                {
-                    string s1 = configReader.ReadElementContentAsString();
-                    VAKV = getBetween(s1, "Kv=", 3);
-                    VAMA = getBetween(s1, "mA=", 3);
-                    VAMS = getBetween(s1, "ms=", 3);
-                }
-                if (configReader.NodeType == XmlNodeType.Element && configReader.Name == "VascularExtremity")
-                {
-                    string s1 = configReader.ReadElementContentAsString();
-                    VEKV = getBetween(s1, "Kv=", 3);
-                    VEMA = getBetween(s1, "mA=", 3);
-                    VEMS = getBetween(s1, "ms=", 3);
-                }
-                if (configReader.NodeType == XmlNodeType.Element && configReader.Name == "Cine")
-                {
-                    string s1 = configReader.ReadElementContentAsString();
-                    CIKV = getBetween(s1, "Kv=", 3);
-                    CIMA = getBetween(s1, "mA=", 3);
-                    CIMS = getBetween(s1, "ms=", 3);
-                }
-                if (configReader.NodeType == XmlNodeType.Element && configReader.Name == "FLUOROMAP")
-                {
-                    string s1 = configReader.ReadElementContentAsString();
-                    FMKV = getBetween(s1, "Kv=", 3);
-                    FMMA = getBetween(s1, "mA=", 2);
-                    FMMS = getBetween(s1, "ms=", 2);
-                }
 
-                if (configReader.NodeType == XmlNodeType.Element && configReader.Name == "FLUORO1")
-                {
-                    string s1 = configReader.ReadElementContentAsString();
-                    F1KV = getBetween(s1, "Kv=", 3);
-                    F1MA = getBetween(s1, "mA=", 2);
-                    F1MS = getBetween(s1, "ms=", 2);
-                }
-
-                if (configReader.NodeType == XmlNodeType.Element && configReader.Name == "FLUORO2")
-                {
-                    string s1 = configReader.ReadElementContentAsString();
-                    F2KV = getBetween(s1, "Kv=", 3);
-                    F2MA = getBetween(s1, "mA=", 2);
-                    F2MS = getBetween(s1, "ms=", 2);
-                }
-
-                if (configReader.NodeType == XmlNodeType.Element && configReader.Name == "FLUORO3")
-                {
-                    string s1 = configReader.ReadElementContentAsString();
-                    F3KV = getBetween(s1, "Kv=", 3);
-                    F3MA = getBetween(s1, "mA=", 2);
-                    F3MS = getBetween(s1, "ms=", 2);
-                }
-
-                if (configReader.NodeType == XmlNodeType.Element && configReader.Name == "FLUORO4")
-                {
-                    string s1 = configReader.ReadElementContentAsString();
-                    F4KV = getBetween(s1, "Kv=", 3);
-                    F4MA = getBetween(s1, "mA=", 2);
-                    F4MS = getBetween(s1, "ms=", 2);
-                }
-
-                if (configReader.NodeType == XmlNodeType.Element && configReader.Name == "Power")
-                {
-                    string s1 = configReader.ReadElementContentAsString();
-                    VCC = Convert.ToSingle(getBetween(s1, "VCC=", 5));
-                    LOW_Limit = Convert.ToInt32(getBetween(s1, "LOW_Limit=", 3));
-                    HI_Limit = Convert.ToInt32(getBetween(s1, "HI_Limit=", 3));
-                    Cine_LOW_Limit = Convert.ToInt32(getBetween(s1, "Cine_LOW_Limit=", 3));
-                    Cine_HI_Limit = Convert.ToInt32(getBetween(s1, "Cine_HI_Limit=", 3));
-                }
-            }
             CheckPortsNames();
             this.TopMost = true;
         }
@@ -235,7 +242,7 @@ namespace SerialSplitter
             return "";
         }
 
-        public async void OpenSerial1()     // Serial Port para la comunicacion con el Software Vieworks
+        public async void OpenSerial1()     // Serial Port para la comunicacion con el Software Digirad
         {
             serialPort1.PortName = Serial1PortName;
             serialPort1.BaudRate = int.Parse(Serial1BaudRate);  // 115200  Valid values are 110, 300, 1200, 2400, 4800, 9600, 19200, 38400, 57600, or 115200.
@@ -251,7 +258,7 @@ namespace SerialSplitter
             await Task.Delay(100);
         }
 
-        public async void OpenSerial2()     // Serial Port para la comunicacion con el Generador
+        public async void OpenSerial2()     // Serial Port para la comunicacion con la Nano_IF
         {
             serialPort2.PortName = Serial2PortName;
             serialPort2.BaudRate = int.Parse(Serial2BaudRate);  // 115200  Valid values are 110, 300, 1200, 2400, 4800, 9600, 19200, 38400, 57600, or 115200.
@@ -296,7 +303,8 @@ namespace SerialSplitter
             f.Enabled = true;
         }
 
-        void t_Tick(object sender, EventArgs e)
+        // Make t_Tick async
+        private async void t_Tick(object sender, EventArgs e)
         {
             Counter += 1;
             pasos += 1;
@@ -328,10 +336,10 @@ namespace SerialSplitter
                     LastER = "Hand Shake Error";
                 }
             }
-            ReadUPD_Data(e);
         }
 
-        void f_Tick(object sender, EventArgs e)
+        // Make f_Tick async
+        private async void f_Tick(object sender, EventArgs e)
         {
             if (AEC_Lock_Quantity > 0)
             {
@@ -346,9 +354,10 @@ namespace SerialSplitter
                 }
             }
             if (!AEC_Locked && RX_On) AnalyzeDataABC(AnalogData);
+            await ReadUPD_Data(e); // Await the async method
         }
 
-        Boolean WaitForACK()
+        bool WaitForACK()
         {
             int start_time, elapsed_time;
             start_time = DateTime.Now.Second;
@@ -487,21 +496,34 @@ namespace SerialSplitter
                 try
                 {
                     logger.LogError(textBoxER.Text);
-                    logger.LogWarning("VCC:" + textVCC.Substring(0, textVCC.Length - 1) +
-                                " ,Sense Ref:" + textSRE.Substring(0, textSRE.Length - 1) +
-                                " ,Sense Fil:" + textSFI.Substring(0, textSFI.Length - 1) +
-                                " ,Sense CC:" + textSCC.Substring(0, textSCC.Length - 1) +
-                                " ,U Cap:" + textSUC.Substring(0, textSUC.Length - 1) +
-                                " ,I Com:" + textSIC.Substring(0, textSIC.Length - 1) +
-                                " ,U Power:" + textUPW.Substring(0, textUPW.Length - 1) +
-                                " ,%HU:" + textHU.Substring(0, textHU.Length - 1));
+
+                    // Helper to safely trim trailing \r, \n, or whitespace
+                    string SafeTrim(string s)
+                    {
+                        return string.IsNullOrEmpty(s) ? "?" : s.TrimEnd('\r', '\n', ' ');
+                    }
+
+                    logger.LogWarning(
+                        "VCC:" + SafeTrim(textVCC) +
+                        " ,Sense Ref:" + SafeTrim(textSRE) +
+                        " ,Sense Fil:" + SafeTrim(textSFI) +
+                        " ,Sense CC:" + SafeTrim(textSCC) +
+                        " ,U Cap:" + SafeTrim(textSUC) +
+                        " ,I Com:" + SafeTrim(textSIC) +
+                        " ,U Power:" + SafeTrim(textUPW) +
+                        " ,%HU:" + SafeTrim(textHU)
+                    );
+
                     LastER = textBoxER.Text;
                 }
-                catch (Exception err)
+                catch (Exception ex)
                 {
-                    // MessageBox.Show(err.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    // Optionally log to a fallback location or show a message in DEBUG mode
+#if DEBUG
+                    Debug.WriteLine("LoggearError exception: " + ex.Message);
+#endif
+                    // Do not show MessageBox to avoid UI blocking in production
                 }
-
             }
         }
 
@@ -564,7 +586,7 @@ namespace SerialSplitter
                 {
                     File.Delete(destinationDirectory + "DUE_Serial_" + SerialNumber + ".txt");
                 }
-                File.Copy(fileToCopy, destinationDirectory + "DUE_Serial_" + SerialNumber + ".txt");
+                File.Copy(logFilePath, destinationDirectory + "DUE_Serial_" + SerialNumber + ".txt");
             }
             catch (Exception err)
             {
@@ -575,7 +597,7 @@ namespace SerialSplitter
 
         private void button2_Click(object sender, EventArgs e)
         {
-            Process.Start("notepad.exe", "C:\\TechXA\\LogIFDUE.txt");
+            Process.Start("notepad.exe", logFilePath);
         }
 
         private void Form_FormClosing(object sender, FormClosingEventArgs e)
@@ -680,132 +702,81 @@ namespace SerialSplitter
             }
         }
 
-        void ReadUPD_Data(EventArgs e)
+        void SendCommands(string command1, string command2, string command3)
         {
-            string s = u.Read();
-            if (s != "")  //  Para Pruebas  eliminar ==>  && GeneratorReady)
+            if (serialPort3.IsOpen)
             {
-                textBoxUDP.Text = s;
-                if (textBoxUDP.Text == "Head")
-                {
-                    // Head Set
-                    dataOUT3 = "KV" + VHKV;
-                    serialPort3.WriteLine(dataOUT3);
-                    Thread.Sleep(300);
-                    dataOUT3 = "MA" + VHMA;
-                    serialPort3.WriteLine(dataOUT3);
-                    Thread.Sleep(300);
-                    dataOUT3 = "TC" + VHMS;
-                    serialPort3.WriteLine(dataOUT3);
-                }
-                if (textBoxUDP.Text == "Abdomen")
-                {
-                    // Abdomen Set
-                    dataOUT3 = "KV" + VAKV;
-                    serialPort3.WriteLine(dataOUT3);
-                    Thread.Sleep(300);
-                    dataOUT3 = "MA" + VAMA;
-                    serialPort3.WriteLine(dataOUT3);
-                    Thread.Sleep(300);
-                    dataOUT3 = "TC" + VAMS;
-                    serialPort3.WriteLine(dataOUT3);
-                }
-                if (textBoxUDP.Text == "Extremity")
-                {
-                    // Extremity Set
-                    dataOUT3 = "KV" + VEKV;
-                    serialPort3.WriteLine(dataOUT3);
-                    Thread.Sleep(300);
-                    dataOUT3 = "MA" + VEMA;
-                    serialPort3.WriteLine(dataOUT3);
-                    Thread.Sleep(300);
-                    dataOUT3 = "TC" + VEMS;
-                    serialPort3.WriteLine(dataOUT3);
-                }
-                if (textBoxUDP.Text == "Cine")
-                {
-                    // Cine Set
-                    dataOUT3 = "KV" + CIKV;
-                    serialPort3.WriteLine(dataOUT3);
-                    Thread.Sleep(300);
-                    dataOUT3 = "MA" + CIMA;
-                    serialPort3.WriteLine(dataOUT3);
-                    Thread.Sleep(300);
-                    dataOUT3 = "TC" + CIMS;
-                    serialPort3.WriteLine(dataOUT3);
-                }
-                if (textBoxUDP.Text == "FluoroOff")
-                {
-                    // Fluoro Off
-                }
-                if (textBoxUDP.Text == "CineOff") 
-                {
-                    // Cine Off
-                }
-                if (textBoxUDP.Text == "FLUOROMAP")
-                {
-                    // Road Map
-                    dataOUT3 = "KZ" + FMKV;
-                    serialPort3.WriteLine(dataOUT3);
-                    Thread.Sleep(300);
-                    dataOUT3 = "MZ" + FMMA;
-                    serialPort3.WriteLine(dataOUT3);
-                    Thread.Sleep(300);
-                    dataOUT3 = "TX" + FMMS;
-                    serialPort3.WriteLine(dataOUT3);
-                }
-                if (textBoxUDP.Text == "FLUORO1")
-                {
-                    // "F1 Set";
-                    dataOUT3 = "KZ" + F1KV;
-                    serialPort3.WriteLine(dataOUT3);
-                    Thread.Sleep(300);
-                    dataOUT3 = "MZ" + F1MA;
-                    serialPort3.WriteLine(dataOUT3);
-                    Thread.Sleep(300);
-                    dataOUT3 = "TX" + F1MS;
-                    serialPort3.WriteLine(dataOUT3);
-                }
-                if (textBoxUDP.Text == "FLUORO2")
-                {
-                    // "F2 Set";
-                    dataOUT3 = "KZ" + F2KV;
-                    serialPort3.WriteLine(dataOUT3);
-                    Thread.Sleep(300);
-                    dataOUT3 = "MZ" + F2MA;
-                    serialPort3.WriteLine(dataOUT3);
-                    Thread.Sleep(300);
-                    dataOUT3 = "TX" + F2MS;
-                    serialPort3.WriteLine(dataOUT3);
-                }
-                if (textBoxUDP.Text == "FLUORO3")
-                {
-                    // "F3 Set";
-                    dataOUT3 = "KZ" + F3KV;
-                    serialPort3.WriteLine(dataOUT3);
-                    Thread.Sleep(300);
-                    dataOUT3 = "MZ" + F3MA;
-                    serialPort3.WriteLine(dataOUT3);
-                    Thread.Sleep(300);
-                    dataOUT3 = "TX" + F3MS;
-                    serialPort3.WriteLine(dataOUT3);
-                }
-                if (textBoxUDP.Text == "FLUORO4")
-                {
-                    // "F4 Set";
-                    dataOUT3 = "KZ" + F4KV;
-                    serialPort3.WriteLine(dataOUT3);
-                    Thread.Sleep(300);
-                    dataOUT3 = "MZ" + F4MA;
-                    serialPort3.WriteLine(dataOUT3);
-                    Thread.Sleep(300);
-                    dataOUT3 = "TX" + F4MS;
-                    serialPort3.WriteLine(dataOUT3);
-                }
+                dataOUT3 = command1;
+                serialPort3.WriteLine(dataOUT3);
+                Thread.Sleep(300);
+                dataOUT3 = command2;
+                serialPort3.WriteLine(dataOUT3);
+                Thread.Sleep(300);
+                dataOUT3 = command3;
+                serialPort3.WriteLine(dataOUT3);
             }
         }
 
+        // Make ReadUPD_Data async
+        private async Task ReadUPD_Data(EventArgs e)
+        {
+            string s = u.Read();
+            if (string.IsNullOrEmpty(s))
+                return;
 
+            textBoxUDP.Text = s;
+
+            // Helper to send a sequence of commands with delay
+            async Task SendCommands(params string[] commands)
+            {
+                foreach (var cmd in commands)
+                {
+                    serialPort3.WriteLine(cmd);
+                    if (DEBUG) DisplayData(6, cmd);
+                    await Task.Delay(300); // Non-blocking delay
+                }
+            }
+
+            switch (s)
+            {
+                case "Head":
+                    await SendCommands("KV" + VHKV, "MA" + VHMA, "TC" + VHMS);
+                    break;
+                case "Abdomen":
+                    await SendCommands("KV" + VAKV, "MA" + VAMA, "TC" + VAMS);
+                    break;
+                case "Extremity":
+                    await SendCommands("KV" + VEKV, "MA" + VEMA, "TC" + VEMS);
+                    break;
+                case "Cine":
+                    await SendCommands("KV" + CIKV, "MA" + CIMA, "TC" + CIMS);
+                    break;
+                case "FLUOROMAP":
+                    await SendCommands("KZ" + FMKV, "MZ" + FMMA, "TX" + FMMS);
+                    break;
+                case "FLUORO1":
+                    await SendCommands("KZ" + F1KV, "MZ" + F1MA, "TX" + F1MS);
+                    break;
+                case "FLUORO2":
+                    await SendCommands("KZ" + F2KV, "MZ" + F2MA, "TX" + F2MS);
+                    break;
+                case "FLUORO3":
+                    await SendCommands("KZ" + F3KV, "MZ" + F3MA, "TX" + F3MS);
+                    break;
+                case "FLUORO4":
+                    await SendCommands("KZ" + F4KV, "MZ" + F4MA, "TX" + F4MS);
+                    break;
+                case "FluoroOff":
+                    // No action needed
+                    break;
+                case "CineOff":
+                    // No action needed
+                    break;
+                default:
+                    // Optionally log unknown command
+                    break;
+            }
+        }
 
         private void serialPort1_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
         {
@@ -848,8 +819,15 @@ namespace SerialSplitter
 
         private void ShowData2(object sender, EventArgs e)
         {
+            if (string.IsNullOrEmpty(dataIN2))
+                return;
+
             if (DEBUG) DisplayData(2, dataIN2);
+
+            // Always forward data to serialPort1
             serialPort1.WriteLine(dataIN2);
+
+            // Handle specific commands
             if (dataIN2.Contains("FluoroOff") || dataIN2.Contains("CineOff"))
             {
                 AEC_Lock = false;
@@ -857,6 +835,8 @@ namespace SerialSplitter
                 dataOUT3 = "KV" + textBoxKVF.Text;
                 serialPort3.WriteLine(dataOUT3);
                 if (DEBUG) DisplayData(6, dataOUT3);
+                // Early return since this is a terminal action
+                return;
             }
             if (dataIN2.Contains("FluoroOn") || dataIN2.Contains("CineOn"))
             {
@@ -895,223 +875,101 @@ namespace SerialSplitter
         private void ShowData3(object sender, EventArgs e)
         {
             DoubleBuffered = true;
+
+            if (string.IsNullOrEmpty(dataIN3))
+                return;
+
+            // Helper to safely trim trailing \r, \n, or whitespace
+            string SafeTrim(string s)
+            {
+                return string.IsNullOrEmpty(s) ? "?" : s.TrimEnd('\r', '\n', ' ');
+            }
+
             if (DEBUG) DisplayData(3, dataIN3);
-            string msg;
-            if (dataIN3.Length > 4) msg = dataIN3.Remove(0, 4); else msg = "";
-            // ACK = false;
-            // NACK = false;
-            switch (message)
+
+            // Extract message type and payload
+            string msgType = dataIN3.Length > 4 ? dataIN3.Substring(0, 4) : dataIN3;
+            string msg = dataIN3.Length > 4 ? dataIN3.Substring(4) : "";
+
+            // Remove trailing whitespace for easier comparison
+            string msgTrimmed = msg.Trim();
+
+            switch (msgType)
             {
                 case "EZ: ":
-                    switch (msg)
-                    {
-                        case "SBE0\r":
-                            break;
-
-                        case "SBE1\r":
-                            textBoxER.Text = "Falla de tarjeta de Estator";
-                            LoggearError();
-
-                            break;
-
-                        case "HBE0\r":
-                            break;
-
-                        case "HBE1\r":
-                            textBoxER.Text = "Falla de tarjeta de Calefaccion";
-                            LoggearError();
-                            break;
-
-                        case "IBM0\r":
-                            break;
-
-                        case "IBM1\r":
-                            textBoxER.Text = "Falla de tarjeta de Inversor";
-                            LoggearError();
-                            break;
-
-                        case "FPE0\r":
-                            break;
-
-                        case "FPE1\r":
-                            textBoxER.Text = "Verificar Relay Preparacion";
-                            LoggearError();
-                            break;
-
-                        case "TMP0\r":
-                            break;
-
-                        case "TMP1\r":
-                            textBoxER.Text = "Temperatura de Tubo Exedida";
-                            LoggearError();
-                            break;
-
-                        default:
-                            break;
-                    }
+                    HandleEZ(msgTrimmed);
                     break;
+
                 case "ER: ":
-                    if (msg != "\r")
-                    {
-                        textBoxER.Text = "";
-                    }
-                    switch (msg)
-                    {
-                        case "LHB\r":
-                            textBoxER.Text = "Falla de Lampara Testigo Calefaccion";
-                            LoggearError();
-                            break;
-
-                        case "CAP\r":
-                            textBoxER.Text = "Falla de Estator (UCap)";
-                            LoggearError();
-                            break;
-
-                        case "COM\r":
-                            textBoxER.Text = "Falla de Estator (ICom)";
-                            LoggearError();
-                            break;
-
-                        case "IBE\r":
-                            button1.BackColor = Color.Red;
-                            textBoxER.Text = "Falla de Inversor";
-                            LoggearError();
-                            break;
-
-                        case "IBZ\r":
-                            button1.BackColor = Color.Red;  // Inverter error
-                            textBoxER.Text = "GAT Desconectado";
-                            LoggearError();
-                            break;
-
-                        case "FIL\r":
-                            button2.BackColor = Color.Red;
-                            textBoxER.Text = "Falla de Filamento";
-                           LoggearError();
-                            break;
-
-                        case "FCC\r":
-                                textBoxER.Text = "Filamento en Corto Circuito";
-                            button2.BackColor = Color.Red;
-                            LoggearError();
-                            break;
-
-                        case "TMP\r":
-                            button3.BackColor = Color.Red;        // Temperatura Tubo
-                            textBoxER.Text = "Temperatura de Tubo Exedida";
-                            LoggearError();
-                            break;
-
-                        case "EEE\r":
-                            textBoxER.Text = "Falla de Memoria EEPROM";
-                            LoggearError();
-                            break;
-
-                        case "SYM\r":
-                            textBoxER.Text = "Simulador Activado";
-                            break;
-
-                        case "UPW\r":
-                            button1.BackColor = Color.Red;
-                            textBoxER.Text = "Baja Tension en UPower";
-                            LoggearError();
-                            break;
-
-                        case "CPM\r":
-                            // Error Stator Boar Missing
-                            textBoxER.Text = "Falta Placa Estator";
-                            button3.BackColor = Color.Red;
-                            LoggearError();
-                            break;
-
-                        case "FPE1\r":
-                            // Fin Prep Board Missing o Relay Pegado
-                            textBoxER.Text = "Verificar Relay Preparacion";
-                            LoggearError();
-                            break;
-
-                        case "ESF0\r":
-                            textBoxER.Text = "Falla de Relay Foco Fino";
-                            LoggearError();
-                            break;
-
-                        case "ESF1\r":
-                            textBoxER.Text = "Falla de Relay Foco Grueso";
-                            LoggearError();
-                            break;
-
-
-                        default:
-                            if (msg != "\r") textBoxER.Text = msg;
-                            break;
-                    }
-                    // buttonCal.BackColor = Color.RosyBrown;
+                    HandleER(msgTrimmed);
                     break;
+
                 case "ET: ":
-                    textBoxET.Text = dataIN3.Remove(0, 4);
-                    if (textBoxET.Text == "CINE\r") Cine = true; else Cine = false;
+                    textBoxET.Text = msg;
+                    Cine = (msgTrimmed == "CINE");
                     break;
+
                 case "SN: ":
-                    SerialNumber = dataIN3.Remove(0, 4);
+                    SerialNumber = msg;
                     break;
+
                 case "SW: ":
-                    if (dataIN3.Remove(0, 4) != SW_Version)
+                    if (msg != SW_Version)
                     {
                         MessageBox.Show("Error de Software, Versiones incompatibles de Generador y GUI");
                         SW_Ready = false;
                         textBoxER.Text = "Software error (DUE != GUI)";
                         LoggearError();
-                        break;
                     }
-                    SW_Ready = true;
+                    else
+                    {
+                        SW_Ready = true;
+                    }
                     break;
+
                 case "Kv: ":
-                    if (textBoxKV.Text != dataIN3.Remove(0, 4))
-                    {
-                        textBoxKV.Text = dataIN3.Remove(0, 4);
-                    }
-                    // kvs = Int32.Parse(textBoxKV.Text);
+                    if (textBoxKV.Text != msg)
+                        textBoxKV.Text = msg;
                     break;
+
                 case "mA: ":
-                    if (textBoxMA.Text != dataIN3.Remove(0, 4))
-                    {
-                        textBoxMA.Text = dataIN3.Remove(0, 4);
-                    }
-                    // mas = Int32.Parse(textBoxMA.Text);
+                    if (textBoxMA.Text != msg)
+                        textBoxMA.Text = msg;
                     break;
+
                 case "SKv:":
-                    textBoxKVF.Text = dataIN3.Remove(0, 4);
+                    textBoxKVF.Text = msg;
                     break;
+
                 case "SmA:":
-                    textBoxMAF.Text = dataIN3.Remove(0, 4);
+                    textBoxMAF.Text = msg;
                     break;
+
                 case "ms: ":
-                    if (textBoxMS.Text != dataIN3.Remove(0, 4))
-                    {
-                        textBoxMS.Text = dataIN3.Remove(0, 4);
-                    }
-                    // mss = Int32.Parse(textBoxMS.Text);
+                    if (textBoxMS.Text != msg)
+                        textBoxMS.Text = msg;
                     break;
+
                 case "mf: ":
-                    if (textBoxSms.Text != dataIN3.Remove(0, 4))
-                    {
-                        textBoxSms.Text = dataIN3.Remove(0, 4);
-                    }
+                    if (textBoxSms.Text != msg)
+                        textBoxSms.Text = msg;
                     break;
+
                 case "mc: ":
-                    if (textBoxCms.Text != dataIN3.Remove(0, 4))
-                    {
-                        textBoxCms.Text = dataIN3.Remove(0, 4);
-                    }
+                    if (textBoxCms.Text != msg)
+                        textBoxCms.Text = msg;
                     break;
+
                 case "Kv+:":
-                    textKVP = dataIN3.Remove(0, 4);
+                    textKVP = msg;
                     break;
+
                 case "Kv-:":
-                    textKVN = dataIN3.Remove(0, 4);
+                    textKVN = msg;
                     break;
+
                 case "RmA:":
-                    textRmA = dataIN3.Remove(0, 4);
+                    textRmA = msg;
                     try
                     {
                         decimal mARead = Convert.ToDecimal(textRmA);
@@ -1124,177 +982,242 @@ namespace SerialSplitter
                         textmAReal = "???";
                     }
                     break;
+
                 case "SFI:":
-                    textSFI = dataIN3.Remove(0, 4);
+                    textSFI = msg;
                     break;
+
                 case "SRE:":
-                    textSRE = dataIN3.Remove(0, 4);
+                    textSRE = msg;
                     break;
+
                 case "SCC:":
-                    textSCC = dataIN3.Remove(0, 4);
+                    textSCC = msg;
                     break;
+
                 case "SIC:":
-                    textSIC = dataIN3.Remove(0, 4);
+                    textSIC = msg;
                     break;
+
                 case "SUC:":
-                    textSUC = dataIN3.Remove(0, 4);
+                    textSUC = msg;
                     break;
+
                 case "UPW:":
-                    textUPW = dataIN3.Remove(0, 4);
+                    textUPW = msg;
                     break;
-                case "TST:":
-                    // textBoxTST.Text = dataIN3.Remove(0, 4);
-                    break;
-                case "FO: ":
-                    break;
-                case "HO: ":
-                    // textBoxHO.Text = dataIN3.Remove(0, 4);
-                    break;
+
                 case "CAL:":
-                    if (msg == "1\r")
+                    if (msgTrimmed == "1")
                     {
                         dataOUT3 = "DB0";
-                        serialPort3.WriteLine(dataOUT3);   // Send data to Generator to turn off Calibration
+                        serialPort3.WriteLine(dataOUT3);
                         if (DEBUG) DisplayData(6, dataOUT3);
                     }
                     break;
+
                 case "VCC:":
-                    textVCC = dataIN3.Remove(0, 4);
-                 /* if (textVCC != "")
-                    {
-                        try
-                        {
-                            float Test = float.Parse(textVCC);
-                            if (Test < (VCC - 0.3) || Test > (VCC + 0.3)) radioButton3.BackColor = Color.Red;
-                            else
-                            {
-                                if (Test < (VCC - 0.1) || Test > (VCC + 0.1)) radioButton3.BackColor = Color.Yellow;
-                                else
-                                {
-                                    if (Test > (VCC - 0.11) || Test < (VCC + 0.09)) radioButton3.BackColor = Color.LightGreen;
-                                }
-                            }
-                        }
-                        catch (Exception err)
-                        {
-                            //   MessageBox.Show(err.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        }
-                    } */
+                    textVCC = msg;
                     break;
+
                 case "HU: ":
-                    textHU = dataIN3.Remove(0, 4);
+                    textHU = msg;
                     break;
+
                 case "FT: ":
-                    if (msg == "0\r")
-                    {
-                        buttonFM.BackColor = Color.LightGray;
-                        buttonFM.Text = "No Fluoro";
-                    }
-                    if (msg == "1\r")
-                    {
-                        buttonFM.BackColor = Color.LightYellow;
-                        buttonFM.Text = "Fluoro C";
-                    }
-                    if (msg == "2\r")
-                    {
-                        buttonFM.BackColor = Color.LightGreen;
-                        buttonFM.Text = "Fluoro P";
-                    }
+                    UpdateFluoroButton(msgTrimmed);
                     break;
+
                 case "RD: ":
                     if ((buttonPW.BackColor == Color.LightSkyBlue) && AutoON)
                     {
                         buttonPW_Click(sender, e);
                     }
-
-                    if (msg == "0\r")
-                    {
-                        buttonRM.BackColor = Color.LightYellow;
-                        buttonRM.Text = "RAD0";
-                    }
-                    if (msg == "1\r")
-                    {
-                        buttonRM.BackColor = Color.LightGreen;
-                        buttonRM.Text = "RAD1";
-                    }
-                    if (msg == "2\r")
-                    {
-                        buttonRM.BackColor = Color.LightGreen;
-                        buttonRM.Text = "RAD2";
-                    }
-                    if (msg == "3\r")
-                    {
-                        buttonRM.BackColor = Color.LightGreen;
-                        buttonRM.Text = "CINE";
-                    }
-                    if (msg == "4\r")
-                    {
-                        buttonRM.BackColor = Color.Red;
-                        buttonRM.Text = "Service";
-                    }
-                    break;
-                case "CL: ":
-                    break;
-                case "POK:":
-                 /* if (msg == "0\r")
-                    {
-                        PROK = 0;
-                    }
-                    if (msg == "1\r")
-                    {
-                        PROK = 1;
-                    }
-                    if (msg == "2\r")
-                    {
-                        PROK = 2;
-                    } */
-                    break;
-                case "XOK:":
-                 /* if (msg == "0\r")
-                    {
-                        // buttonPrep
-                        RXOK = 0;
-                    }
-                    if (msg == "1\r")
-                    {
-                        RXOK = 1;
-                    } */
-                    break;
-                case "EEP:":
-                    // ConfigSize = Convert.ToInt32(dataIN.Remove(0, 4));
-                    // ConfigReady = true;
-                    break;
-
-                case "TC1:":
-                    // textBoxTC1.Text = dataIN.Remove(0, 4) + "ºC";
+                    UpdateRadButton(msgTrimmed);
                     break;
 
                 case "LOG:":
-                    // GUI_Sound(4);
-                    logger.LogInfo("VCC:" + textVCC.Substring(0, textVCC.Length - 1) +
-                                   " Kv:" + textBoxKV.Text.Substring(0, textBoxKV.Text.Length - 1) +
-                                   " mA:" + textBoxMA.Text.Substring(0, textBoxMA.Text.Length - 1) +
-                                   " ms:" + textBoxMS.Text.Substring(0, textBoxMS.Text.Length - 1) +
-                                   " Kv+:" + textKVP.Substring(0, textKVP.Length - 1) +
-                                   " Kv-:" + textKVN.Substring(0, textKVN.Length - 1) +
-                                   " mA:" + textmAReal + " %HU:" + textHU);
-
-                    // logger.LogWarning("Este es un mensaje de advertencia.");
-                    // logger.LogError("Este es un mensaje de error.");
+                    logger.LogInfo("VCC:" + SafeTrim(textVCC) +
+                                   " Kv:" + SafeTrim(textBoxKV.Text) +
+                                   " mA:" + SafeTrim(textBoxMA.Text) +
+                                   " ms:" + SafeTrim(textBoxMS.Text) +
+                                   " Kv+:" + SafeTrim(textKVP) +
+                                   " Kv-:" + SafeTrim(textKVN) +
+                                   " mA:" + SafeTrim(textmAReal) + " %HU:" + SafeTrim(textHU));
                     break;
 
+                // Add other cases as needed
+
                 default:
+                    // Optionally handle unknown message types
                     break;
             }
 
-            if ((textBoxET.Text == "OFF\r") || (textBoxET.Text == "ERROR\r") || (textBoxET.Text == "\r"))
+            // Update Power button color based on equipment state
+            if (textBoxET.Text == "OFF\r" || textBoxET.Text == "ERROR\r" || textBoxET.Text == "\r")
             {
                 buttonPW.BackColor = Color.LightSkyBlue;
             }
-
-            if ((textBoxET.Text == "IDLE\r")) // || (textBox1.Text == "ERROR\r") || (textBox1.Text == "\r")
+            else if (textBoxET.Text == "IDLE\r")
             {
                 buttonPW.BackColor = Color.LightGreen;
+            }
+        }
+
+        // Helper for EZ: errors
+        private void HandleEZ(string msg)
+        {
+            switch (msg)
+            {
+                case "SBE1":
+                    textBoxER.Text = "Falla de tarjeta de Estator";
+                    LoggearError();
+                    break;
+                case "HBE1":
+                    textBoxER.Text = "Falla de tarjeta de Calefaccion";
+                    LoggearError();
+                    break;
+                case "IBM1":
+                    textBoxER.Text = "Falla de tarjeta de Inversor";
+                    LoggearError();
+                    break;
+                case "FPE1":
+                    textBoxER.Text = "Verificar Relay Preparacion";
+                    LoggearError();
+                    break;
+                case "TMP1":
+                    textBoxER.Text = "Temperatura de Tubo Exedida";
+                    LoggearError();
+                    break;
+                    // Add more as needed
+            }
+        }
+
+        // Helper for ER: errors
+        private void HandleER(string msg)
+        {
+            if (msg != "")
+                textBoxER.Text = "";
+
+            switch (msg)
+            {
+                case "LHB":
+                    textBoxER.Text = "Falla de Lampara Testigo Calefaccion";
+                    LoggearError();
+                    break;
+                case "CAP":
+                    textBoxER.Text = "Falla de Estator (UCap)";
+                    LoggearError();
+                    break;
+                case "COM":
+                    textBoxER.Text = "Falla de Estator (ICom)";
+                    LoggearError();
+                    break;
+                case "IBE":
+                    button1.BackColor = Color.Red;
+                    textBoxER.Text = "Falla de Inversor";
+                    LoggearError();
+                    break;
+                case "IBZ":
+                    button1.BackColor = Color.Red;
+                    textBoxER.Text = "GAT Desconectado";
+                    LoggearError();
+                    break;
+                case "FIL":
+                    button2.BackColor = Color.Red;
+                    textBoxER.Text = "Falla de Filamento";
+                    LoggearError();
+                    break;
+                case "FCC":
+                    textBoxER.Text = "Filamento en Corto Circuito";
+                    button2.BackColor = Color.Red;
+                    LoggearError();
+                    break;
+                case "TMP":
+                    button3.BackColor = Color.Red;
+                    textBoxER.Text = "Temperatura de Tubo Exedida";
+                    LoggearError();
+                    break;
+                case "EEE":
+                    textBoxER.Text = "Falla de Memoria EEPROM";
+                    LoggearError();
+                    break;
+                case "SYM":
+                    textBoxER.Text = "Simulador Activado";
+                    break;
+                case "UPW":
+                    button1.BackColor = Color.Red;
+                    textBoxER.Text = "Baja Tension en UPower";
+                    LoggearError();
+                    break;
+                case "CPM":
+                    textBoxER.Text = "Falta Placa Estator";
+                    button3.BackColor = Color.Red;
+                    LoggearError();
+                    break;
+                case "FPE1":
+                    textBoxER.Text = "Verificar Relay Preparacion";
+                    LoggearError();
+                    break;
+                case "ESF0":
+                    textBoxER.Text = "Falla de Relay Foco Fino";
+                    LoggearError();
+                    break;
+                case "ESF1":
+                    textBoxER.Text = "Falla de Relay Foco Grueso";
+                    LoggearError();
+                    break;
+                default:
+                    if (msg != "") textBoxER.Text = msg;
+                    break;
+            }
+        }
+
+        // Helper for FT: (Fluoro Type) button
+        private void UpdateFluoroButton(string msg)
+        {
+            switch (msg)
+            {
+                case "0":
+                    buttonFM.BackColor = Color.LightGray;
+                    buttonFM.Text = "No Fluoro";
+                    break;
+                case "1":
+                    buttonFM.BackColor = Color.LightYellow;
+                    buttonFM.Text = "Fluoro C";
+                    break;
+                case "2":
+                    buttonFM.BackColor = Color.LightGreen;
+                    buttonFM.Text = "Fluoro P";
+                    break;
+            }
+        }
+
+        // Helper for RD: (Rad Mode) button
+        private void UpdateRadButton(string msg)
+        {
+            switch (msg)
+            {
+                case "0":
+                    buttonRM.BackColor = Color.LightYellow;
+                    buttonRM.Text = "RAD0";
+                    break;
+                case "1":
+                    buttonRM.BackColor = Color.LightGreen;
+                    buttonRM.Text = "RAD1";
+                    break;
+                case "2":
+                    buttonRM.BackColor = Color.LightGreen;
+                    buttonRM.Text = "RAD2";
+                    break;
+                case "3":
+                    buttonRM.BackColor = Color.LightGreen;
+                    buttonRM.Text = "CINE";
+                    break;
+                case "4":
+                    buttonRM.BackColor = Color.Red;
+                    buttonRM.Text = "Service";
+                    break;
             }
         }
 
@@ -1460,7 +1383,7 @@ namespace SerialSplitter
         {
             this.logFilePath = logFilePath;
             // Si el archivo no existe, crea uno nuevo; si existe, lo abre en modo append (agregar al final).
-            File.AppendAllText(logFilePath, "=== Inicio de Log Interface Pimax Digirad ===" + Environment.NewLine);
+            File.AppendAllText(logFilePath, "=== Log Interface Aspor - Digirad ===" + Environment.NewLine);
         }
 
         public void LogInfo(string message)
