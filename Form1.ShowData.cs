@@ -39,8 +39,7 @@ namespace SerialSplitter
             Counter = 0;
             try
             {
-                // DisplayInibit = false;
-                if (!DisplayInibit) this.Invoke(new EventHandler(ShowData3)); else this.Invoke(new EventHandler(ShowDataReduced));
+                if (RX_On) this.Invoke(new EventHandler(ShowDataReduced)); else this.Invoke(new EventHandler(ShowData3));
             }
             catch (Exception err)
             {
@@ -50,7 +49,7 @@ namespace SerialSplitter
 
         private void ShowData1(object sender, EventArgs e)
         {
-            if (DEBUG) DisplayData(1, dataIN1);
+            // if (DEBUG) DisplayData(1, dataIN1);
             if (dataIN1.Contains("LK"))
             {
                 AEC_Lock = true;
@@ -62,7 +61,7 @@ namespace SerialSplitter
             if (dataIN1.Contains("Ax"))
             {
                 AnalogData = Convert.ToInt32(dataIN1.Substring(2));
-                if (DEBUG) DisplayData(1, dataIN1);
+                if (DEBUG) DisplayData(1, dataIN1 + "  " + Demora_AEC.ToString());
                 serialPort1.WriteLine("ACK");
                 if (DEBUG) DisplayData(4, "ACK");
                 AEC_Locked = false;
@@ -90,24 +89,19 @@ namespace SerialSplitter
             {
                 AEC_Lock = false;
                 RX_On = false;
-                dataOUT3 = "KV" + textBoxKVF.Text;
-                serialPort3.WriteLine(dataOUT3);
-                if (DEBUG) DisplayData(6, dataOUT3);
-                // Early return since this is a terminal action
-                return;
+                Demora_SendKV = 20;
             }
             if (dataIN2.Contains("FluoroOn") || dataIN2.Contains("CineOn"))
             {
+                if (dataIN2.Contains("CineOn")) Cine = true; else Cine = false;
+                Demora_AEC = 30;
                 RX_On = true;
             }
-
             if (DEBUG) DisplayData(4, dataIN2);
         }
 
         private void ShowData3(object sender, EventArgs e)
         {
-            DoubleBuffered = true;
-
             if (string.IsNullOrEmpty(dataIN3))
                 return;
 
@@ -455,8 +449,6 @@ namespace SerialSplitter
 
         private void ShowDataReduced(object sender, EventArgs e)
         {
-            DoubleBuffered = true;
-            if (DEBUG) DisplayData(3, dataIN3);
             string msg;
             if (dataIN3.Length > 4) msg = dataIN3.Remove(0, 4); else msg = "";
             // ACK = false;
@@ -564,10 +556,10 @@ namespace SerialSplitter
                     textBoxET.Text = dataIN3.Remove(0, 4);
                     break;
                 case "Kv: ":
-                    if (textBoxKV.Text != dataIN3.Remove(0, 4))
-                    {
-                        textBoxKV.Text = dataIN3.Remove(0, 4);
-                    }
+                //   if (textBoxKV.Text != dataIN3.Remove(0, 4))
+                //   {
+                //       textBoxKV.Text = dataIN3.Remove(0, 4);
+                //   }
                     // kvs = Int32.Parse(textBoxKV.Text);
                     break;
                 case "SKv:":

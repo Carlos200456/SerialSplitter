@@ -77,6 +77,9 @@
             this.label15 = new System.Windows.Forms.Label();
             this.textBoxUDP = new System.Windows.Forms.TextBox();
             this.label16 = new System.Windows.Forms.Label();
+            this.button4 = new System.Windows.Forms.Button();
+            this.button5 = new System.Windows.Forms.Button();
+            this.buttonAEC = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // serialPort1
@@ -491,11 +494,45 @@
             this.label16.TabIndex = 44;
             this.label16.Text = "UDP";
             // 
+            // button4
+            // 
+            this.button4.Location = new System.Drawing.Point(399, 76);
+            this.button4.Name = "button4";
+            this.button4.Size = new System.Drawing.Size(56, 23);
+            this.button4.TabIndex = 45;
+            this.button4.Text = "KV +";
+            this.button4.UseVisualStyleBackColor = true;
+            this.button4.Click += new System.EventHandler(this.button4_Click);
+            // 
+            // button5
+            // 
+            this.button5.Location = new System.Drawing.Point(399, 101);
+            this.button5.Name = "button5";
+            this.button5.Size = new System.Drawing.Size(56, 23);
+            this.button5.TabIndex = 46;
+            this.button5.Text = "KV -";
+            this.button5.UseVisualStyleBackColor = true;
+            this.button5.Click += new System.EventHandler(this.button5_Click);
+            // 
+            // buttonAEC
+            // 
+            this.buttonAEC.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.buttonAEC.Location = new System.Drawing.Point(316, 101);
+            this.buttonAEC.Name = "buttonAEC";
+            this.buttonAEC.Size = new System.Drawing.Size(56, 23);
+            this.buttonAEC.TabIndex = 47;
+            this.buttonAEC.Text = "AEC";
+            this.buttonAEC.UseVisualStyleBackColor = true;
+            this.buttonAEC.Click += new System.EventHandler(this.buttonAEC_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(472, 372);
+            this.Controls.Add(this.buttonAEC);
+            this.Controls.Add(this.button5);
+            this.Controls.Add(this.button4);
             this.Controls.Add(this.label16);
             this.Controls.Add(this.textBoxUDP);
             this.Controls.Add(this.label15);
@@ -598,6 +635,9 @@
         private System.Windows.Forms.Label label15;
         private System.Windows.Forms.TextBox textBoxUDP;
         private System.Windows.Forms.Label label16;
+        private System.Windows.Forms.Button button4;
+        private System.Windows.Forms.Button button5;
+        private System.Windows.Forms.Button buttonAEC;
     }
 }
 
