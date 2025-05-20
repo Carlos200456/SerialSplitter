@@ -43,7 +43,7 @@ namespace SerialSplitter
         bool RX_On = false;
         bool AEC_Lock = true;
         public static float VCC = 0.0f;
-        int Counter, VHKVOF, VAKVOF, VEKVOF, CIKVOF, LOW_Limit, HI_Limit, Cine_LOW_Limit, Cine_HI_Limit, Offset_KV_Cine, AnalogData, Old_AnalogData, ValorMedioCine, ValorMedioFluoro, Demora_SendKV, Demora_AEC;
+        int Counter, VHKVOF = 15, VAKVOF = 12, VEKVOF = 6, CIKVOF = 4, LOW_Limit, HI_Limit, Cine_LOW_Limit, Cine_HI_Limit, Offset_KV_Cine, AnalogData, Old_AnalogData, ValorMedioCine, ValorMedioFluoro, Demora_SendKV, Demora_AEC;
         int dif_aec = 0;
         // float mxs;
 
