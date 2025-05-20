@@ -50,21 +50,12 @@ namespace SerialSplitter
         private void ShowData1(object sender, EventArgs e)
         {
             // if (DEBUG) DisplayData(1, dataIN1);
-            if (dataIN1.Contains("LK"))
-            {
-                AEC_Lock = true;
-                AEC_Lock_Quantity = Convert.ToInt32(dataIN1.Substring(2));
-                if (DEBUG) DisplayData(4, dataIN1);
-                serialPort1.WriteLine("ACK");
-                if (DEBUG) DisplayData(4, "ACK");
-            }
             if (dataIN1.Contains("Ax"))
             {
                 AnalogData = Convert.ToInt32(dataIN1.Substring(2));
                 if (DEBUG) DisplayData(1, dataIN1);
                 serialPort1.WriteLine("ACK");
                 if (DEBUG) DisplayData(4, "ACK");
-                AEC_Locked = false;
             }
             else
             {
@@ -88,7 +79,6 @@ namespace SerialSplitter
             if (dataIN2.Contains("FluoroOff") || dataIN2.Contains("CineOff"))
             {
                 AEC_Lock = false;
-                AEC_Locked = false;
                 RX_On = false;
                 Demora_SendKV = 20;
             }
@@ -97,6 +87,10 @@ namespace SerialSplitter
                 if (dataIN2.Contains("CineOn")) Cine = true; else Cine = false;
                 Demora_AEC = 10;
                 RX_On = true;
+            }
+            if (dataIN2.Contains("AEC_Locked"))
+            {                 
+                AEC_Lock = true;
             }
             if (DEBUG) DisplayData(4, dataIN2);
         }

@@ -227,7 +227,7 @@
             // 
             // buttonGRST
             // 
-            this.buttonGRST.Location = new System.Drawing.Point(399, 51);
+            this.buttonGRST.Location = new System.Drawing.Point(400, 33);
             this.buttonGRST.Name = "buttonGRST";
             this.buttonGRST.Size = new System.Drawing.Size(56, 23);
             this.buttonGRST.TabIndex = 15;
@@ -379,7 +379,7 @@
             // 
             // buttonExit
             // 
-            this.buttonExit.Location = new System.Drawing.Point(399, 126);
+            this.buttonExit.Location = new System.Drawing.Point(400, 101);
             this.buttonExit.Name = "buttonExit";
             this.buttonExit.Size = new System.Drawing.Size(56, 23);
             this.buttonExit.TabIndex = 32;
@@ -452,9 +452,9 @@
             // 
             // buttonSV
             // 
-            this.buttonSV.Location = new System.Drawing.Point(316, 76);
+            this.buttonSV.Location = new System.Drawing.Point(184, 77);
             this.buttonSV.Name = "buttonSV";
-            this.buttonSV.Size = new System.Drawing.Size(56, 23);
+            this.buttonSV.Size = new System.Drawing.Size(50, 23);
             this.buttonSV.TabIndex = 40;
             this.buttonSV.Text = "Set Val";
             this.buttonSV.UseVisualStyleBackColor = true;
@@ -496,7 +496,7 @@
             // 
             // button4
             // 
-            this.button4.Location = new System.Drawing.Point(399, 76);
+            this.button4.Location = new System.Drawing.Point(400, 56);
             this.button4.Name = "button4";
             this.button4.Size = new System.Drawing.Size(56, 23);
             this.button4.TabIndex = 45;
@@ -506,7 +506,7 @@
             // 
             // button5
             // 
-            this.button5.Location = new System.Drawing.Point(399, 101);
+            this.button5.Location = new System.Drawing.Point(400, 79);
             this.button5.Name = "button5";
             this.button5.Size = new System.Drawing.Size(56, 23);
             this.button5.TabIndex = 46;
@@ -517,7 +517,7 @@
             // buttonAEC
             // 
             this.buttonAEC.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.buttonAEC.Location = new System.Drawing.Point(316, 101);
+            this.buttonAEC.Location = new System.Drawing.Point(316, 79);
             this.buttonAEC.Name = "buttonAEC";
             this.buttonAEC.Size = new System.Drawing.Size(56, 23);
             this.buttonAEC.TabIndex = 47;

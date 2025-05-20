@@ -39,13 +39,11 @@ namespace SerialSplitter
         bool DEBUG = true;
 #endif
         bool Cine = false;
-        bool AEC_Locked = true;
         bool AEC_ON = true;
         bool RX_On = false;
         bool AEC_Lock = true;
-        int AEC_Lock_Quantity = 0;
         public static float VCC = 0.0f;
-        int Counter, LOW_Limit, HI_Limit, Cine_LOW_Limit, Cine_HI_Limit, AnalogData, Old_AnalogData, ValorMedioCine, ValorMedioFluoro, Demora_SendKV, Demora_AEC;
+        int Counter, VHKVOF, VAKVOF, VEKVOF, CIKVOF, LOW_Limit, HI_Limit, Cine_LOW_Limit, Cine_HI_Limit, Offset_KV_Cine, AnalogData, Old_AnalogData, ValorMedioCine, ValorMedioFluoro, Demora_SendKV, Demora_AEC;
         int dif_aec = 0;
         // float mxs;
 
@@ -134,21 +132,25 @@ namespace SerialSplitter
                                     break;
                                 case "VascularHead":
                                     VHKV = getBetween(s1, "Kv=", 3);
+                                    VHKVOF = Convert.ToInt32(getBetween(s1, "KvOffSet=", 2));
                                     VHMA = getBetween(s1, "mA=", 3);
                                     VHMS = getBetween(s1, "ms=", 3);
                                     break;
                                 case "VascularAbdomen":
                                     VAKV = getBetween(s1, "Kv=", 3);
+                                    VAKVOF = Convert.ToInt32(getBetween(s1, "KvOffSet=", 2));
                                     VAMA = getBetween(s1, "mA=", 3);
                                     VAMS = getBetween(s1, "ms=", 3);
                                     break;
                                 case "VascularExtremity":
                                     VEKV = getBetween(s1, "Kv=", 3);
+                                    VEKVOF = Convert.ToInt32(getBetween(s1, "KvOffSet=", 2));
                                     VEMA = getBetween(s1, "mA=", 3);
                                     VEMS = getBetween(s1, "ms=", 3);
                                     break;
                                 case "Cine":
                                     CIKV = getBetween(s1, "Kv=", 3);
+                                    CIKVOF = Convert.ToInt32(getBetween(s1, "KvOffSet=", 2));
                                     CIMA = getBetween(s1, "mA=", 3);
                                     CIMS = getBetween(s1, "ms=", 3);
                                     break;
@@ -215,7 +217,7 @@ namespace SerialSplitter
                     OpenSerial1();
                     radioButton1.Checked = true;
                     radioButton1.BackColor = Color.Green;
-               }
+                }
                 if (Serial2PortName == ports[i])
                 {
                     OpenSerial2();
@@ -324,14 +326,17 @@ namespace SerialSplitter
         // Make f_Tick async
         private async void f_Tick(object sender, EventArgs e)
         {
-            if (RX_On && AEC_ON && (Demora_AEC == 0)) AnalyzeDataABC(AnalogData, sender, e);
+            if (RX_On && AEC_ON && (Demora_AEC == 0) && !AEC_Lock)
+            {
+                AnalyzeDataABC(AnalogData, sender, e);
+            }
             await ReadUPD_Data(e); // Await the async method
             if (Demora_SendKV == 1)
             {
                 // Ensure textBoxKVF.Text contains a valid integer value.
                 if (int.TryParse(textBoxKVF.Text, out int kv))
                 {
-                    kv = kv - 4;
+                    kv = kv - Offset_KV_Cine;
                     if (kv < 40) kv = 40;
                     dataOUT3 = "KV" + kv.ToString();
                     serialPort3.WriteLine(dataOUT3);
@@ -365,25 +370,23 @@ namespace SerialSplitter
             ValorMedioFluoro = ((HI_Limit - LOW_Limit) / 2) + LOW_Limit;
             if (!Cine)   // AEC Fluoroscopia
             {
-                if ((value > LOW_Limit) && (value < HI_Limit)) AEC_Locked = true; else AEC_Locked = false;
                 if (value < LOW_Limit)
                 {
                     dif_aec = (ValorMedioFluoro - value) / 3;
                     if (dif_aec > 10) dif_aec = 10;
                     if (dif_aec < 1) dif_aec = 1;
                     button4_Click(sender, e);
-                } 
+                }
                 if (value > HI_Limit)
                 {
                     dif_aec = (value - ValorMedioFluoro) / 3;
                     if (dif_aec > 10) dif_aec = 10;
                     if (dif_aec < 1) dif_aec = 1;
                     button5_Click(sender, e);
-                } 
-            } 
+                }
+            }
             else    // AEC Cine
             {
-                if ((value > Cine_LOW_Limit) && (value < Cine_HI_Limit)) AEC_Locked = true; else AEC_Locked = false;
                 if (value < Cine_LOW_Limit)
                 {
                     dif_aec = (ValorMedioCine - value) / 5;
@@ -437,9 +440,7 @@ namespace SerialSplitter
         private void buttonExit_Click(object sender, EventArgs e)
         {
             logger.LogInfo("Salida de la Aplicación por el operador");
-            // Call Form1_FormClosing
-            Form_FormClosing(sender, new FormClosingEventArgs(CloseReason.UserClosing, false));
-            Application.Exit();
+            this.Close(); // Esto dispara Form_FormClosing automáticamente
         }
 
         private void buttonPW_Click(object sender, EventArgs e)
@@ -455,7 +456,7 @@ namespace SerialSplitter
                         if (DEBUG) DisplayData(6, dataOUT3);
                         // Omitir la siguiente linea en Debug
 #if !DEBUG
-                        this.Size = new Size(488,140);
+                        this.Size = new Size(488, 140);
                         this.Left = 100;  // 680;   // Centrado
                         this.Top = 948;
                         this.ControlBox = false;
@@ -621,15 +622,19 @@ namespace SerialSplitter
             {
                 case "Head":
                     await SendCommands("KV" + VHKV, "MA" + VHMA, "TC" + VHMS);
+                    Offset_KV_Cine = VHKVOF; // 15
                     break;
                 case "Abdomen":
                     await SendCommands("KV" + VAKV, "MA" + VAMA, "TC" + VAMS);
+                    Offset_KV_Cine = VAKVOF; // 12
                     break;
                 case "Extremity":
                     await SendCommands("KV" + VEKV, "MA" + VEMA, "TC" + VEMS);
+                    Offset_KV_Cine = VEKVOF; // 6
                     break;
                 case "Cine":
                     await SendCommands("KV" + CIKV, "MA" + CIMA, "TC" + CIMS);
+                    Offset_KV_Cine = CIKVOF; // 4
                     break;
                 case "FLUOROMAP":
                     await SendCommands("KZ" + FMKV, "MZ" + FMMA, "TX" + FMMS);
@@ -728,30 +733,20 @@ namespace SerialSplitter
         {
             try
             {
-                // Close serial ports if open, suppress exceptions to avoid blocking shutdown
-                if (serialPort1 != null && serialPort1.IsOpen)
-                {
-                    try { serialPort1.Close(); } catch { /* Ignore */ }
-                }
-                if (serialPort2 != null && serialPort2.IsOpen)
-                {
-                    try { serialPort2.Close(); } catch { /* Ignore */ }
-                }
-                if (serialPort3 != null && serialPort3.IsOpen)
-                {
-                    try { serialPort3.Close(); } catch { /* Ignore */ }
-                }
+                // Cierre seguro de los puertos
+                if (serialPort1 != null && serialPort1.IsOpen) { try { serialPort1.Close(); } catch { } }
+                if (serialPort2 != null && serialPort2.IsOpen) { try { serialPort2.Close(); } catch { } }
+                if (serialPort3 != null && serialPort3.IsOpen) { try { serialPort3.Close(); } catch { } }
             }
-            catch
-            {
-                // Suppress all exceptions to ensure shutdown continues
-            }
+            catch { }
             finally
             {
-                // Ensure form close is invoked on UI thread, but only if not disposed
                 if (this.IsHandleCreated && !this.IsDisposed)
                 {
-                    this.Invoke(new EventHandler(NowClose));
+                    if (this.InvokeRequired)
+                        this.Invoke(new EventHandler(NowClose));
+                    else
+                        NowClose(this, EventArgs.Empty);
                 }
             }
         }
@@ -763,12 +758,14 @@ namespace SerialSplitter
 
         private void Form_FormClosing(object sender, FormClosingEventArgs e)
         {
+            t?.Stop();
+            f?.Stop();
 
-            if (serialPort1.IsOpen || serialPort2.IsOpen || serialPort3.IsOpen)
+            if ((serialPort1?.IsOpen ?? false) || (serialPort2?.IsOpen ?? false) || (serialPort3?.IsOpen ?? false))
             {
-                e.Cancel = true; //cancel the fom closing
-                Thread CloseDown = new Thread(new ThreadStart(CloseSerialOnExit)); //close port in new thread to avoid hang
-                CloseDown.Start(); //close port in new thread to avoid hang
+                e.Cancel = true;
+                Thread CloseDown = new Thread(new ThreadStart(CloseSerialOnExit));
+                CloseDown.Start();
             }
         }
     }
