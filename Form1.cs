@@ -27,21 +27,6 @@ namespace SerialSplitter
         string dataIN1 = "", dataIN2 = "", dataIN3 = "", dataOUT1 = "", dataOUT2 = "", dataOUT3 = "", path, textKVP, textKVN, textmAReal, textRmA, LastER, textSFI, textSRE, textSCC, textSIC, textSUC, textUPW, textHU, textVCC, message;
         string Serial1PortName, Serial1BaudRate, Serial1DataBits, Serial1StopBits, Serial1Parity, Serial2PortName, Serial2BaudRate, Serial2DataBits, Serial2StopBits, Serial2Parity, Serial3PortName, Serial3BaudRate, Serial3DataBits, Serial3StopBits, Serial3Parity;
 
-        private void buttonAEC_Click(object sender, EventArgs e)
-        {
-            if (AEC_ON)             {
-                AEC_ON = false;
-                buttonAEC.BackColor = Color.Red;
-                buttonAEC.Text = "AEC OFF";
-            }
-            else
-            {
-                AEC_ON = true;
-                buttonAEC.BackColor = Color.LightGreen;
-                buttonAEC.Text = "AEC ON";
-            }
-        }
-
         readonly string[] mA_Table = new string[8] { "50\r", "100\r", "200\r", "300\r", "400\r", "500\r", "600\r", "700\r" };
         readonly string[] ms_Table = new string[30] { "2\r", "5\r", "8\r", "10\r", "20\r", "30\r", "40\r", "50\r", "60\r", "80\r", "100\r", "120\r", "150\r", "200\r", "250\r", "300\r", "400\r", "500\r", "600\r", "800\r", "1000\r", "1200\r", "1500\r", "2000\r", "2500\r", "3000\r", "3500\r", "4000\r", "4500\r", "5000\r" };
         bool ACK = false;
@@ -61,8 +46,8 @@ namespace SerialSplitter
         int AEC_Lock_Quantity = 0;
         public static float VCC = 0.0f;
         int Counter, LOW_Limit, HI_Limit, Cine_LOW_Limit, Cine_HI_Limit, AnalogData, Old_AnalogData, ValorMedioCine, ValorMedioFluoro, Demora_SendKV, Demora_AEC;
-
-        float mxs;
+        int dif_aec = 0;
+        // float mxs;
 
         StringBuilder sb = new StringBuilder();
         char LF = (char)10;
@@ -339,19 +324,7 @@ namespace SerialSplitter
         // Make f_Tick async
         private async void f_Tick(object sender, EventArgs e)
         {
-            if (AEC_Lock_Quantity > 0)
-            {
-                if (AEC_Lock_Quantity == 1)
-                {
-                    AEC_Locked = true;
-                    AEC_Lock_Quantity = 0;
-                }
-                else
-                {
-                    AEC_Lock_Quantity -= 1;
-                }
-            }
-            if (RX_On && AEC_ON && (Demora_AEC == 0)) AnalyzeDataABC(AnalogData);
+            if (RX_On && AEC_ON && (Demora_AEC == 0)) AnalyzeDataABC(AnalogData, sender, e);
             await ReadUPD_Data(e); // Await the async method
             if (Demora_SendKV == 1)
             {
@@ -386,9 +359,8 @@ namespace SerialSplitter
             if (ACK) return true; else return false;
         }
 
-        private void AnalyzeDataABC(int value)
+        private void AnalyzeDataABC(int value, object sender, EventArgs e)
         {
-            int dif_aec = 0;
             ValorMedioCine = ((Cine_HI_Limit - Cine_LOW_Limit) / 2) + Cine_LOW_Limit;
             ValorMedioFluoro = ((HI_Limit - LOW_Limit) / 2) + LOW_Limit;
             if (!Cine)   // AEC Fluoroscopia
@@ -396,19 +368,17 @@ namespace SerialSplitter
                 if ((value > LOW_Limit) && (value < HI_Limit)) AEC_Locked = true; else AEC_Locked = false;
                 if (value < LOW_Limit)
                 {
-                    dif_aec = (ValorMedioFluoro - value) / 2;
+                    dif_aec = (ValorMedioFluoro - value) / 3;
                     if (dif_aec > 10) dif_aec = 10;
                     if (dif_aec < 1) dif_aec = 1;
-                    dataOUT3 = "K+" + dif_aec.ToString();
-                    serialPort3.Write(dataOUT3);
+                    button4_Click(sender, e);
                 } 
                 if (value > HI_Limit)
                 {
-                    dif_aec = (value - ValorMedioFluoro) / 2;
+                    dif_aec = (value - ValorMedioFluoro) / 3;
                     if (dif_aec > 10) dif_aec = 10;
                     if (dif_aec < 1) dif_aec = 1;
-                    dataOUT3 = "K-" + dif_aec.ToString();
-                    serialPort3.Write(dataOUT3);
+                    button5_Click(sender, e);
                 } 
             } 
             else    // AEC Cine
@@ -416,19 +386,17 @@ namespace SerialSplitter
                 if ((value > Cine_LOW_Limit) && (value < Cine_HI_Limit)) AEC_Locked = true; else AEC_Locked = false;
                 if (value < Cine_LOW_Limit)
                 {
-                    dif_aec = (ValorMedioCine - value) / 2;
+                    dif_aec = (ValorMedioCine - value) / 5;
                     if (dif_aec > 10) dif_aec = 10;
                     if (dif_aec < 1) dif_aec = 1;
-                    dataOUT3 = "K+" + dif_aec.ToString();
-                    serialPort3.Write(dataOUT3);
+                    button4_Click(sender, e);
                 }
                 if (value > Cine_HI_Limit)
                 {
-                    dif_aec = (value - ValorMedioCine) / 2;
+                    dif_aec = (value - ValorMedioCine) / 5;
                     if (dif_aec > 10) dif_aec = 10;
                     if (dif_aec < 1) dif_aec = 1;
-                    dataOUT3 = "K-" + dif_aec.ToString();
-                    serialPort3.Write(dataOUT3);
+                    button5_Click(sender, e);
                 }
             }
             if (DEBUG) DisplayData(6, dataOUT3);
@@ -595,19 +563,36 @@ namespace SerialSplitter
             }
         }
 
+        private void buttonAEC_Click(object sender, EventArgs e)
+        {
+            if (AEC_ON)
+            {
+                AEC_ON = false;
+                buttonAEC.BackColor = Color.Red;
+                buttonAEC.Text = "AEC OFF";
+                dif_aec = 1;
+            }
+            else
+            {
+                AEC_ON = true;
+                buttonAEC.BackColor = Color.LightGreen;
+                buttonAEC.Text = "AEC ON";
+            }
+        }
+
         private void button4_Click(object sender, EventArgs e) // KV +
         {
             if (serialPort3.IsOpen)
             {
-                dataOUT3 = "K+1";
+                dataOUT3 = "K+" + dif_aec.ToString();
                 serialPort3.WriteLine(dataOUT3);
                 if (DEBUG) DisplayData(6, dataOUT3);
             }
         }
 
-        private void button5_Click(object sender, EventArgs e)
+        private void button5_Click(object sender, EventArgs e) // KV -
         {
-            dataOUT3 = "K-1";
+            dataOUT3 = "K-" + dif_aec.ToString();
             serialPort3.WriteLine(dataOUT3);
             if (DEBUG) DisplayData(6, dataOUT3);
         }
