@@ -80,6 +80,8 @@
             this.button4 = new System.Windows.Forms.Button();
             this.button5 = new System.Windows.Forms.Button();
             this.buttonAEC = new System.Windows.Forms.Button();
+            this.textBoxHU = new System.Windows.Forms.TextBox();
+            this.label17 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // serialPort1
@@ -406,7 +408,7 @@
             // 
             // buttonFM
             // 
-            this.buttonFM.Location = new System.Drawing.Point(195, 4);
+            this.buttonFM.Location = new System.Drawing.Point(134, 4);
             this.buttonFM.Name = "buttonFM";
             this.buttonFM.Size = new System.Drawing.Size(55, 34);
             this.buttonFM.TabIndex = 35;
@@ -416,7 +418,7 @@
             // 
             // buttonRM
             // 
-            this.buttonRM.Location = new System.Drawing.Point(104, 4);
+            this.buttonRM.Location = new System.Drawing.Point(73, 4);
             this.buttonRM.Name = "buttonRM";
             this.buttonRM.Size = new System.Drawing.Size(55, 34);
             this.buttonRM.TabIndex = 36;
@@ -452,7 +454,7 @@
             // 
             // buttonSV
             // 
-            this.buttonSV.Location = new System.Drawing.Point(184, 77);
+            this.buttonSV.Location = new System.Drawing.Point(319, 101);
             this.buttonSV.Name = "buttonSV";
             this.buttonSV.Size = new System.Drawing.Size(50, 23);
             this.buttonSV.TabIndex = 40;
@@ -463,11 +465,11 @@
             // label14
             // 
             this.label14.AutoSize = true;
-            this.label14.Location = new System.Drawing.Point(230, 82);
+            this.label14.Location = new System.Drawing.Point(236, 82);
             this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(32, 13);
+            this.label14.Size = new System.Drawing.Size(29, 13);
             this.label14.TabIndex = 41;
-            this.label14.Text = "F ms.";
+            this.label14.Text = "ms.F";
             // 
             // label15
             // 
@@ -506,7 +508,7 @@
             // 
             // button5
             // 
-            this.button5.Location = new System.Drawing.Point(400, 79);
+            this.button5.Location = new System.Drawing.Point(400, 78);
             this.button5.Name = "button5";
             this.button5.Size = new System.Drawing.Size(56, 23);
             this.button5.TabIndex = 46;
@@ -517,7 +519,7 @@
             // buttonAEC
             // 
             this.buttonAEC.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.buttonAEC.Location = new System.Drawing.Point(316, 79);
+            this.buttonAEC.Location = new System.Drawing.Point(316, 78);
             this.buttonAEC.Name = "buttonAEC";
             this.buttonAEC.Size = new System.Drawing.Size(56, 23);
             this.buttonAEC.TabIndex = 47;
@@ -525,11 +527,30 @@
             this.buttonAEC.UseVisualStyleBackColor = true;
             this.buttonAEC.Click += new System.EventHandler(this.buttonAEC_Click);
             // 
+            // textBoxHU
+            // 
+            this.textBoxHU.Location = new System.Drawing.Point(203, 18);
+            this.textBoxHU.Name = "textBoxHU";
+            this.textBoxHU.Size = new System.Drawing.Size(39, 20);
+            this.textBoxHU.TabIndex = 48;
+            this.textBoxHU.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            // 
+            // label17
+            // 
+            this.label17.AutoSize = true;
+            this.label17.Location = new System.Drawing.Point(207, 4);
+            this.label17.Name = "label17";
+            this.label17.Size = new System.Drawing.Size(31, 13);
+            this.label17.TabIndex = 49;
+            this.label17.Text = "%HU";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(472, 372);
+            this.Controls.Add(this.label17);
+            this.Controls.Add(this.textBoxHU);
             this.Controls.Add(this.buttonAEC);
             this.Controls.Add(this.button5);
             this.Controls.Add(this.button4);
@@ -638,6 +659,8 @@
         private System.Windows.Forms.Button button4;
         private System.Windows.Forms.Button button5;
         private System.Windows.Forms.Button buttonAEC;
+        private System.Windows.Forms.TextBox textBoxHU;
+        private System.Windows.Forms.Label label17;
     }
 }
 

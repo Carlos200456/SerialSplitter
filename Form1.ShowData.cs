@@ -243,6 +243,7 @@ namespace SerialSplitter
 
                 case "HU: ":
                     textHU = msg;
+                    textBoxHU.Text = msg;
                     break;
 
                 case "FT: ":
