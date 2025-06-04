@@ -23,7 +23,7 @@ namespace SerialSplitter
     public partial class Form1 : Form
     {
         string SW_Version = "3.3\r";        // =======> Version de software para compatibilidad
-        string VHKV, VHMA, VHMS, VAKV, VAMA, VAMS, VEKV, VEMA, VEMS, CIKV, CIMA, CIMS, FMKV, FMMA, FMMS, F1KV, F1MA, F1MS, F2KV, F2MA, F2MS, F3KV, F3MA, F3MS, F4KV, F4MA, F4MS, SerialNumber = "";
+        string VHKV, VHMA, VHMS, VNKV, VNMA, VNMS, VAKV, VAMA, VAMS, VEKV, VEMA, VEMS, VUEKV, VUEMA, VUEMS, VFKV, VFMA, VFMS, CIKV, CIMA, CIMS, CHKV, CHMA, CHMS, FMKV, FMMA, FMMS, F1KV, F1MA, F1MS, F2KV, F2MA, F2MS, F3KV, F3MA, F3MS, F4KV, F4MA, F4MS, SerialNumber = "";
         string dataIN1 = "", dataIN2 = "", dataIN3 = "", dataOUT1 = "", dataOUT2 = "", dataOUT3 = "", path, textKVP, textKVN, textmAReal, textRmA, LastER, textSFI, textSRE, textSCC, textSIC, textSUC, textUPW, textHU, textVCC, message;
         string Serial1PortName, Serial1BaudRate, Serial1DataBits, Serial1StopBits, Serial1Parity, Serial2PortName, Serial2BaudRate, Serial2DataBits, Serial2StopBits, Serial2Parity, Serial3PortName, Serial3BaudRate, Serial3DataBits, Serial3StopBits, Serial3Parity;
 
@@ -43,7 +43,7 @@ namespace SerialSplitter
         bool RX_On = false;
         bool AEC_Lock = true;
         public static float VCC = 0.0f;
-        int Counter, VHKVOF = 15, VAKVOF = 12, VEKVOF = 6, CIKVOF = 4, LOW_Limit, HI_Limit, Cine_LOW_Limit, Cine_HI_Limit, Offset_KV_Cine, AnalogData, Old_AnalogData, ValorMedioCine, ValorMedioFluoro, Demora_SendKV, Demora_AEC;
+        int Counter, VHKVOF = 15, VNKVOF = 12, VAKVOF = 12, VEKVOF = 6, VUEKVOF = 6, VFKVOF = 6, CIKVOF = 4, CHKVOF = 4, LOW_Limit, HI_Limit, Cine_LOW_Limit, Cine_HI_Limit, Offset_KV_Cine, AnalogData, Old_AnalogData, ValorMedioCine, ValorMedioFluoro, Demora_SendKV, Demora_AEC;
         int dif_aec = 0;
         // float mxs;
 
@@ -136,23 +136,47 @@ namespace SerialSplitter
                                     VHMA = getBetween(s1, "mA=", 3);
                                     VHMS = getBetween(s1, "ms=", 3);
                                     break;
-                                case "VascularAbdomen":
-                                    VAKV = getBetween(s1, "Kv=", 3);
-                                    VAKVOF = Convert.ToInt32(getBetween(s1, "KvOffSet=", 2));
-                                    VAMA = getBetween(s1, "mA=", 3);
-                                    VAMS = getBetween(s1, "ms=", 3);
-                                    break;
-                                case "VascularExtremity":
-                                    VEKV = getBetween(s1, "Kv=", 3);
-                                    VEKVOF = Convert.ToInt32(getBetween(s1, "KvOffSet=", 2));
-                                    VEMA = getBetween(s1, "mA=", 3);
-                                    VEMS = getBetween(s1, "ms=", 3);
+                                case "VascularNeck":
+                                    VNKV = getBetween(s1, "Kv=", 3);
+                                    VNKVOF = Convert.ToInt32(getBetween(s1, "KvOffSet=", 2));
+                                    VNMA = getBetween(s1, "mA=", 3);
+                                    VNMS = getBetween(s1, "ms=", 3);
                                     break;
                                 case "Cine":
                                     CIKV = getBetween(s1, "Kv=", 3);
                                     CIKVOF = Convert.ToInt32(getBetween(s1, "KvOffSet=", 2));
                                     CIMA = getBetween(s1, "mA=", 3);
                                     CIMS = getBetween(s1, "ms=", 3);
+                                    break;
+                                case "VascularArms":
+                                    VUEKV = getBetween(s1, "Kv=", 3);
+                                    VUEKVOF = Convert.ToInt32(getBetween(s1, "KvOffSet=", 2));
+                                    VUEMA = getBetween(s1, "mA=", 3);
+                                    VUEMS = getBetween(s1, "ms=", 3);
+                                    break;
+                                case "VascularAbdomen":
+                                    VAKV = getBetween(s1, "Kv=", 3);
+                                    VAKVOF = Convert.ToInt32(getBetween(s1, "KvOffSet=", 2));
+                                    VAMA = getBetween(s1, "mA=", 3);
+                                    VAMS = getBetween(s1, "ms=", 3);
+                                    break;
+                                case "VascularLegs":
+                                    VEKV = getBetween(s1, "Kv=", 3);
+                                    VEKVOF = Convert.ToInt32(getBetween(s1, "KvOffSet=", 2));
+                                    VEMA = getBetween(s1, "mA=", 3);
+                                    VEMS = getBetween(s1, "ms=", 3);
+                                    break;
+                                case "VascularFoot":
+                                    VFKV = getBetween(s1, "Kv=", 3);
+                                    VFKVOF = Convert.ToInt32(getBetween(s1, "KvOffSet=", 2));
+                                    VFMA = getBetween(s1, "mA=", 3);
+                                    VFMS = getBetween(s1, "ms=", 3);
+                                    break;
+                                case "Heart":
+                                    CHKV = getBetween(s1, "Kv=", 3);
+                                    CHKVOF = Convert.ToInt32(getBetween(s1, "KvOffSet=", 2));
+                                    CHMA = getBetween(s1, "mA=", 3);
+                                    CHMS = getBetween(s1, "ms=", 3);
                                     break;
                                 case "FLUOROMAP":
                                     FMKV = getBetween(s1, "Kv=", 3);
@@ -624,17 +648,33 @@ namespace SerialSplitter
                     await SendCommands("KV" + VHKV, "MA" + VHMA, "TC" + VHMS);
                     Offset_KV_Cine = VHKVOF; // 15
                     break;
-                case "Abdomen":
-                    await SendCommands("KV" + VAKV, "MA" + VAMA, "TC" + VAMS);
-                    Offset_KV_Cine = VAKVOF; // 12
-                    break;
-                case "Extremity":
-                    await SendCommands("KV" + VEKV, "MA" + VEMA, "TC" + VEMS);
-                    Offset_KV_Cine = VEKVOF; // 6
+                case "Neck":
+                    await SendCommands("KV" + VNKV, "MA" + VNMA, "TC" + VNMS);
+                    Offset_KV_Cine = VNKVOF; // 15
                     break;
                 case "Cine":
                     await SendCommands("KV" + CIKV, "MA" + CIMA, "TC" + CIMS);
                     Offset_KV_Cine = CIKVOF; // 4
+                    break;
+                case "Arms":
+                    await SendCommands("KV" + VUEKV, "MA" + VUEMA, "TC" + VUEMS);
+                    Offset_KV_Cine = VUEKVOF; // 6
+                    break;
+                case "Abdomen":
+                    await SendCommands("KV" + VAKV, "MA" + VAMA, "TC" + VAMS);
+                    Offset_KV_Cine = VAKVOF; // 12
+                    break;
+                case "Legs":
+                    await SendCommands("KV" + VEKV, "MA" + VEMA, "TC" + VEMS);
+                    Offset_KV_Cine = VEKVOF; // 6
+                    break;
+                case "Foot":
+                    await SendCommands("KV" + VFKV, "MA" + VFMA, "TC" + VFMS);
+                    Offset_KV_Cine = VFKVOF; // 6
+                    break;
+                case "Heart":
+                    await SendCommands("KV" + CHKV, "MA" + CHMA, "TC" + CHMS);
+                    Offset_KV_Cine = CHKVOF; // 4
                     break;
                 case "FLUOROMAP":
                     await SendCommands("KZ" + FMKV, "MZ" + FMMA, "TX" + FMMS);
