@@ -465,20 +465,20 @@
             // label14
             // 
             this.label14.AutoSize = true;
-            this.label14.Location = new System.Drawing.Point(236, 82);
+            this.label14.Location = new System.Drawing.Point(212, 82);
             this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(29, 13);
+            this.label14.Size = new System.Drawing.Size(52, 13);
             this.label14.TabIndex = 41;
-            this.label14.Text = "ms.F";
+            this.label14.Text = "Fluoro ms";
             // 
             // label15
             // 
             this.label15.AutoSize = true;
-            this.label15.Location = new System.Drawing.Point(94, 82);
+            this.label15.Location = new System.Drawing.Point(99, 82);
             this.label15.Name = "label15";
-            this.label15.Size = new System.Drawing.Size(47, 13);
+            this.label15.Size = new System.Drawing.Size(44, 13);
             this.label15.TabIndex = 42;
-            this.label15.Text = "Cine ms.";
+            this.label15.Text = "Cine ms";
             // 
             // textBoxUDP
             // 

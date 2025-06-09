@@ -27,8 +27,8 @@ namespace SerialSplitter
         string dataIN1 = "", dataIN2 = "", dataIN3 = "", dataOUT1 = "", dataOUT2 = "", dataOUT3 = "", path, textKVP, textKVN, textmAReal, textRmA, LastER, textSFI, textSRE, textSCC, textSIC, textSUC, textUPW, textHU, textVCC, message;
         string Serial1PortName, Serial1BaudRate, Serial1DataBits, Serial1StopBits, Serial1Parity, Serial2PortName, Serial2BaudRate, Serial2DataBits, Serial2StopBits, Serial2Parity, Serial3PortName, Serial3BaudRate, Serial3DataBits, Serial3StopBits, Serial3Parity;
 
-        readonly string[] mA_Table = new string[8] { "50\r", "100\r", "200\r", "300\r", "400\r", "500\r", "600\r", "700\r" };
-        readonly string[] ms_Table = new string[30] { "2\r", "5\r", "8\r", "10\r", "20\r", "30\r", "40\r", "50\r", "60\r", "80\r", "100\r", "120\r", "150\r", "200\r", "250\r", "300\r", "400\r", "500\r", "600\r", "800\r", "1000\r", "1200\r", "1500\r", "2000\r", "2500\r", "3000\r", "3500\r", "4000\r", "4500\r", "5000\r" };
+        // readonly string[] mA_Table = new string[8] { "50\r", "100\r", "200\r", "300\r", "400\r", "500\r", "600\r", "700\r" };
+        // readonly string[] ms_Table = new string[30] { "2\r", "5\r", "8\r", "10\r", "20\r", "30\r", "40\r", "50\r", "60\r", "80\r", "100\r", "120\r", "150\r", "200\r", "250\r", "300\r", "400\r", "500\r", "600\r", "800\r", "1000\r", "1200\r", "1500\r", "2000\r", "2500\r", "3000\r", "3500\r", "4000\r", "4500\r", "5000\r" };
         bool ACK = false;
         bool NACK = false;
         bool AutoON = true;
@@ -47,9 +47,9 @@ namespace SerialSplitter
         int dif_aec = 0;
         // float mxs;
 
-        StringBuilder sb = new StringBuilder();
-        char LF = (char)10;
-        char CR = (char)13;
+        // StringBuilder sb = new StringBuilder();
+        // char LF = (char)10;
+        // char CR = (char)13;
 
         System.Windows.Forms.Timer t = null;
         System.Windows.Forms.Timer f = null;
@@ -482,7 +482,7 @@ namespace SerialSplitter
 #if !DEBUG
                         this.Size = new Size(488, 140);
                         this.Left = 100;  // 680;   // Centrado
-                        this.Top = 948;
+                        this.Top = 954;
                         this.ControlBox = false;
                         this.Text = "";
 #endif
