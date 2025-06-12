@@ -72,8 +72,16 @@ namespace SerialSplitter
 
             if (DEBUG) DisplayData(2, dataIN2);
 
-            // Always forward data to serialPort1
-            serialPort1.WriteLine(dataIN2);
+            // Always forward data to serialPort1 exept on specific commands
+            if (dataIN2.Contains("*"))
+            {
+                // Check AEC
+                if (RX_On && AEC_ON && (Demora_AEC == 0) && !AEC_Lock)
+                {
+                    AnalyzeDataABC(AnalogData, sender, e);
+                }
+                return;
+            } else serialPort1.WriteLine(dataIN2);
 
             // Handle specific commands
             if (dataIN2.Contains("FluoroOff") || dataIN2.Contains("CineOff"))

@@ -350,10 +350,6 @@ namespace SerialSplitter
         // Make f_Tick async
         private async void f_Tick(object sender, EventArgs e)
         {
-            if (RX_On && AEC_ON && (Demora_AEC == 0) && !AEC_Lock)
-            {
-                AnalyzeDataABC(AnalogData, sender, e);
-            }
             await ReadUPD_Data(e); // Await the async method
             if (Demora_SendKV == 1)
             {
