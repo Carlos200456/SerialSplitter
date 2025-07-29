@@ -392,15 +392,15 @@ namespace SerialSplitter
             {
                 if (value < LOW_Limit)
                 {
-                    dif_aec = (ValorMedioFluoro - value) / 3;
-                    if (dif_aec > 10) dif_aec = 10;
+                    dif_aec = (ValorMedioFluoro - value) / 4;
+                    if (dif_aec > 10) dif_aec = 4;
                     if (dif_aec < 1) dif_aec = 1;
                     button4_Click(sender, e);
                 }
                 if (value > HI_Limit)
                 {
-                    dif_aec = (value - ValorMedioFluoro) / 3;
-                    if (dif_aec > 10) dif_aec = 10;
+                    dif_aec = (value - ValorMedioFluoro) / 4;
+                    if (dif_aec > 10) dif_aec = 4;
                     if (dif_aec < 1) dif_aec = 1;
                     button5_Click(sender, e);
                 }
@@ -410,14 +410,14 @@ namespace SerialSplitter
                 if (value < Cine_LOW_Limit)
                 {
                     dif_aec = (ValorMedioCine - value) / 5;
-                    if (dif_aec > 10) dif_aec = 10;
+                    if (dif_aec > 10) dif_aec = 5;
                     if (dif_aec < 1) dif_aec = 1;
                     button4_Click(sender, e);
                 }
                 if (value > Cine_HI_Limit)
                 {
                     dif_aec = (value - ValorMedioCine) / 5;
-                    if (dif_aec > 10) dif_aec = 10;
+                    if (dif_aec > 10) dif_aec = 5;
                     if (dif_aec < 1) dif_aec = 1;
                     button5_Click(sender, e);
                 }
