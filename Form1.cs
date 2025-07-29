@@ -43,7 +43,9 @@ namespace SerialSplitter
         bool RX_On = false;
         bool AEC_Lock = true;
         public static float VCC = 0.0f;
-        int Counter, VHKVOF = 15, VNKVOF = 12, VAKVOF = 12, VEKVOF = 6, VUEKVOF = 6, VFKVOF = 6, CIKVOF = 4, CHKVOF = 4, LOW_Limit, HI_Limit, Cine_LOW_Limit, Cine_HI_Limit, Offset_KV_Cine, AnalogData, Old_AnalogData, ValorMedioCine, ValorMedioFluoro, Demora_SendKV, Demora_AEC;
+        int Counter, VHKVOF = 15, VNKVOF = 12, VAKVOF = 12, VEKVOF = 6, VUEKVOF = 6, VFKVOF = 6, CIKVOF = 4, CHKVOF = 4, 
+            LOW_Limit, HI_Limit, Cine_LOW_Limit, Cine_HI_Limit, Offset_KV_Cine, AnalogData, Old_AnalogData, ValorMedioCine, 
+            ValorMedioFluoro, Demora_SendKV, Demora_AEC, Offset_Max_Fluoro, Offset_Max_Cine;
         int dif_aec = 0;
         // float mxs;
 
@@ -209,6 +211,8 @@ namespace SerialSplitter
                                     HI_Limit = Convert.ToInt32(getBetween(s1, "HI_Limit=", 3));
                                     Cine_LOW_Limit = Convert.ToInt32(getBetween(s1, "Cine_LOW_Limit=", 3));
                                     Cine_HI_Limit = Convert.ToInt32(getBetween(s1, "Cine_HI_Limit=", 3));
+                                    Offset_Max_Fluoro = Convert.ToInt32(getBetween(s1, "Offset_Max_Fluoro=", 3));
+                                    Offset_Max_Cine = Convert.ToInt32(getBetween(s1, "Offset_Max_Cine=", 3));
                                     break;
                                 default:
                                     break;
@@ -393,14 +397,14 @@ namespace SerialSplitter
                 if (value < LOW_Limit)
                 {
                     dif_aec = (ValorMedioFluoro - value) / 4;
-                    if (dif_aec > 10) dif_aec = 4;
+                    if (dif_aec > Offset_Max_Fluoro) dif_aec = Offset_Max_Fluoro;
                     if (dif_aec < 1) dif_aec = 1;
                     button4_Click(sender, e);
                 }
                 if (value > HI_Limit)
                 {
                     dif_aec = (value - ValorMedioFluoro) / 4;
-                    if (dif_aec > 10) dif_aec = 4;
+                    if (dif_aec > Offset_Max_Fluoro) dif_aec = Offset_Max_Fluoro;
                     if (dif_aec < 1) dif_aec = 1;
                     button5_Click(sender, e);
                 }
@@ -410,14 +414,14 @@ namespace SerialSplitter
                 if (value < Cine_LOW_Limit)
                 {
                     dif_aec = (ValorMedioCine - value) / 5;
-                    if (dif_aec > 10) dif_aec = 5;
+                    if (dif_aec > Offset_Max_Cine) dif_aec = Offset_Max_Cine;
                     if (dif_aec < 1) dif_aec = 1;
                     button4_Click(sender, e);
                 }
                 if (value > Cine_HI_Limit)
                 {
                     dif_aec = (value - ValorMedioCine) / 5;
-                    if (dif_aec > 10) dif_aec = 5;
+                    if (dif_aec > Offset_Max_Cine) dif_aec = Offset_Max_Cine;
                     if (dif_aec < 1) dif_aec = 1;
                     button5_Click(sender, e);
                 }
