@@ -33,6 +33,10 @@ namespace SerialSplitter
         bool NACK = false;
         bool AutoON = true;
         bool SW_Ready = false;
+        public static bool OpenIrisDW = false;
+        public static bool CloseIrisDW = false;
+        public static bool IrisUp = false;
+
 #if !DEBUG
         bool DEBUG = false;
 #else
@@ -88,6 +92,30 @@ namespace SerialSplitter
         public Form1()
         {
             InitializeComponent();
+            System.Windows.Forms.Button existingButton1 = buttonIrisOpen;
+            System.Windows.Forms.Button existingButton2 = buttonIrisClose;
+            // Remove button2 and button3 from the form
+            this.Controls.Remove(existingButton1);
+            this.Controls.Remove(existingButton2);
+            CustomButton ButtonIrisOpen = new CustomButton();
+            CustomButton ButtonIrisClose = new CustomButton();
+            ButtonIrisOpen.Location = existingButton1.Location;
+            ButtonIrisOpen.Size = existingButton1.Size;
+            ButtonIrisOpen.Text = existingButton1.Text;
+            ButtonIrisOpen.Font = existingButton1.Font;
+            ButtonIrisOpen.MouseDown += buttonIrisOpen_MouseDown;
+            ButtonIrisOpen.MouseUp += buttonIris_MouseUp;
+            // ... Set any other properties you need ...
+            this.Controls.Add(ButtonIrisOpen);
+            ButtonIrisClose.Location = existingButton2.Location;
+            ButtonIrisClose.Size = existingButton2.Size;
+            ButtonIrisClose.Text = existingButton2.Text;
+            ButtonIrisClose.Font = existingButton2.Font;
+            ButtonIrisClose.MouseDown += buttonIrisClose_MouseDown;
+            ButtonIrisClose.MouseUp += buttonIris_MouseUp;
+            // ... Set any other properties you need ...
+            this.Controls.Add(ButtonIrisClose);
+
             LastER = "";
 
             try
@@ -453,10 +481,10 @@ namespace SerialSplitter
             textBoxER.Text = "";
             textBoxKV.Text = "";
             textBoxMA.Text = "";
-            textBoxMS.Text = "";
+            textBoxMScine.Text = "";
             textBoxKVF.Text = "";
             textBoxMAF.Text = "";
-            textBoxCms.Text = "";
+            textBoxMSrad.Text = "";
             textBoxSms.Text = "";
             Refresh();
         }
@@ -480,9 +508,9 @@ namespace SerialSplitter
                         if (DEBUG) DisplayData(6, dataOUT3);
                         // Omitir la siguiente linea en Debug
 #if !DEBUG
-                        this.Size = new Size(488, 140);
+                        this.Size = new Size(518, 200);
                         this.Left = 100;  // 680;   // Centrado
-                        this.Top = 954;
+                        this.Top = 910;
                         this.ControlBox = false;
                         this.Text = "";
 #endif
@@ -620,6 +648,89 @@ namespace SerialSplitter
             dataOUT3 = "K-" + dif_aec.ToString();
             serialPort3.WriteLine(dataOUT3);
             if (DEBUG) DisplayData(6, dataOUT3);
+        }
+
+        // Colimator Control Buttons
+        public void buttonIrisOpen_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (serialPort2.IsOpen)
+            {
+                dataOUT2 = "IC5";
+                serialPort2.WriteLine(dataOUT2);
+            }
+        }
+
+        private void buttonIris_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (serialPort2.IsOpen)
+            {
+                dataOUT2 = "IC0";
+                serialPort2.WriteLine(dataOUT2);
+            }
+
+        }
+
+        private void buttonIrisClose_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (serialPort2.IsOpen)
+            {
+                dataOUT2 = "IC-5";
+                serialPort2.WriteLine(dataOUT2);
+            }
+        }
+
+        private void buttonVColsOpen_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (serialPort2.IsOpen)
+            {
+                dataOUT2 = "VC5";
+                serialPort2.WriteLine(dataOUT2);
+            }
+        }
+
+        private void buttonVCol_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (serialPort2.IsOpen)
+            {
+                dataOUT2 = "VC0";
+                serialPort2.WriteLine(dataOUT2);
+            }
+        }
+
+        private void buttonVColsClose_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (serialPort2.IsOpen)
+            {
+                dataOUT2 = "VC-5";
+                serialPort2.WriteLine(dataOUT2);
+            }
+        }
+
+        private void buttonRotCW_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (serialPort2.IsOpen)
+            {
+                dataOUT2 = "RO5";
+                serialPort2.WriteLine(dataOUT2);
+            }
+        }
+
+        private void buttonRot_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (serialPort2.IsOpen)
+            {
+                dataOUT2 = "RO0";
+                serialPort2.WriteLine(dataOUT2);
+            }
+        }
+
+        private void buttonRotCCW_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (serialPort2.IsOpen)
+            {
+                dataOUT2 = "RO-5";
+                serialPort2.WriteLine(dataOUT2);
+            }
         }
 
         // Make ReadUPD_Data async
@@ -843,4 +954,37 @@ namespace SerialSplitter
             File.AppendAllText(logFilePath, logEntry);
         }
     }
+
+    public class CustomButton : System.Windows.Forms.Button
+    {
+        const int WM_POINTERDOWN = 0x0246;
+        const int WM_POINTERUP = 0x0247;
+
+        protected override void WndProc(ref Message m)
+        {
+            base.WndProc(ref m);
+
+            if (m.Msg == WM_POINTERDOWN)
+            {
+                // Differentiate between the two buttons
+                if (this.Text == "Iris Open")
+                {
+                    // Handle the Iris Open button "buttonIrisOpen_MouseDown"
+                    Form1.OpenIrisDW = true;
+
+                }
+                else if (this.Text == "Iris Close")
+                {
+                    // Handle the Iris Close button "buttonIrisClose_MouseDown"
+                    Form1.CloseIrisDW = true;
+                }
+            }
+            else if (m.Msg == WM_POINTERUP)
+            {
+                // Handle pointer up event
+                Form1.IrisUp = true;
+            }
+        }
+    }
+
 }

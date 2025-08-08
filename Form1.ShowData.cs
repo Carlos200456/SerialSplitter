@@ -175,8 +175,8 @@ namespace SerialSplitter
                     break;
 
                 case "ms: ":
-                    if (textBoxMS.Text != msg)
-                        textBoxMS.Text = msg;
+                    if (textBoxMSrad.Text != msg)
+                        textBoxMSrad.Text = msg;
                     break;
 
                 case "mf: ":
@@ -185,8 +185,10 @@ namespace SerialSplitter
                     break;
 
                 case "mc: ":
-                    if (textBoxCms.Text != msg)
-                        textBoxCms.Text = msg;
+                    //if (textBoxCms.Text != msg)
+                    //    textBoxCms.Text = msg;
+                    if (textBoxMScine.Text != msg)
+                        textBoxMScine.Text = msg;
                     break;
 
                 case "Kv+:":
@@ -270,7 +272,7 @@ namespace SerialSplitter
                     logger.LogInfo("VCC:" + SafeTrim(textVCC) +
                                    " Kv:" + SafeTrim(textBoxKV.Text) +
                                    " mA:" + SafeTrim(textBoxMA.Text) +
-                                   " ms:" + SafeTrim(textBoxMS.Text) +
+                                   " ms:" + SafeTrim(textBoxMScine.Text) +
                                    " Kv+:" + SafeTrim(textKVP) +
                                    " Kv-:" + SafeTrim(textKVN) +
                                    " mA:" + SafeTrim(textmAReal) + " %HU:" + SafeTrim(textHU));
