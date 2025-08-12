@@ -92,13 +92,32 @@ namespace SerialSplitter
         public Form1()
         {
             InitializeComponent();
+            //------------------------------------------------------------------------------//
             System.Windows.Forms.Button existingButton1 = buttonIrisOpen;
             System.Windows.Forms.Button existingButton2 = buttonIrisClose;
+            System.Windows.Forms.Button existingButton3 = buttonVColOpen;
+            System.Windows.Forms.Button existingButton4 = buttonVColClose;
+            System.Windows.Forms.Button existingButton5 = buttonRotCW;
+            System.Windows.Forms.Button existingButton6 = buttonRotCCW;
             // Remove button2 and button3 from the form
             this.Controls.Remove(existingButton1);
             this.Controls.Remove(existingButton2);
+            this.Controls.Remove(existingButton3);
+            this.Controls.Remove(existingButton4);
+            this.Controls.Remove(existingButton5);
+            this.Controls.Remove(existingButton6);
             CustomButton ButtonIrisOpen = new CustomButton();
             CustomButton ButtonIrisClose = new CustomButton();
+            CustomButton ButtonVColOpen = new CustomButton();
+            CustomButton ButtonVColClose = new CustomButton();
+            CustomButton ButtonRotCW = new CustomButton();
+            CustomButton ButtonRotCCW = new CustomButton();
+            ButtonIrisOpen.ButtonImage = Properties.Resources.Iris_Open;
+            ButtonIrisClose.ButtonImage = Properties.Resources.Iris_Close;
+            ButtonVColOpen.ButtonImage = Properties.Resources.ColOpen;
+            ButtonVColClose.ButtonImage = Properties.Resources.ColClose;
+            ButtonRotCW.ButtonImage = Properties.Resources.RotCW;
+            ButtonRotCCW.ButtonImage = Properties.Resources.RotCCW;
             ButtonIrisOpen.Location = existingButton1.Location;
             ButtonIrisOpen.Size = existingButton1.Size;
             ButtonIrisOpen.Text = existingButton1.Text;
@@ -115,6 +134,51 @@ namespace SerialSplitter
             ButtonIrisClose.MouseUp += buttonIris_MouseUp;
             // ... Set any other properties you need ...
             this.Controls.Add(ButtonIrisClose);
+            ButtonVColOpen.Location = existingButton3.Location;
+            ButtonVColOpen.Size = existingButton3.Size;
+            ButtonVColOpen.Text = existingButton3.Text;
+            ButtonVColOpen.Font = existingButton3.Font;
+            ButtonVColOpen.MouseDown += buttonVColOpen_MouseDown;
+            ButtonVColOpen.MouseUp += buttonVCol_MouseUp;
+            // ... Set any other properties you need ...
+            this.Controls.Add(ButtonVColOpen);
+            ButtonVColClose.Location = existingButton4.Location;
+            ButtonVColClose.Size = existingButton4.Size;
+            ButtonVColClose.Text = existingButton4.Text;
+            ButtonVColClose.Font = existingButton4.Font;
+            ButtonVColClose.ForeColor = Color.White;
+            ButtonVColClose.BackgroundImage = Properties.Resources.ColClose;
+            ButtonVColClose.BackgroundImageLayout = ImageLayout.Stretch;
+            ButtonVColClose.MouseDown += buttonVColClose_MouseDown;
+            ButtonVColClose.MouseUp += buttonVCol_MouseUp;
+            // ... Set any other properties you need ...
+            this.Controls.Add(ButtonVColClose);
+            ButtonRotCW.Location = existingButton5.Location;
+            ButtonRotCW.Size = existingButton5.Size;
+            ButtonRotCW.Text = existingButton5.Text;
+            ButtonRotCW.Font = existingButton5.Font;
+            ButtonRotCW.ForeColor = Color.White;
+            ButtonRotCW.BackgroundImage = Properties.Resources.RotCW;
+            ButtonRotCW.BackgroundImageLayout = ImageLayout.Stretch;
+            // Put Button Image in front of button text
+
+
+            ButtonRotCW.MouseDown += buttonRotCW_MouseDown;
+            ButtonRotCW.MouseUp += buttonRot_MouseUp;
+            // ... Set any other properties you need ...
+            this.Controls.Add(ButtonRotCW);
+            ButtonRotCCW.Location = existingButton6.Location;
+            ButtonRotCCW.Size = existingButton6.Size;
+            ButtonRotCCW.Text = existingButton6.Text;
+            ButtonRotCCW.Font = existingButton6.Font;
+            ButtonRotCCW.ForeColor = Color.White;
+            ButtonRotCCW.BackgroundImage = Properties.Resources.RotCCW;
+            ButtonRotCCW.BackgroundImageLayout = ImageLayout.Stretch;
+            ButtonRotCCW.MouseDown += buttonRotCW_MouseDown;
+            ButtonRotCCW.MouseUp += buttonRot_MouseUp;
+            // ... Set any other properties you need ...
+            this.Controls.Add(ButtonRotCCW);
+            //------------------------------------------------------------------------------//
 
             LastER = "";
 
@@ -464,6 +528,13 @@ namespace SerialSplitter
             serialPort2.DtrEnable = true;
             Thread.Sleep(100);
             serialPort2.DtrEnable = false;
+#if DEBUG
+            this.ControlBox = false;
+            this.Text = "";
+            this.Left = 460;   // Centrado 460
+            this.Top = 983;
+            this.Size = new Size(1000, 104);
+#endif
         }
 
         private void buttonGRST_Click(object sender, EventArgs e)
@@ -508,11 +579,11 @@ namespace SerialSplitter
                         if (DEBUG) DisplayData(6, dataOUT3);
                         // Omitir la siguiente linea en Debug
 #if !DEBUG
-                        this.Size = new Size(518, 200);
-                        this.Left = 100;  // 680;   // Centrado
-                        this.Top = 910;
                         this.ControlBox = false;
                         this.Text = "";
+                        this.Left = 460;   // Centrado 460
+                        this.Top = 983;
+                        this.Size = new Size(1000, 104);
 #endif
                         logger.LogInfo("Turn On by Operator");
                         AutoON = true;
@@ -564,44 +635,43 @@ namespace SerialSplitter
 
         private void buttonFM_Click(object sender, EventArgs e)
         {
-            if (serialPort3.IsOpen)
-            {
-                if (buttonFM.Text == "No Fluoro")
-                {
-                    dataOUT3 = "TF1";
-                }
-                if (buttonFM.Text == "Fluoro C")
-                {
-                    dataOUT3 = "TF2";
-                }
-                if (buttonFM.Text == "Fluoro P") dataOUT3 = "TF0";
-                serialPort3.WriteLine(dataOUT3);
-                if (DEBUG) DisplayData(6, dataOUT3);
-            }
-
+            //if (serialPort3.IsOpen)
+            //{
+            //    if (buttonFM.Text == "No Fluoro")
+            //    {
+            //        dataOUT3 = "TF1";
+            //    }
+            //    if (buttonFM.Text == "Fluoro C")
+            //    {
+            //        dataOUT3 = "TF2";
+            //    }
+            //    if (buttonFM.Text == "Fluoro P") dataOUT3 = "TF0";
+            //    serialPort3.WriteLine(dataOUT3);
+            //    if (DEBUG) DisplayData(6, dataOUT3);
+            //}
         }
 
         private void buttonRM_Click(object sender, EventArgs e)
         {
-            if (serialPort3.IsOpen)
-            {
-                if (buttonRM.Text == "RAD0")
-                {
-                    dataOUT3 = "TE1";
-                }
-                if (buttonRM.Text == "RAD1")
-                {
-                    dataOUT3 = "TE2";
-                }
-                if (buttonRM.Text == "RAD2")
-                {
-                    dataOUT3 = "TE3";
-                }
-                if (buttonRM.Text == "CINE") dataOUT3 = "TE0";       // TODO Service Mode in Generator
-                // if (buttonSPot1.Text == "Service") dataOUT = "TE0";
-                serialPort3.WriteLine(dataOUT3);
-                if (DEBUG) DisplayData(6, dataOUT3);
-            }
+            //if (serialPort3.IsOpen)
+            //{
+            //    if (buttonRM.Text == "RAD0")
+            //    {
+            //        dataOUT3 = "TE1";
+            //    }
+            //    if (buttonRM.Text == "RAD1")
+            //    {
+            //        dataOUT3 = "TE2";
+            //    }
+            //    if (buttonRM.Text == "RAD2")
+            //    {
+            //        dataOUT3 = "TE3";
+            //    }
+            //    if (buttonRM.Text == "CINE") dataOUT3 = "TE0";       // TODO Service Mode in Generator
+            //    // if (buttonSPot1.Text == "Service") dataOUT = "TE0";
+            //    serialPort3.WriteLine(dataOUT3);
+            //    if (DEBUG) DisplayData(6, dataOUT3);
+            //}
         }
 
         private void buttonSV_Click(object sender, EventArgs e)
@@ -660,7 +730,7 @@ namespace SerialSplitter
             }
         }
 
-        private void buttonIris_MouseUp(object sender, MouseEventArgs e)
+        public void buttonIris_MouseUp(object sender, MouseEventArgs e)
         {
             if (serialPort2.IsOpen)
             {
@@ -670,7 +740,7 @@ namespace SerialSplitter
 
         }
 
-        private void buttonIrisClose_MouseDown(object sender, MouseEventArgs e)
+        public void buttonIrisClose_MouseDown(object sender, MouseEventArgs e)
         {
             if (serialPort2.IsOpen)
             {
@@ -679,7 +749,7 @@ namespace SerialSplitter
             }
         }
 
-        private void buttonVColsOpen_MouseDown(object sender, MouseEventArgs e)
+        public void buttonVColOpen_MouseDown(object sender, MouseEventArgs e)
         {
             if (serialPort2.IsOpen)
             {
@@ -688,7 +758,7 @@ namespace SerialSplitter
             }
         }
 
-        private void buttonVCol_MouseUp(object sender, MouseEventArgs e)
+        public void buttonVCol_MouseUp(object sender, MouseEventArgs e)
         {
             if (serialPort2.IsOpen)
             {
@@ -697,7 +767,7 @@ namespace SerialSplitter
             }
         }
 
-        private void buttonVColsClose_MouseDown(object sender, MouseEventArgs e)
+        public void buttonVColClose_MouseDown(object sender, MouseEventArgs e)
         {
             if (serialPort2.IsOpen)
             {
@@ -706,7 +776,7 @@ namespace SerialSplitter
             }
         }
 
-        private void buttonRotCW_MouseDown(object sender, MouseEventArgs e)
+        public void buttonRotCW_MouseDown(object sender, MouseEventArgs e)
         {
             if (serialPort2.IsOpen)
             {
@@ -715,7 +785,7 @@ namespace SerialSplitter
             }
         }
 
-        private void buttonRot_MouseUp(object sender, MouseEventArgs e)
+        public void buttonRot_MouseUp(object sender, MouseEventArgs e)
         {
             if (serialPort2.IsOpen)
             {
@@ -724,7 +794,7 @@ namespace SerialSplitter
             }
         }
 
-        private void buttonRotCCW_MouseDown(object sender, MouseEventArgs e)
+        public void buttonRotCCW_MouseDown(object sender, MouseEventArgs e)
         {
             if (serialPort2.IsOpen)
             {
@@ -959,10 +1029,21 @@ namespace SerialSplitter
     {
         const int WM_POINTERDOWN = 0x0246;
         const int WM_POINTERUP = 0x0247;
+        public Image ButtonImage { get; set; }
+        protected override void OnPaint(PaintEventArgs pevent)
+        {
+            ControlPaint.DrawButton(pevent.Graphics, this.ClientRectangle, ButtonState.Normal);
+            if (ButtonImage != null)
+            {
+                pevent.Graphics.DrawImage(ButtonImage, new Rectangle(0, 0, this.Width, this.Height));
+            }
+        }
 
+        // ... (WndProc and other logic unchanged)
         protected override void WndProc(ref Message m)
         {
             base.WndProc(ref m);
+            Form1 form = this.FindForm() as Form1;
 
             if (m.Msg == WM_POINTERDOWN)
             {
@@ -970,19 +1051,64 @@ namespace SerialSplitter
                 if (this.Text == "Iris Open")
                 {
                     // Handle the Iris Open button "buttonIrisOpen_MouseDown"
-                    Form1.OpenIrisDW = true;
-
+                    // FIX: Provide required parameters for buttonIrisOpen_MouseDown
+                    if (form != null)
+                    {
+                        form.buttonIrisOpen_MouseDown(this, new MouseEventArgs(MouseButtons.Left, 1, 0, 0, 0));
+                    }
                 }
-                else if (this.Text == "Iris Close")
+                if (this.Text == "Iris Close")
                 {
                     // Handle the Iris Close button "buttonIrisClose_MouseDown"
-                    Form1.CloseIrisDW = true;
+                    if (form != null)
+                    {
+                        form.buttonIrisClose_MouseDown(this, new MouseEventArgs(MouseButtons.Left, 1, 0, 0, 0));
+                    }
+                }
+                if (this.Text == "Coll Open")
+                {
+                    // Handle the Iris Open button "buttonIrisOpen_MouseDown"
+                    // FIX: Provide required parameters for buttonIrisOpen_MouseDown
+                    if (form != null)
+                    {
+                        form.buttonVColOpen_MouseDown(this, new MouseEventArgs(MouseButtons.Left, 1, 0, 0, 0));
+                    }
+                }
+                if (this.Text == "Coll Close")
+                {
+                    // Handle the Iris Close button "buttonIrisClose_MouseDown"
+                    if (form != null)
+                    {
+                        form.buttonVColClose_MouseDown(this, new MouseEventArgs(MouseButtons.Left, 1, 0, 0, 0));
+                    }
+                }
+                if (this.Text == "Rot CW")
+                {
+                    // Handle the Iris Open button "buttonIrisOpen_MouseDown"
+                    // FIX: Provide required parameters for buttonIrisOpen_MouseDown
+                    if (form != null)
+                    {
+                        form.buttonRotCW_MouseDown(this, new MouseEventArgs(MouseButtons.Left, 1, 0, 0, 0));
+                    }
+                }
+                if (this.Text == "Rot CCW")
+                {
+                    // Handle the Iris Close button "buttonIrisClose_MouseDown"
+                    if (form != null)
+                    {
+                        form.buttonRotCCW_MouseDown(this, new MouseEventArgs(MouseButtons.Left, 1, 0, 0, 0));
+                    }
                 }
             }
             else if (m.Msg == WM_POINTERUP)
             {
                 // Handle pointer up event
-                Form1.IrisUp = true;
+                if (form != null)
+                {
+                    form.buttonIris_MouseUp(this, new MouseEventArgs(MouseButtons.Left, 1, 0, 0, 0));
+                    form.buttonVCol_MouseUp(this, new MouseEventArgs(MouseButtons.Left, 1, 0, 0, 0));
+                    form.buttonRot_MouseUp(this, new MouseEventArgs(MouseButtons.Left, 1, 0, 0, 0));
+                }
             }
         }
     }

@@ -137,5 +137,23 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\Iris_Close.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\Iris_Open.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\ColClose.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\ColOpen.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\RotCCW.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\RotCW.bmp" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
