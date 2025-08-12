@@ -436,6 +436,13 @@ namespace SerialSplitter
             serialPort2.DtrEnable = true;
             Thread.Sleep(100);
             serialPort2.DtrEnable = false;
+#if DEBUG
+            this.ControlBox = false;
+            this.Text = "";
+            this.Size = new Size(484, 118);
+            this.Left = 100;  // 680;   // Centrado
+            this.Top = 968;
+#endif
         }
 
         private void buttonGRST_Click(object sender, EventArgs e)
@@ -480,11 +487,11 @@ namespace SerialSplitter
                         if (DEBUG) DisplayData(6, dataOUT3);
                         // Omitir la siguiente linea en Debug
 #if !DEBUG
-                        this.Size = new Size(488, 140);
-                        this.Left = 100;  // 680;   // Centrado
-                        this.Top = 954;
                         this.ControlBox = false;
                         this.Text = "";
+                        this.Size = new Size(484, 118);
+                        this.Left = 100;  // 680;   // Centrado
+                        this.Top = 968;
 #endif
                         logger.LogInfo("Turn On by Operator");
                         AutoON = true;
