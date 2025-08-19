@@ -49,7 +49,7 @@ namespace SerialSplitter
         public static float VCC = 0.0f;
         int Counter, VHKVOF = 15, VNKVOF = 12, VAKVOF = 12, VEKVOF = 6, VUEKVOF = 6, VFKVOF = 6, CIKVOF = 4, CHKVOF = 4, 
             LOW_Limit, HI_Limit, Cine_LOW_Limit, Cine_HI_Limit, Offset_KV_Cine, AnalogData, Old_AnalogData, ValorMedioCine, 
-            ValorMedioFluoro, Demora_SendKV, Demora_AEC, Offset_Max_Fluoro, Offset_Max_Cine;
+            ValorMedioFluoro, Demora_SendKV, Demora_AEC, Offset_Max_Fluoro, Offset_Max_Cine, Service;
         int dif_aec = 0;
         // float mxs;
 
@@ -305,16 +305,19 @@ namespace SerialSplitter
                                     Cine_HI_Limit = Convert.ToInt32(getBetween(s1, "Cine_HI_Limit=", 3));
                                     Offset_Max_Fluoro = Convert.ToInt32(getBetween(s1, "Offset_Max_Fluoro=", 3));
                                     Offset_Max_Cine = Convert.ToInt32(getBetween(s1, "Offset_Max_Cine=", 3));
+                                    Service = Convert.ToInt32(getBetween(s1, "DEBUG=", 1));
                                     break;
                                 default:
                                     break;
                             }
                         }
+                        // If the node is an end element, we can stop reading
                         // Stop if we reach the end of <Configuration>
                         if (configReader.NodeType == XmlNodeType.EndElement && configReader.Name == "Configuration")
                             break;
                     }
                 }
+                if (Service == 1) DEBUG = true; else DEBUG = false;
             }
             catch (Exception err)
             {
@@ -532,8 +535,16 @@ namespace SerialSplitter
             this.ControlBox = false;
             this.Text = "";
             this.Left = 460;   // Centrado 460
-            this.Top = 983;
-            this.Size = new Size(1000, 104);
+            if (Service == 1)
+            {
+                this.Top = 944;
+                this.Size = new Size(1000, 145);
+            }
+            else
+            {
+                this.Top = 984;
+                this.Size = new Size(1000, 105);
+            }
 #endif
         }
 
@@ -582,8 +593,17 @@ namespace SerialSplitter
                         this.ControlBox = false;
                         this.Text = "";
                         this.Left = 460;   // Centrado 460
-                        this.Top = 983;
-                        this.Size = new Size(1000, 104);
+                        if (Service == 1)
+                        {
+                            this.Top = 944;
+                            this.Size = new Size(1000, 145);
+                            DEBUG = true;
+                        }
+                        else
+                        {
+                            this.Top = 984;
+                            this.Size = new Size(1000, 105);
+                        }
 #endif
                         logger.LogInfo("Turn On by Operator");
                         AutoON = true;

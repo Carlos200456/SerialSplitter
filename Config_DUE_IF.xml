@@ -6,17 +6,17 @@
     <SerialPort3>       name="COM1" baudrate="38400" stopbits="One" parity="None" databits="8" </SerialPort3>
     <VascularHead>      Name="CABEZA"  Kv="075" KvOffSet="07" mA="050" ms="100" </VascularHead>
     <VascularNeck>      Name="CUELLO"  Kv="065" KvOffSet="03" mA="050" ms="050" </VascularNeck>
-    <VascularArms> 	Name="BRAZO"   Kv="055" KvOffSet="03" mA="100" ms="011" </VascularArms>
+    <VascularArms> 		Name="BRAZO"   Kv="055" KvOffSet="03" mA="100" ms="011" </VascularArms>
     <Cine>              Name="CINE"    Kv="070" KvOffSet="03" mA="200" ms="012" </Cine>
     <VascularAbdomen>   Name="ABDOMEN" Kv="075" KvOffSet="08" mA="200" ms="020" </VascularAbdomen>
-    <VascularLegs> 	Name="PIERNA"  Kv="060" KvOffSet="01" mA="200" ms="012" </VascularLegs>
-    <VascularFoot> 	Name="PIE"     Kv="055" KvOffSet="06" mA="100" ms="020" </VascularFoot>
+    <VascularLegs> 		Name="PIERNA"  Kv="060" KvOffSet="01" mA="200" ms="012" </VascularLegs>
+    <VascularFoot> 		Name="PIE"     Kv="055" KvOffSet="06" mA="100" ms="020" </VascularFoot>
     <Heart>             Name="CORAZON" Kv="070" KvOffSet="05" mA="200" ms="016" </Heart>
     <FLUOROMAP>         Name="FLUOROR" Kv="070" mA="30"  ms="12" </FLUOROMAP>
     <FLUORO1>           Name="FLUORO1" Kv="075" mA="40"  ms="12" </FLUORO1>
     <FLUORO2>           Name="FLUORO2" Kv="077" mA="40"  ms="16" </FLUORO2>
     <FLUORO3>           Name="FLUORO3" Kv="080" mA="50"  ms="20" </FLUORO3>
     <FLUORO4>           Name="FLUORO4" Kv="070" mA="30"  ms="12" </FLUORO4>
-    <Power>             VCC="15.30"    LOW_Limit="015"   HI_Limit="030"   Cine_LOW_Limit="025"   Cine_HI_Limit="040" Offset_Max_Fluoro="004" Offset_Max_Cine="003" </Power>
+    <Power>             VCC="15.30"    LOW_Limit="015"   HI_Limit="030"   Cine_LOW_Limit="025"   Cine_HI_Limit="040" Offset_Max_Fluoro="004" Offset_Max_Cine="003" DEBUG="1"</Power>
   </Configuration>
 </root>
