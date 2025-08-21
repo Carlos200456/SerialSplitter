@@ -800,7 +800,7 @@ namespace SerialSplitter
         {
             if (serialPort2.IsOpen)
             {
-                dataOUT2 = "RO5";
+                dataOUT2 = "RO-5";
                 serialPort2.WriteLine(dataOUT2);
             }
         }
@@ -818,7 +818,7 @@ namespace SerialSplitter
         {
             if (serialPort2.IsOpen)
             {
-                dataOUT2 = "RO-5";
+                dataOUT2 = "RO5";
                 serialPort2.WriteLine(dataOUT2);
             }
         }
