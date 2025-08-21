@@ -756,6 +756,9 @@ namespace SerialSplitter
             {
                 dataOUT2 = "IC0";
                 serialPort2.WriteLine(dataOUT2);
+                Thread.Sleep(100);
+                dataOUT2 = "IC0";
+                serialPort2.WriteLine(dataOUT2);
             }
 
         }
@@ -784,6 +787,9 @@ namespace SerialSplitter
             {
                 dataOUT2 = "VC0";
                 serialPort2.WriteLine(dataOUT2);
+                Thread.Sleep(100);
+                dataOUT2 = "VC0";
+                serialPort2.WriteLine(dataOUT2);
             }
         }
 
@@ -809,6 +815,9 @@ namespace SerialSplitter
         {
             if (serialPort2.IsOpen)
             {
+                dataOUT2 = "RO0";
+                serialPort2.WriteLine(dataOUT2);
+                Thread.Sleep(100);
                 dataOUT2 = "RO0";
                 serialPort2.WriteLine(dataOUT2);
             }
