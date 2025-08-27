@@ -300,15 +300,15 @@ namespace SerialSplitter
             switch (msg)
             {
                 case "SBE1":
-                    textBoxER.Text = "Falla de tarjeta de Estator";
+                    textBoxER.Text = "Falla de tarjeta Estator";
                     LoggearError();
                     break;
                 case "HBE1":
-                    textBoxER.Text = "Falla de tarjeta de Calefaccion";
+                    textBoxER.Text = "Falla de tarjeta Calefaccion";
                     LoggearError();
                     break;
                 case "IBM1":
-                    textBoxER.Text = "Falla de tarjeta de Inversor";
+                    textBoxER.Text = "Falla de tarjeta Inversor";
                     LoggearError();
                     break;
                 case "FPE1":
@@ -381,7 +381,7 @@ namespace SerialSplitter
                     LoggearError();
                     break;
                 case "CPM":
-                    textBoxER.Text = "Falta Placa Estator";
+                    textBoxER.Text = "Falla de Estator (CPM)";
                     button3.BackColor = Color.Red;
                     LoggearError();
                     break;
@@ -528,7 +528,7 @@ namespace SerialSplitter
 
                         case "CPM\r":
                             // Error Stator Boar Missing
-                            textBoxER.Text = "Falta Placa Estator";
+                            textBoxER.Text = "Falla de Estator (CPM)";
                             button3.BackColor = Color.Red;
                             LoggearError();
                             break;
