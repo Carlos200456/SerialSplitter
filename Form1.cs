@@ -184,7 +184,7 @@ namespace SerialSplitter
 
             try
             {
-                using (XmlTextReader configReader = new XmlTextReader(AppPath + "Config_DUE_IF.xml"))
+                using (XmlTextReader configReader = new XmlTextReader(AppPath + "Config_DUE_IF_Arco.xml"))
                 {
                     // Move to <Configuration>
                     while (configReader.Read())
