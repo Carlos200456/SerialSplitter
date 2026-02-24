@@ -22,7 +22,7 @@ namespace SerialSplitter
 {
     public partial class Form1 : Form
     {
-        string SW_Version = "3.4\r";        // =======> Version de software para compatibilidad
+        string SW_Version = "3.5\r";        // =======> Version de software para compatibilidad
         string VHKV, VHMA, VHMS, VNKV, VNMA, VNMS, VAKV, VAMA, VAMS, VEKV, VEMA, VEMS, VUEKV, VUEMA, VUEMS, VFKV, VFMA, VFMS, CIKV, CIMA, CIMS, CHKV, CHMA, CHMS, FMKV, FMMA, FMMS, F1KV, F1MA, F1MS, F2KV, F2MA, F2MS, F3KV, F3MA, F3MS, F4KV, F4MA, F4MS, SerialNumber = "";
         string dataIN1 = "", dataIN2 = "", dataIN3 = "", dataOUT1 = "", dataOUT2 = "", dataOUT3 = "", path, textKVP, textKVN, textmAReal, textRmA, LastER, textSFI, textSRE, textSCC, textSIC, textSUC, textUPW, textHU, textVCC, message;
         string Serial1PortName, Serial1BaudRate, Serial1DataBits, Serial1StopBits, Serial1Parity, Serial2PortName, Serial2BaudRate, Serial2DataBits, Serial2StopBits, Serial2Parity, Serial3PortName, Serial3BaudRate, Serial3DataBits, Serial3StopBits, Serial3Parity;
