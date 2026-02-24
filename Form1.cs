@@ -22,7 +22,7 @@ namespace SerialSplitter
 {
     public partial class Form1 : Form
     {
-        string SW_Version = "3.4\r";        // =======> Version de software para compatibilidad
+        string SW_Version = "3.5\r";        // =======> Version de software para compatibilidad
         string VHKV, VHMA, VHMS, VNKV, VNMA, VNMS, VAKV, VAMA, VAMS, VEKV, VEMA, VEMS, VUEKV, VUEMA, VUEMS, VFKV, VFMA, VFMS, CIKV, CIMA, CIMS, CHKV, CHMA, CHMS, FMKV, FMMA, FMMS, F1KV, F1MA, F1MS, F2KV, F2MA, F2MS, F3KV, F3MA, F3MS, F4KV, F4MA, F4MS, SerialNumber = "";
         string dataIN1 = "", dataIN2 = "", dataIN3 = "", dataOUT1 = "", dataOUT2 = "", dataOUT3 = "", path, textKVP, textKVN, textmAReal, textRmA, LastER, textSFI, textSRE, textSCC, textSIC, textSUC, textUPW, textHU, textVCC, message;
         string Serial1PortName, Serial1BaudRate, Serial1DataBits, Serial1StopBits, Serial1Parity, Serial2PortName, Serial2BaudRate, Serial2DataBits, Serial2StopBits, Serial2Parity, Serial3PortName, Serial3BaudRate, Serial3DataBits, Serial3StopBits, Serial3Parity;
@@ -112,107 +112,107 @@ namespace SerialSplitter
                             switch (elementName)
                             {
                                 case "SerialPort1":
-                                    Serial1PortName = getBetween(s1, "name=", 4);
-                                    Serial1BaudRate = getBetween(s1, "baudrate=", 5);
-                                    Serial1DataBits = getBetween(s1, "databits=", 1);
-                                    Serial1StopBits = getBetween(s1, "stopbits=", 3);
-                                    Serial1Parity = getBetween(s1, "parity=", 4);
+                                    Serial1PortName = getBetween(s1, "name=", -1);
+                                    Serial1BaudRate = getBetween(s1, "baudrate=", -1);
+                                    Serial1DataBits = getBetween(s1, "databits=", -1);
+                                    Serial1StopBits = getBetween(s1, "stopbits=", -1);
+                                    Serial1Parity = getBetween(s1, "parity=", -1);
                                     break;
                                 case "SerialPort2":
-                                    Serial2PortName = getBetween(s1, "name=", 4);
-                                    Serial2BaudRate = getBetween(s1, "baudrate=", 5);
-                                    Serial2DataBits = getBetween(s1, "databits=", 1);
-                                    Serial2StopBits = getBetween(s1, "stopbits=", 3);
-                                    Serial2Parity = getBetween(s1, "parity=", 4);
+                                    Serial2PortName = getBetween(s1, "name=", -1);
+                                    Serial2BaudRate = getBetween(s1, "baudrate=", -1);
+                                    Serial2DataBits = getBetween(s1, "databits=", -1);
+                                    Serial2StopBits = getBetween(s1, "stopbits=", -1);
+                                    Serial2Parity = getBetween(s1, "parity=", -1);
                                     break;
                                 case "SerialPort3":
-                                    Serial3PortName = getBetween(s1, "name=", 4);
-                                    Serial3BaudRate = getBetween(s1, "baudrate=", 5);
-                                    Serial3DataBits = getBetween(s1, "databits=", 1);
-                                    Serial3StopBits = getBetween(s1, "stopbits=", 3);
-                                    Serial3Parity = getBetween(s1, "parity=", 4);
+                                    Serial3PortName = getBetween(s1, "name=", -1);
+                                    Serial3BaudRate = getBetween(s1, "baudrate=", -1);
+                                    Serial3DataBits = getBetween(s1, "databits=", -1);
+                                    Serial3StopBits = getBetween(s1, "stopbits=", -1);
+                                    Serial3Parity = getBetween(s1, "parity=", -1);
                                     break;
                                 case "VascularHead":
-                                    VHKV = getBetween(s1, "Kv=", 3);
-                                    VHKVOF = Convert.ToInt32(getBetween(s1, "KvOffSet=", 2));
-                                    VHMA = getBetween(s1, "mA=", 3);
-                                    VHMS = getBetween(s1, "ms=", 3);
+                                    VHKV = getBetween(s1, "Kv=", -1);
+                                    VHKVOF = Convert.ToInt32(getBetween(s1, "KvOffSet=", -1));
+                                    VHMA = getBetween(s1, "mA=", -1);
+                                    VHMS = getBetween(s1, "ms=", -1);
                                     break;
                                 case "VascularNeck":
-                                    VNKV = getBetween(s1, "Kv=", 3);
-                                    VNKVOF = Convert.ToInt32(getBetween(s1, "KvOffSet=", 2));
-                                    VNMA = getBetween(s1, "mA=", 3);
-                                    VNMS = getBetween(s1, "ms=", 3);
+                                    VNKV = getBetween(s1, "Kv=", -1);
+                                    VNKVOF = Convert.ToInt32(getBetween(s1, "KvOffSet=", -1));
+                                    VNMA = getBetween(s1, "mA=", -1);
+                                    VNMS = getBetween(s1, "ms=", -1);
                                     break;
                                 case "Cine":
-                                    CIKV = getBetween(s1, "Kv=", 3);
-                                    CIKVOF = Convert.ToInt32(getBetween(s1, "KvOffSet=", 2));
-                                    CIMA = getBetween(s1, "mA=", 3);
-                                    CIMS = getBetween(s1, "ms=", 3);
+                                    CIKV = getBetween(s1, "Kv=", -1);
+                                    CIKVOF = Convert.ToInt32(getBetween(s1, "KvOffSet=", -1));
+                                    CIMA = getBetween(s1, "mA=", -1);
+                                    CIMS = getBetween(s1, "ms=", -1);
                                     break;
                                 case "VascularArms":
-                                    VUEKV = getBetween(s1, "Kv=", 3);
-                                    VUEKVOF = Convert.ToInt32(getBetween(s1, "KvOffSet=", 2));
-                                    VUEMA = getBetween(s1, "mA=", 3);
-                                    VUEMS = getBetween(s1, "ms=", 3);
+                                    VUEKV = getBetween(s1, "Kv=", -1);
+                                    VUEKVOF = Convert.ToInt32(getBetween(s1, "KvOffSet=", -1));
+                                    VUEMA = getBetween(s1, "mA=", -1);
+                                    VUEMS = getBetween(s1, "ms=", -1);
                                     break;
                                 case "VascularAbdomen":
-                                    VAKV = getBetween(s1, "Kv=", 3);
-                                    VAKVOF = Convert.ToInt32(getBetween(s1, "KvOffSet=", 2));
-                                    VAMA = getBetween(s1, "mA=", 3);
-                                    VAMS = getBetween(s1, "ms=", 3);
+                                    VAKV = getBetween(s1, "Kv=", -1);
+                                    VAKVOF = Convert.ToInt32(getBetween(s1, "KvOffSet=", -1));
+                                    VAMA = getBetween(s1, "mA=", -1);
+                                    VAMS = getBetween(s1, "ms=", -1);
                                     break;
                                 case "VascularLegs":
-                                    VEKV = getBetween(s1, "Kv=", 3);
-                                    VEKVOF = Convert.ToInt32(getBetween(s1, "KvOffSet=", 2));
-                                    VEMA = getBetween(s1, "mA=", 3);
-                                    VEMS = getBetween(s1, "ms=", 3);
+                                    VEKV = getBetween(s1, "Kv=", -1);
+                                    VEKVOF = Convert.ToInt32(getBetween(s1, "KvOffSet=", -1));
+                                    VEMA = getBetween(s1, "mA=", -1);
+                                    VEMS = getBetween(s1, "ms=", -1);
                                     break;
                                 case "VascularFoot":
-                                    VFKV = getBetween(s1, "Kv=", 3);
-                                    VFKVOF = Convert.ToInt32(getBetween(s1, "KvOffSet=", 2));
-                                    VFMA = getBetween(s1, "mA=", 3);
-                                    VFMS = getBetween(s1, "ms=", 3);
+                                    VFKV = getBetween(s1, "Kv=", -1);
+                                    VFKVOF = Convert.ToInt32(getBetween(s1, "KvOffSet=", -1));
+                                    VFMA = getBetween(s1, "mA=", -1);
+                                    VFMS = getBetween(s1, "ms=", -1);
                                     break;
                                 case "Heart":
-                                    CHKV = getBetween(s1, "Kv=", 3);
-                                    CHKVOF = Convert.ToInt32(getBetween(s1, "KvOffSet=", 2));
-                                    CHMA = getBetween(s1, "mA=", 3);
-                                    CHMS = getBetween(s1, "ms=", 3);
+                                    CHKV = getBetween(s1, "Kv=", -1);
+                                    CHKVOF = Convert.ToInt32(getBetween(s1, "KvOffSet=", -1));
+                                    CHMA = getBetween(s1, "mA=", -1);
+                                    CHMS = getBetween(s1, "ms=", -1);
                                     break;
                                 case "FLUOROMAP":
-                                    FMKV = getBetween(s1, "Kv=", 3);
-                                    FMMA = getBetween(s1, "mA=", 2);
-                                    FMMS = getBetween(s1, "ms=", 2);
+                                    FMKV = getBetween(s1, "Kv=", -1);
+                                    FMMA = getBetween(s1, "mA=", -1);
+                                    FMMS = getBetween(s1, "ms=", -1);
                                     break;
                                 case "FLUORO1":
-                                    F1KV = getBetween(s1, "Kv=", 3);
-                                    F1MA = getBetween(s1, "mA=", 2);
-                                    F1MS = getBetween(s1, "ms=", 2);
+                                    F1KV = getBetween(s1, "Kv=", -1);
+                                    F1MA = getBetween(s1, "mA=", -1);
+                                    F1MS = getBetween(s1, "ms=", -1);
                                     break;
                                 case "FLUORO2":
-                                    F2KV = getBetween(s1, "Kv=", 3);
-                                    F2MA = getBetween(s1, "mA=", 2);
-                                    F2MS = getBetween(s1, "ms=", 2);
+                                    F2KV = getBetween(s1, "Kv=", -1);
+                                    F2MA = getBetween(s1, "mA=", -1);
+                                    F2MS = getBetween(s1, "ms=", -1);
                                     break;
                                 case "FLUORO3":
-                                    F3KV = getBetween(s1, "Kv=", 3);
-                                    F3MA = getBetween(s1, "mA=", 2);
-                                    F3MS = getBetween(s1, "ms=", 2);
+                                    F3KV = getBetween(s1, "Kv=", -1);
+                                    F3MA = getBetween(s1, "mA=", -1);
+                                    F3MS = getBetween(s1, "ms=", -1);
                                     break;
                                 case "FLUORO4":
-                                    F4KV = getBetween(s1, "Kv=", 3);
-                                    F4MA = getBetween(s1, "mA=", 2);
-                                    F4MS = getBetween(s1, "ms=", 2);
+                                    F4KV = getBetween(s1, "Kv=", -1);
+                                    F4MA = getBetween(s1, "mA=", -1);
+                                    F4MS = getBetween(s1, "ms=", -1);
                                     break;
                                 case "Power":
-                                    VCC = Convert.ToSingle(getBetween(s1, "VCC=", 5));
-                                    LOW_Limit = Convert.ToInt32(getBetween(s1, "LOW_Limit=", 3));
-                                    HI_Limit = Convert.ToInt32(getBetween(s1, "HI_Limit=", 3));
-                                    Cine_LOW_Limit = Convert.ToInt32(getBetween(s1, "Cine_LOW_Limit=", 3));
-                                    Cine_HI_Limit = Convert.ToInt32(getBetween(s1, "Cine_HI_Limit=", 3));
-                                    Offset_Max_Fluoro = Convert.ToInt32(getBetween(s1, "Offset_Max_Fluoro=", 3));
-                                    Offset_Max_Cine = Convert.ToInt32(getBetween(s1, "Offset_Max_Cine=", 3));
+                                    VCC = Convert.ToSingle(getBetween(s1, "VCC=", -1));
+                                    LOW_Limit = Convert.ToInt32(getBetween(s1, "LOW_Limit=", -1));
+                                    HI_Limit = Convert.ToInt32(getBetween(s1, "HI_Limit=", -1));
+                                    Cine_LOW_Limit = Convert.ToInt32(getBetween(s1, "Cine_LOW_Limit=", -1));
+                                    Cine_HI_Limit = Convert.ToInt32(getBetween(s1, "Cine_HI_Limit=", -1));
+                                    Offset_Max_Fluoro = Convert.ToInt32(getBetween(s1, "Offset_Max_Fluoro=", -1));
+                                    Offset_Max_Cine = Convert.ToInt32(getBetween(s1, "Offset_Max_Cine=", -1 ));
                                     break;
                                 default:
                                     break;
@@ -727,15 +727,55 @@ namespace SerialSplitter
 
         public static string getBetween(string strSource, string strStart, int largo)
         {
-            if (strSource.Contains(strStart))
+            if (string.IsNullOrEmpty(strSource) || string.IsNullOrEmpty(strStart))
+                return "";
+
+            int idx = strSource.IndexOf(strStart, StringComparison.Ordinal);
+            if (idx < 0)
+                return "";
+
+            int start = idx + strStart.Length;
+            if (start >= strSource.Length)
+                return "";
+
+            // Skip leading whitespace after the marker
+            while (start < strSource.Length && char.IsWhiteSpace(strSource[start]))
+                start++;
+
+            if (start >= strSource.Length)
+                return "";
+
+            int end = start;
+
+            if (largo > 0)
             {
-                int Start, End;
-                Start = strSource.IndexOf(strStart, 0) + strStart.Length;
-                End = Start + largo;
-                return strSource.Substring((Start + 1), End - Start);
+                int maxEnd = Math.Min(start + largo, strSource.Length);
+                while (end < maxEnd && !char.IsWhiteSpace(strSource[end]) && strSource[end] != '\r' && strSource[end] != '\n')
+                    end++;
+            }
+            else
+            {
+                // variable length: read until whitespace or line break
+                while (end < strSource.Length && !char.IsWhiteSpace(strSource[end]) && strSource[end] != '\r' && strSource[end] != '\n')
+                    end++;
             }
 
-            return "";
+            if (end <= start)
+                return "";
+
+            string result = strSource.Substring(start, end - start).Trim();
+
+            // Remove surrounding quotes if present (handles "COM7" or 'COM7')
+            if (result.Length >= 2)
+            {
+                if ((result[0] == '"' && result[result.Length - 1] == '"') ||
+                    (result[0] == '\'' && result[result.Length - 1] == '\''))
+                {
+                    result = result.Substring(1, result.Length - 2);
+                }
+            }
+
+            return result;
         }
 
         private void LoggearError()
