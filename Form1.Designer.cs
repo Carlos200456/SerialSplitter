@@ -88,6 +88,12 @@
             this.buttonIrisClose = new System.Windows.Forms.Button();
             this.label14 = new System.Windows.Forms.Label();
             this.buttonIrisOpen = new System.Windows.Forms.Button();
+            this.textBoxAngC = new System.Windows.Forms.TextBox();
+            this.label18 = new System.Windows.Forms.Label();
+            this.label19 = new System.Windows.Forms.Label();
+            this.textBoxAngL = new System.Windows.Forms.TextBox();
+            this.label20 = new System.Windows.Forms.Label();
+            this.textBoxTemp = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // serialPort1
@@ -617,12 +623,72 @@
             this.buttonIrisOpen.MouseDown += new System.Windows.Forms.MouseEventHandler(this.buttonIrisOpen_MouseDown);
             this.buttonIrisOpen.MouseUp += new System.Windows.Forms.MouseEventHandler(this.buttonIris_MouseUp);
             // 
+            // textBoxAngC
+            // 
+            this.textBoxAngC.Location = new System.Drawing.Point(1001, 21);
+            this.textBoxAngC.Name = "textBoxAngC";
+            this.textBoxAngC.Size = new System.Drawing.Size(55, 20);
+            this.textBoxAngC.TabIndex = 57;
+            this.textBoxAngC.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            // 
+            // label18
+            // 
+            this.label18.AutoSize = true;
+            this.label18.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label18.Location = new System.Drawing.Point(998, 3);
+            this.label18.Name = "label18";
+            this.label18.Size = new System.Drawing.Size(61, 16);
+            this.label18.TabIndex = 58;
+            this.label18.Text = "Angulo C";
+            // 
+            // label19
+            // 
+            this.label19.AutoSize = true;
+            this.label19.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label19.Location = new System.Drawing.Point(999, 43);
+            this.label19.Name = "label19";
+            this.label19.Size = new System.Drawing.Size(59, 16);
+            this.label19.TabIndex = 59;
+            this.label19.Text = "Angulo L";
+            // 
+            // textBoxAngL
+            // 
+            this.textBoxAngL.Location = new System.Drawing.Point(1001, 61);
+            this.textBoxAngL.Name = "textBoxAngL";
+            this.textBoxAngL.Size = new System.Drawing.Size(55, 20);
+            this.textBoxAngL.TabIndex = 60;
+            this.textBoxAngL.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            // 
+            // label20
+            // 
+            this.label20.AutoSize = true;
+            this.label20.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label20.Location = new System.Drawing.Point(336, 70);
+            this.label20.Name = "label20";
+            this.label20.Size = new System.Drawing.Size(78, 16);
+            this.label20.TabIndex = 61;
+            this.label20.Text = "Temp Tubo";
+            // 
+            // textBoxTemp
+            // 
+            this.textBoxTemp.Location = new System.Drawing.Point(417, 69);
+            this.textBoxTemp.Name = "textBoxTemp";
+            this.textBoxTemp.Size = new System.Drawing.Size(55, 20);
+            this.textBoxTemp.TabIndex = 62;
+            this.textBoxTemp.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.WindowFrame;
-            this.ClientSize = new System.Drawing.Size(984, 203);
+            this.ClientSize = new System.Drawing.Size(1084, 203);
+            this.Controls.Add(this.textBoxTemp);
+            this.Controls.Add(this.label20);
+            this.Controls.Add(this.textBoxAngL);
+            this.Controls.Add(this.label19);
+            this.Controls.Add(this.label18);
+            this.Controls.Add(this.textBoxAngC);
             this.Controls.Add(this.label14);
             this.Controls.Add(this.buttonRotCCW);
             this.Controls.Add(this.buttonRotCW);
@@ -747,6 +813,12 @@
         private System.Windows.Forms.Button buttonIrisClose;
         private System.Windows.Forms.Button buttonIrisOpen;
         private System.Windows.Forms.Label label14;
+        private System.Windows.Forms.TextBox textBoxAngC;
+        private System.Windows.Forms.Label label18;
+        private System.Windows.Forms.Label label19;
+        private System.Windows.Forms.TextBox textBoxAngL;
+        private System.Windows.Forms.Label label20;
+        private System.Windows.Forms.TextBox textBoxTemp;
     }
 }
 

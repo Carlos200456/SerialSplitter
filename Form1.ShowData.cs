@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Globalization;
 using System.IO.Ports;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace SerialSplitter
 {
@@ -101,7 +103,57 @@ namespace SerialSplitter
                 AEC_Lock = true;
             }
             if (DEBUG) DisplayData(4, dataIN2);
+            if (dataIN2.Contains("TO="))
+            {
+                string alStr = getBetween(dataIN2, "TO=", -1);
+                if (TryParseAndCeilToInt(alStr, out int tempAL))
+                {
+                    textBoxTemp.Text = tempAL.ToString(CultureInfo.InvariantCulture) + " °C";
+                }
+            }
+            if (dataIN2.Contains("AL="))
+            {
+                string alStr = getBetween(dataIN2, "AL=", -1);
+                if (TryParseAndCeilToInt(alStr, out int tempAL))
+                {
+                    textBoxAngL.Text = tempAL.ToString(CultureInfo.InvariantCulture);
+                }
+                else
+                {
+                    textBoxAngL.Text = ""; // or keep previous value / log invalid input
+                }
+            }
+            if (dataIN2.Contains("AC="))
+            {
+                string acStr = getBetween(dataIN2, "AC=", -1);
+                if (TryParseAndCeilToInt(acStr, out int tempAC))
+                {
+                    textBoxAngC.Text = tempAC.ToString(CultureInfo.InvariantCulture);
+                }
+                else
+                {
+                    textBoxAngC.Text = "";
+                }
+            }
+
         }
+
+        // Add this helper inside the Form1 class (near other helpers)
+        private bool TryParseAndCeilToInt(string input, out int value)
+        {
+            value = 0;
+            if (string.IsNullOrWhiteSpace(input))
+                return false;
+
+            // Parse using invariant culture so decimal separator is '.':
+            if (!double.TryParse(input.Trim(), NumberStyles.Float | NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out double d))
+                return false;
+
+            // For the examples: -0.43 -> 0, 1.65 -> 2
+            value = (int)Math.Ceiling(d);
+            return true;
+        }
+
 
         private void ShowData3(object sender, EventArgs e)
         {
