@@ -555,6 +555,11 @@ namespace SerialSplitter
             serialPort3.DtrEnable = true;
             Thread.Sleep(100);
             serialPort3.DtrEnable = false;
+            serialPort2.DtrEnable = false;
+            Thread.Sleep(50);
+            serialPort2.DtrEnable = true;
+            Thread.Sleep(100);
+            serialPort2.DtrEnable = false;
             buttonPW.BackColor = Color.LightGray;
             button1.BackColor = Color.LightGray;
             button2.BackColor = Color.LightGray;
@@ -603,6 +608,11 @@ namespace SerialSplitter
                         {
                             this.Top = 984;
                             this.Size = new Size(1100, 105);
+                            serialPort2.DtrEnable = false;
+                            Thread.Sleep(50);
+                            serialPort2.DtrEnable = true;
+                            Thread.Sleep(100);
+                            serialPort2.DtrEnable = false;
                         }
 #endif
                         logger.LogInfo("Turn On by Operator");
