@@ -121,8 +121,14 @@
   <data name="ColClose" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Images\ColClose.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="ColCloseH" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\ColCloseH.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="ColOpen" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Images\ColOpen.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ColOpenH" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\ColOpenH.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="Iris_Close" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Images\Iris_Close.bmp;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>

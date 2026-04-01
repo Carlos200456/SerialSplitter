@@ -116,8 +116,8 @@ namespace SerialSplitter
             ButtonIrisClose.ButtonImage = Properties.Resources.Iris_Close;
             ButtonVColOpen.ButtonImage = Properties.Resources.ColOpen;
             ButtonVColClose.ButtonImage = Properties.Resources.ColClose;
-            ButtonRotCW.ButtonImage = Properties.Resources.ColOpen;
-            ButtonRotCCW.ButtonImage = Properties.Resources.ColClose;
+            ButtonRotCW.ButtonImage = Properties.Resources.ColOpenH;
+            ButtonRotCCW.ButtonImage = Properties.Resources.ColCloseH;
             ButtonIrisOpen.Location = existingButton1.Location;
             ButtonIrisOpen.Size = existingButton1.Size;
             ButtonIrisOpen.Text = existingButton1.Text;
@@ -158,7 +158,7 @@ namespace SerialSplitter
             ButtonRotCW.Text = existingButton5.Text;
             ButtonRotCW.Font = existingButton5.Font;
             ButtonRotCW.ForeColor = Color.White;
-            ButtonRotCW.BackgroundImage = Properties.Resources.ColOpen;
+            ButtonRotCW.BackgroundImage = Properties.Resources.ColOpenH;
             ButtonRotCW.BackgroundImageLayout = ImageLayout.Stretch;
             // Put Button Image in front of button text
 
@@ -172,7 +172,7 @@ namespace SerialSplitter
             ButtonRotCCW.Text = existingButton6.Text;
             ButtonRotCCW.Font = existingButton6.Font;
             ButtonRotCCW.ForeColor = Color.White;
-            ButtonRotCCW.BackgroundImage = Properties.Resources.ColClose;
+            ButtonRotCCW.BackgroundImage = Properties.Resources.ColCloseH;
             ButtonRotCCW.BackgroundImageLayout = ImageLayout.Stretch;
             ButtonRotCCW.MouseDown += buttonRotCW_MouseDown;
             ButtonRotCCW.MouseUp += buttonRot_MouseUp;
