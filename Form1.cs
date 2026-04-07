@@ -174,7 +174,7 @@ namespace SerialSplitter
             ButtonRotCCW.ForeColor = Color.White;
             ButtonRotCCW.BackgroundImage = Properties.Resources.ColCloseH;
             ButtonRotCCW.BackgroundImageLayout = ImageLayout.Stretch;
-            ButtonRotCCW.MouseDown += buttonRotCW_MouseDown;
+            ButtonRotCCW.MouseDown += buttonRotCCW_MouseDown;
             ButtonRotCCW.MouseUp += buttonRot_MouseUp;
             // ... Set any other properties you need ...
             this.Controls.Add(ButtonRotCCW);
