@@ -816,7 +816,7 @@ namespace SerialSplitter
         {
             if (serialPort2.IsOpen)
             {
-                dataOUT2 = "HC5";
+                dataOUT2 = "RO5";
                 serialPort2.WriteLine(dataOUT2);
             }
         }
@@ -825,10 +825,10 @@ namespace SerialSplitter
         {
             if (serialPort2.IsOpen)
             {
-                dataOUT2 = "HC0";
+                dataOUT2 = "RO0";
                 serialPort2.WriteLine(dataOUT2);
                 Thread.Sleep(100);
-                dataOUT2 = "HC0";
+                dataOUT2 = "RO0";
                 serialPort2.WriteLine(dataOUT2);
             }
         }
@@ -837,7 +837,7 @@ namespace SerialSplitter
         {
             if (serialPort2.IsOpen)
             {
-                dataOUT2 = "HC-5";
+                dataOUT2 = "RO-5";
                 serialPort2.WriteLine(dataOUT2);
             }
         }
