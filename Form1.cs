@@ -49,7 +49,7 @@ namespace SerialSplitter
         public static float VCC = 0.0f;
         int Counter, VHKVOF = 15, VNKVOF = 12, VAKVOF = 12, VEKVOF = 6, VUEKVOF = 6, VFKVOF = 6, CIKVOF = 4, CHKVOF = 4, 
             LOW_Limit, HI_Limit, Cine_LOW_Limit, Cine_HI_Limit, Offset_KV_Cine, AnalogData, Old_AnalogData, ValorMedioCine, 
-            ValorMedioFluoro, Demora_SendKV, Demora_AEC, Offset_Max_Fluoro, Offset_Max_Cine, Service;
+            ValorMedioFluoro, Demora_SendKV, Demora_AEC, Offset_Max_Fluoro, Offset_Max_Cine, Service, ActualFL = 0;
         int dif_aec = 0;
         // float mxs;
 
@@ -99,7 +99,7 @@ namespace SerialSplitter
             System.Windows.Forms.Button existingButton4 = buttonVColClose;
             System.Windows.Forms.Button existingButton5 = buttonRotCW;
             System.Windows.Forms.Button existingButton6 = buttonRotCCW;
-            // Remove button2 and button3 from the form
+            // Remove button 1 to button6 from the form
             this.Controls.Remove(existingButton1);
             this.Controls.Remove(existingButton2);
             this.Controls.Remove(existingButton3);
@@ -755,7 +755,9 @@ namespace SerialSplitter
         {
             if (serialPort2.IsOpen)
             {
-                dataOUT2 = "IC5";
+                if (ActualFL == 3) ActualFL = 0;
+                dataOUT2 = "FL" + ActualFL.ToString();
+                ActualFL += 1;
                 serialPort2.WriteLine(dataOUT2);
             }
         }
@@ -777,7 +779,7 @@ namespace SerialSplitter
         {
             if (serialPort2.IsOpen)
             {
-                dataOUT2 = "IC-5";
+                dataOUT2 = "FL3";
                 serialPort2.WriteLine(dataOUT2);
             }
         }
