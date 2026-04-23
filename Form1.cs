@@ -93,47 +93,49 @@ namespace SerialSplitter
         {
             InitializeComponent();
             //------------------------------------------------------------------------------//
-            System.Windows.Forms.Button existingButton1 = buttonIrisOpen;
+            // System.Windows.Forms.Button existingButton1 = buttonIrisOpen;
+            buttonIrisOpen.Text = "Filtro 3";
             System.Windows.Forms.Button existingButton2 = buttonIrisClose;
             System.Windows.Forms.Button existingButton3 = buttonVColOpen;
             System.Windows.Forms.Button existingButton4 = buttonVColClose;
             System.Windows.Forms.Button existingButton5 = buttonRotCW;
             System.Windows.Forms.Button existingButton6 = buttonRotCCW;
             // Remove button 1 to button6 from the form
-            this.Controls.Remove(existingButton1);
+            // this.Controls.Remove(existingButton1);
             this.Controls.Remove(existingButton2);
             this.Controls.Remove(existingButton3);
             this.Controls.Remove(existingButton4);
             this.Controls.Remove(existingButton5);
             this.Controls.Remove(existingButton6);
-            CustomButton ButtonIrisOpen = new CustomButton();
-            CustomButton ButtonIrisClose = new CustomButton();
+            // CustomButton ButtonIrisOpen = new CustomButton();
+            // CustomButton ButtonIrisClose = new CustomButton();
             CustomButton ButtonVColOpen = new CustomButton();
             CustomButton ButtonVColClose = new CustomButton();
             CustomButton ButtonRotCW = new CustomButton();
             CustomButton ButtonRotCCW = new CustomButton();
-            ButtonIrisOpen.ButtonImage = Properties.Resources.Iris_Open;
-            ButtonIrisClose.ButtonImage = Properties.Resources.Iris_Close;
+            // ButtonIrisOpen.ButtonImage = Properties.Resources.Iris_Open;
+            // ButtonIrisClose.ButtonImage = Properties.Resources.Iris_Close;
             ButtonVColOpen.ButtonImage = Properties.Resources.ColOpen;
             ButtonVColClose.ButtonImage = Properties.Resources.ColClose;
             ButtonRotCW.ButtonImage = Properties.Resources.ColOpenH;
             ButtonRotCCW.ButtonImage = Properties.Resources.ColCloseH;
-            ButtonIrisOpen.Location = existingButton1.Location;
-            ButtonIrisOpen.Size = existingButton1.Size;
-            ButtonIrisOpen.Text = existingButton1.Text;
-            ButtonIrisOpen.Font = existingButton1.Font;
-            ButtonIrisOpen.MouseDown += buttonIrisOpen_MouseDown;
-            ButtonIrisOpen.MouseUp += buttonIris_MouseUp;
+            // ButtonIrisOpen.Location = existingButton1.Location;
+            // ButtonIrisOpen.Size = existingButton1.Size;
+            // ButtonIrisOpen.Text = "FL0";
+            // ButtonIrisOpen.Font = existingButton1.Font;
+            // ButtonIrisOpen.Name = "ButtonIrisOpen";
+            // ButtonIrisOpen.MouseDown += buttonIrisOpen_MouseDown;
+            // ButtonIrisOpen.MouseUp += buttonIris_MouseUp;
             // ... Set any other properties you need ...
-            this.Controls.Add(ButtonIrisOpen);
-            ButtonIrisClose.Location = existingButton2.Location;
-            ButtonIrisClose.Size = existingButton2.Size;
-            ButtonIrisClose.Text = existingButton2.Text;
-            ButtonIrisClose.Font = existingButton2.Font;
-            ButtonIrisClose.MouseDown += buttonIrisClose_MouseDown;
-            ButtonIrisClose.MouseUp += buttonIris_MouseUp;
+            // this.Controls.Add(ButtonIrisOpen);
+//            ButtonIrisClose.Location = existingButton2.Location;
+//            ButtonIrisClose.Size = existingButton2.Size;
+//            ButtonIrisClose.Text = existingButton2.Text;
+//            ButtonIrisClose.Font = existingButton2.Font;
+//            ButtonIrisClose.MouseDown += buttonIrisClose_MouseDown;
+//            ButtonIrisClose.MouseUp += buttonIris_MouseUp;
             // ... Set any other properties you need ...
-            this.Controls.Add(ButtonIrisClose);
+//            this.Controls.Add(ButtonIrisClose);
             ButtonVColOpen.Location = existingButton3.Location;
             ButtonVColOpen.Size = existingButton3.Size;
             ButtonVColOpen.Text = existingButton3.Text;
@@ -755,10 +757,11 @@ namespace SerialSplitter
         {
             if (serialPort2.IsOpen)
             {
-                if (ActualFL == 3) ActualFL = 0;
+                if (ActualFL == 4) ActualFL = 0;
                 dataOUT2 = "FL" + ActualFL.ToString();
-                ActualFL += 1;
+                buttonIrisOpen.Text = "Filtro " + ActualFL.ToString();
                 serialPort2.WriteLine(dataOUT2);
+                ActualFL += 1;
             }
         }
 
