@@ -452,19 +452,19 @@ namespace SerialSplitter
         private async void f_Tick(object sender, EventArgs e)
         {
             await ReadUPD_Data(e); // Await the async method
-            if (Demora_SendKV == 1)
-            {
-                // Ensure textBoxKVF.Text contains a valid integer value.
-                if (int.TryParse(textBoxKVF.Text, out int kv))
-                {
-                    kv = kv - Offset_KV_Cine;
-                    if (kv < 40) kv = 40;
-                    dataOUT3 = "KV" + kv.ToString();
-                    serialPort3.WriteLine(dataOUT3);
-                    if (DEBUG) DisplayData(6, dataOUT3);
-                }
-            }
-            if (Demora_SendKV > 0) Demora_SendKV -= 1;
+            //if (Demora_SendKV == 1)
+            //{
+            //    // Ensure textBoxKVF.Text contains a valid integer value.
+            //    if (int.TryParse(textBoxKVF.Text, out int kv))
+            //    {
+            //        kv = kv - Offset_KV_Cine;
+            //        if (kv < 40) kv = 40;
+            //        dataOUT3 = "KV" + kv.ToString();
+            //        serialPort3.WriteLine(dataOUT3);
+            //        if (DEBUG) DisplayData(6, dataOUT3);
+            //    }
+            //}
+            //if (Demora_SendKV > 0) Demora_SendKV -= 1;
             if (Demora_AEC > 0) Demora_AEC -= 1;
         }
 
