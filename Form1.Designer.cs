@@ -90,10 +90,16 @@
             this.buttonIrisOpen = new System.Windows.Forms.Button();
             this.textBoxAngC = new System.Windows.Forms.TextBox();
             this.label18 = new System.Windows.Forms.Label();
-            this.label19 = new System.Windows.Forms.Label();
             this.textBoxAngL = new System.Windows.Forms.TextBox();
             this.label20 = new System.Windows.Forms.Label();
             this.textBoxTemp = new System.Windows.Forms.TextBox();
+            this.buttonM1set = new System.Windows.Forms.Button();
+            this.buttonM2set = new System.Windows.Forms.Button();
+            this.buttonM3set = new System.Windows.Forms.Button();
+            this.buttonM1Read = new System.Windows.Forms.Button();
+            this.buttonM2Read = new System.Windows.Forms.Button();
+            this.buttonM3Read = new System.Windows.Forms.Button();
+            this.label19 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // serialPort1
@@ -625,37 +631,29 @@
             // 
             // textBoxAngC
             // 
-            this.textBoxAngC.Location = new System.Drawing.Point(1001, 21);
+            this.textBoxAngC.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBoxAngC.Location = new System.Drawing.Point(1017, 10);
             this.textBoxAngC.Name = "textBoxAngC";
-            this.textBoxAngC.Size = new System.Drawing.Size(55, 20);
+            this.textBoxAngC.Size = new System.Drawing.Size(55, 31);
             this.textBoxAngC.TabIndex = 57;
             this.textBoxAngC.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // label18
             // 
             this.label18.AutoSize = true;
-            this.label18.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label18.Location = new System.Drawing.Point(998, 3);
+            this.label18.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label18.Location = new System.Drawing.Point(989, 13);
             this.label18.Name = "label18";
-            this.label18.Size = new System.Drawing.Size(61, 16);
+            this.label18.Size = new System.Drawing.Size(28, 25);
             this.label18.TabIndex = 58;
-            this.label18.Text = "Angulo C";
-            // 
-            // label19
-            // 
-            this.label19.AutoSize = true;
-            this.label19.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label19.Location = new System.Drawing.Point(999, 43);
-            this.label19.Name = "label19";
-            this.label19.Size = new System.Drawing.Size(59, 16);
-            this.label19.TabIndex = 59;
-            this.label19.Text = "Angulo L";
+            this.label18.Text = "C";
             // 
             // textBoxAngL
             // 
-            this.textBoxAngL.Location = new System.Drawing.Point(1001, 61);
+            this.textBoxAngL.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBoxAngL.Location = new System.Drawing.Point(1017, 46);
             this.textBoxAngL.Name = "textBoxAngL";
-            this.textBoxAngL.Size = new System.Drawing.Size(55, 20);
+            this.textBoxAngL.Size = new System.Drawing.Size(55, 31);
             this.textBoxAngL.TabIndex = 60;
             this.textBoxAngL.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
@@ -677,16 +675,92 @@
             this.textBoxTemp.TabIndex = 62;
             this.textBoxTemp.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
+            // buttonM1set
+            // 
+            this.buttonM1set.Location = new System.Drawing.Point(20, 147);
+            this.buttonM1set.Name = "buttonM1set";
+            this.buttonM1set.Size = new System.Drawing.Size(44, 34);
+            this.buttonM1set.TabIndex = 63;
+            this.buttonM1set.Text = "M1";
+            this.buttonM1set.UseVisualStyleBackColor = true;
+            this.buttonM1set.Click += new System.EventHandler(this.buttonM1set_Click);
+            // 
+            // buttonM2set
+            // 
+            this.buttonM2set.Location = new System.Drawing.Point(70, 147);
+            this.buttonM2set.Name = "buttonM2set";
+            this.buttonM2set.Size = new System.Drawing.Size(44, 34);
+            this.buttonM2set.TabIndex = 64;
+            this.buttonM2set.Text = "M2";
+            this.buttonM2set.UseVisualStyleBackColor = true;
+            this.buttonM2set.Click += new System.EventHandler(this.buttonM2set_Click);
+            // 
+            // buttonM3set
+            // 
+            this.buttonM3set.Location = new System.Drawing.Point(120, 147);
+            this.buttonM3set.Name = "buttonM3set";
+            this.buttonM3set.Size = new System.Drawing.Size(44, 34);
+            this.buttonM3set.TabIndex = 65;
+            this.buttonM3set.Text = "M3";
+            this.buttonM3set.UseVisualStyleBackColor = true;
+            this.buttonM3set.Click += new System.EventHandler(this.buttonM3set_Click);
+            // 
+            // buttonM1Read
+            // 
+            this.buttonM1Read.Location = new System.Drawing.Point(363, 129);
+            this.buttonM1Read.Name = "buttonM1Read";
+            this.buttonM1Read.Size = new System.Drawing.Size(44, 34);
+            this.buttonM1Read.TabIndex = 66;
+            this.buttonM1Read.Text = "N";
+            this.buttonM1Read.UseVisualStyleBackColor = true;
+            this.buttonM1Read.Click += new System.EventHandler(this.buttonM1Read_Click);
+            // 
+            // buttonM2Read
+            // 
+            this.buttonM2Read.Location = new System.Drawing.Point(413, 129);
+            this.buttonM2Read.Name = "buttonM2Read";
+            this.buttonM2Read.Size = new System.Drawing.Size(44, 34);
+            this.buttonM2Read.TabIndex = 67;
+            this.buttonM2Read.Text = "Z1";
+            this.buttonM2Read.UseVisualStyleBackColor = true;
+            this.buttonM2Read.Click += new System.EventHandler(this.buttonM2Read_Click);
+            // 
+            // buttonM3Read
+            // 
+            this.buttonM3Read.Location = new System.Drawing.Point(463, 129);
+            this.buttonM3Read.Name = "buttonM3Read";
+            this.buttonM3Read.Size = new System.Drawing.Size(44, 34);
+            this.buttonM3Read.TabIndex = 68;
+            this.buttonM3Read.Text = "Z2";
+            this.buttonM3Read.UseVisualStyleBackColor = true;
+            this.buttonM3Read.Click += new System.EventHandler(this.buttonM3Read_Click);
+            // 
+            // label19
+            // 
+            this.label19.AutoSize = true;
+            this.label19.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label19.Location = new System.Drawing.Point(991, 49);
+            this.label19.Name = "label19";
+            this.label19.Size = new System.Drawing.Size(25, 25);
+            this.label19.TabIndex = 69;
+            this.label19.Text = "L";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.WindowFrame;
-            this.ClientSize = new System.Drawing.Size(1084, 203);
+            this.ClientSize = new System.Drawing.Size(1084, 215);
+            this.Controls.Add(this.label19);
+            this.Controls.Add(this.buttonM3Read);
+            this.Controls.Add(this.buttonM2Read);
+            this.Controls.Add(this.buttonM1Read);
+            this.Controls.Add(this.buttonM3set);
+            this.Controls.Add(this.buttonM2set);
+            this.Controls.Add(this.buttonM1set);
             this.Controls.Add(this.textBoxTemp);
             this.Controls.Add(this.label20);
             this.Controls.Add(this.textBoxAngL);
-            this.Controls.Add(this.label19);
             this.Controls.Add(this.label18);
             this.Controls.Add(this.textBoxAngC);
             this.Controls.Add(this.label14);
@@ -815,10 +889,16 @@
         private System.Windows.Forms.Label label14;
         private System.Windows.Forms.TextBox textBoxAngC;
         private System.Windows.Forms.Label label18;
-        private System.Windows.Forms.Label label19;
         private System.Windows.Forms.TextBox textBoxAngL;
         private System.Windows.Forms.Label label20;
         private System.Windows.Forms.TextBox textBoxTemp;
+        private System.Windows.Forms.Button buttonM1set;
+        private System.Windows.Forms.Button buttonM2set;
+        private System.Windows.Forms.Button buttonM3set;
+        private System.Windows.Forms.Button buttonM1Read;
+        private System.Windows.Forms.Button buttonM2Read;
+        private System.Windows.Forms.Button buttonM3Read;
+        private System.Windows.Forms.Label label19;
     }
 }
 

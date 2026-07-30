@@ -585,6 +585,41 @@ namespace SerialSplitter
             this.Close(); // Esto dispara Form_FormClosing automáticamente
         }
 
+        private void buttonM1set_Click(object sender, EventArgs e)
+        {
+            dataOUT2 = "M1";
+            serialPort2.WriteLine(dataOUT2);
+        }
+
+        private void buttonM2set_Click(object sender, EventArgs e)
+        {
+            dataOUT2 = "M2";
+            serialPort2.WriteLine(dataOUT2);
+        }   
+
+        private void buttonM3set_Click(object sender, EventArgs e)
+        {
+            dataOUT2 = "M3";
+            serialPort2.WriteLine(dataOUT2);
+        }
+
+        private void buttonM1Read_Click(object sender, EventArgs e)
+        {
+            dataOUT2 = "IM1";
+            serialPort2.WriteLine(dataOUT2);
+        }
+
+        private void buttonM2Read_Click(object sender, EventArgs e)
+        {
+            dataOUT2 = "IM2";
+            serialPort2.WriteLine(dataOUT2);
+        }
+        private void buttonM3Read_Click(object sender, EventArgs e)
+        {
+            dataOUT2 = "IM3";
+            serialPort2.WriteLine(dataOUT2);
+        }
+
         private void buttonPW_Click(object sender, EventArgs e)
         {
             if (serialPort3.IsOpen)
@@ -871,35 +906,35 @@ namespace SerialSplitter
             switch (s)
             {
                 case "Head":
-                    await SendCommands("KV" + VHKV, "MA" + VHMA, "TC" + VHMS);
+                    if (VHKV != "000") await SendCommands("KV" + VHKV, "MA" + VHMA, "TC" + VHMS); else await SendCommands("MA" + VHMA, "TC" + VHMS);
                     Offset_KV_Cine = VHKVOF; // 15
                     break;
                 case "Neck":
-                    await SendCommands("KV" + VNKV, "MA" + VNMA, "TC" + VNMS);
+                    if (VNKV != "000") await SendCommands("KV" + VNKV, "MA" + VNMA, "TC" + VNMS); else await SendCommands("MA" + VNMA, "TC" + VNMS);
                     Offset_KV_Cine = VNKVOF; // 15
                     break;
                 case "Cine":
-                    await SendCommands("KV" + CIKV, "MA" + CIMA, "TC" + CIMS);
+                    if (CIKV != "000") await SendCommands("KV" + CIKV, "MA" + CIMA, "TC" + CIMS); else await SendCommands("MA" + CIMA, "TC" + CIMS);
                     Offset_KV_Cine = CIKVOF; // 4
                     break;
                 case "Arms":
-                    await SendCommands("KV" + VUEKV, "MA" + VUEMA, "TC" + VUEMS);
+                    if (VUEKV != "000") await SendCommands("KV" + VUEKV, "MA" + VUEMA, "TC" + VUEMS); else await SendCommands("MA" + VUEMA, "TC" + VUEMS);
                     Offset_KV_Cine = VUEKVOF; // 6
                     break;
                 case "Abdomen":
-                    await SendCommands("KV" + VAKV, "MA" + VAMA, "TC" + VAMS);
+                    if (VAKV != "000") await SendCommands("KV" + VAKV, "MA" + VAMA, "TC" + VAMS); else await SendCommands("MA" + VAMA, "TC" + VAMS);
                     Offset_KV_Cine = VAKVOF; // 12
                     break;
                 case "Legs":
-                    await SendCommands("KV" + VEKV, "MA" + VEMA, "TC" + VEMS);
+                    if (VEKV != "000") await SendCommands("KV" + VEKV, "MA" + VEMA, "TC" + VEMS); else await SendCommands("MA" + VEMA, "TC" + VEMS);
                     Offset_KV_Cine = VEKVOF; // 6
                     break;
                 case "Foot":
-                    await SendCommands("KV" + VFKV, "MA" + VFMA, "TC" + VFMS);
+                    if (VFKV != "000") await SendCommands("KV" + VFKV, "MA" + VFMA, "TC" + VFMS); else await SendCommands("MA" + VFMA, "TC" + VFMS);
                     Offset_KV_Cine = VFKVOF; // 6
                     break;
                 case "Heart":
-                    await SendCommands("KV" + CHKV, "MA" + CHMA, "TC" + CHMS);
+                    if (CHKV != "000") await SendCommands("KV" + CHKV, "MA" + CHMA, "TC" + CHMS); else await SendCommands("MA" + CHMA, "TC" + CHMS);
                     Offset_KV_Cine = CHKVOF; // 4
                     break;
                 case "FLUOROMAP":
