@@ -958,6 +958,18 @@ namespace SerialSplitter
                 case "CineOff":
                     // No action needed
                     break;
+                case "Normal":
+                    dataOUT2 = "M1";
+                    serialPort2.WriteLine(dataOUT2);
+                    break;
+                case "Mag1":
+                    dataOUT2 = "M2";
+                    serialPort2.WriteLine(dataOUT2);
+                    break;
+                case "Mag2":
+                    dataOUT2 = "M3";
+                    serialPort2.WriteLine(dataOUT2);
+                    break;
                 default:
                     // Optionally log unknown command
                     break;
