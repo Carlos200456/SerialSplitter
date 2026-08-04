@@ -587,36 +587,36 @@ namespace SerialSplitter
 
         private void buttonM1set_Click(object sender, EventArgs e)
         {
-            dataOUT2 = "M1";
+            dataOUT2 = "M0";
             serialPort2.WriteLine(dataOUT2);
         }
 
         private void buttonM2set_Click(object sender, EventArgs e)
         {
-            dataOUT2 = "M2";
+            dataOUT2 = "M1";
             serialPort2.WriteLine(dataOUT2);
         }   
 
         private void buttonM3set_Click(object sender, EventArgs e)
         {
-            dataOUT2 = "M3";
+            dataOUT2 = "M2";
             serialPort2.WriteLine(dataOUT2);
         }
 
         private void buttonM1Read_Click(object sender, EventArgs e)
         {
-            dataOUT2 = "IM1";
+            dataOUT2 = "IM0";
             serialPort2.WriteLine(dataOUT2);
         }
 
         private void buttonM2Read_Click(object sender, EventArgs e)
         {
-            dataOUT2 = "IM2";
+            dataOUT2 = "IM1";
             serialPort2.WriteLine(dataOUT2);
         }
         private void buttonM3Read_Click(object sender, EventArgs e)
         {
-            dataOUT2 = "IM3";
+            dataOUT2 = "IM2";
             serialPort2.WriteLine(dataOUT2);
         }
 
