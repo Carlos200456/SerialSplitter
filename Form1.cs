@@ -958,7 +958,7 @@ namespace SerialSplitter
                 case "CineOff":
                     // No action needed
                     break;
-                case "Normal":
+                case "Overview":
                     dataOUT2 = "M1";
                     serialPort2.WriteLine(dataOUT2);
                     break;
