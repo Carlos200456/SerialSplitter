@@ -959,15 +959,15 @@ namespace SerialSplitter
                     // No action needed
                     break;
                 case "Overview":
-                    dataOUT2 = "IM1";
+                    dataOUT2 = "IM0";
                     serialPort2.WriteLine(dataOUT2);
                     break;
                 case "Mag1":
-                    dataOUT2 = "IM2";
+                    dataOUT2 = "IM1";
                     serialPort2.WriteLine(dataOUT2);
                     break;
                 case "Mag2":
-                    dataOUT2 = "IM3";
+                    dataOUT2 = "IM2";
                     serialPort2.WriteLine(dataOUT2);
                     break;
                 default:
