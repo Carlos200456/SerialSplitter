@@ -15,6 +15,7 @@ using System.Threading;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.ToolBar;
 using System.Diagnostics;
+using System.Collections.Concurrent;
 using UDP;
 
 
@@ -330,6 +331,53 @@ namespace SerialSplitter
             this.TopMost = true;
             buttonAEC.BackColor = Color.LightGreen;
             buttonAEC.Text = "AEC ON";
+
+            StartWriter();
+        }
+
+        // Escritor dedicado: todo WriteLine sale por aca, en un hilo aparte, para que un
+        // extremo que todavia no lee (DRAXAClient no listo, o ya cerrado) nunca bloquee la UI,
+        // ni siquiera los 500ms de WriteTimeout. La UI solo encola y sigue.
+        private class TxItem
+        {
+            public SerialPort Port;
+            public string Data;
+        }
+
+        private readonly ConcurrentQueue<TxItem> _txQueue = new ConcurrentQueue<TxItem>();
+        private volatile bool _writerRunning = false;
+        private Thread _writerThread;
+
+        private void StartWriter()
+        {
+            _writerRunning = true;
+            _writerThread = new Thread(WriterLoop) { IsBackground = true };
+            _writerThread.Start();
+        }
+
+        private void WriterLoop()
+        {
+            while (_writerRunning)
+            {
+                if (_txQueue.TryDequeue(out TxItem item))
+                {
+                    try
+                    {
+                        if (item.Port != null && item.Port.IsOpen)
+                            item.Port.WriteLine(item.Data);
+                    }
+                    catch (TimeoutException)
+                    {
+                    }
+                    catch (Exception)
+                    {
+                    }
+                }
+                else
+                {
+                    Thread.Sleep(5);
+                }
+            }
         }
 
         void CheckPortsNames()
@@ -367,6 +415,8 @@ namespace SerialSplitter
             serialPort1.Parity = (Parity)Enum.Parse(typeof(Parity), Serial1Parity);
             serialPort1.Encoding = Encoding.GetEncoding("iso-8859-1");
             // Encoding = Encoding.GetEncoding("Windows-1252");
+            serialPort1.ReadTimeout = 500;
+            serialPort1.WriteTimeout = 500;
             serialPort1.Open();
             serialPort1.DtrEnable = false;
             await Task.Delay(50);
@@ -383,6 +433,8 @@ namespace SerialSplitter
             serialPort2.Parity = (Parity)Enum.Parse(typeof(Parity), Serial2Parity);
             serialPort2.Encoding = Encoding.GetEncoding("iso-8859-1");
             // Encoding = Encoding.GetEncoding("Windows-1252");
+            serialPort2.ReadTimeout = 500;
+            serialPort2.WriteTimeout = 500;
             serialPort2.Open();
             serialPort2.DtrEnable = false;
             await Task.Delay(50);
@@ -399,6 +451,8 @@ namespace SerialSplitter
             serialPort3.Parity = (Parity)Enum.Parse(typeof(Parity), Serial3Parity);
             serialPort3.Encoding = Encoding.GetEncoding("iso-8859-1");
             // Encoding = Encoding.GetEncoding("Windows-1252");
+            serialPort3.ReadTimeout = 500;
+            serialPort3.WriteTimeout = 500;
             serialPort3.Open();
             serialPort3.DtrEnable = false;
             await Task.Delay(50);
@@ -429,7 +483,7 @@ namespace SerialSplitter
                 buttonGRST_Click(sender, e);
             }
             dataOUT3 = "HS";
-            serialPort3.WriteLine(dataOUT3);
+            SafeWriteLine(serialPort3, dataOUT3);
             if (DEBUG) DisplayData(6, dataOUT3);
             if (WaitForACK())
             {
@@ -461,7 +515,7 @@ namespace SerialSplitter
             //        kv = kv - Offset_KV_Cine;
             //        if (kv < 40) kv = 40;
             //        dataOUT3 = "KV" + kv.ToString();
-            //        serialPort3.WriteLine(dataOUT3);
+            //        SafeWriteLine(serialPort3, dataOUT3);
             //        if (DEBUG) DisplayData(6, dataOUT3);
             //    }
             //}
@@ -588,36 +642,36 @@ namespace SerialSplitter
         private void buttonM1set_Click(object sender, EventArgs e)
         {
             dataOUT2 = "M0";
-            serialPort2.WriteLine(dataOUT2);
+            SafeWriteLine(serialPort2, dataOUT2);
         }
 
         private void buttonM2set_Click(object sender, EventArgs e)
         {
             dataOUT2 = "M1";
-            serialPort2.WriteLine(dataOUT2);
+            SafeWriteLine(serialPort2, dataOUT2);
         }   
 
         private void buttonM3set_Click(object sender, EventArgs e)
         {
             dataOUT2 = "M2";
-            serialPort2.WriteLine(dataOUT2);
+            SafeWriteLine(serialPort2, dataOUT2);
         }
 
         private void buttonM1Read_Click(object sender, EventArgs e)
         {
             dataOUT2 = "IM0";
-            serialPort2.WriteLine(dataOUT2);
+            SafeWriteLine(serialPort2, dataOUT2);
         }
 
         private void buttonM2Read_Click(object sender, EventArgs e)
         {
             dataOUT2 = "IM1";
-            serialPort2.WriteLine(dataOUT2);
+            SafeWriteLine(serialPort2, dataOUT2);
         }
         private void buttonM3Read_Click(object sender, EventArgs e)
         {
             dataOUT2 = "IM2";
-            serialPort2.WriteLine(dataOUT2);
+            SafeWriteLine(serialPort2, dataOUT2);
         }
 
         private void buttonPW_Click(object sender, EventArgs e)
@@ -629,7 +683,7 @@ namespace SerialSplitter
                     if (SW_Ready)
                     {
                         dataOUT3 = "PW1";
-                        serialPort3.WriteLine(dataOUT3);
+                        SafeWriteLine(serialPort3, dataOUT3);
                         if (DEBUG) DisplayData(6, dataOUT3);
                         // Omitir la siguiente linea en Debug
 #if !DEBUG
@@ -664,7 +718,7 @@ namespace SerialSplitter
                 else
                 {
                     dataOUT3 = "PW0";
-                    serialPort3.WriteLine(dataOUT3);
+                    SafeWriteLine(serialPort3, dataOUT3);
                     if (DEBUG) DisplayData(6, dataOUT3);
                     logger.LogInfo("Turn Off by Operator");
                     AutoON = false;
@@ -714,7 +768,7 @@ namespace SerialSplitter
             //        dataOUT3 = "TF2";
             //    }
             //    if (buttonFM.Text == "Fluoro P") dataOUT3 = "TF0";
-            //    serialPort3.WriteLine(dataOUT3);
+            //    SafeWriteLine(serialPort3, dataOUT3);
             //    if (DEBUG) DisplayData(6, dataOUT3);
             //}
         }
@@ -737,7 +791,7 @@ namespace SerialSplitter
             //    }
             //    if (buttonRM.Text == "CINE") dataOUT3 = "TE0";       // TODO Service Mode in Generator
             //    // if (buttonSPot1.Text == "Service") dataOUT = "TE0";
-            //    serialPort3.WriteLine(dataOUT3);
+            //    SafeWriteLine(serialPort3, dataOUT3);
             //    if (DEBUG) DisplayData(6, dataOUT3);
             //}
         }
@@ -747,10 +801,10 @@ namespace SerialSplitter
             if (serialPort3.IsOpen)
             {
                 dataOUT3 = "MZ" + textBoxMAF.Text;
-                serialPort3.WriteLine(dataOUT3);
+                SafeWriteLine(serialPort3, dataOUT3);
                 Thread.Sleep(300);
                 dataOUT3 = "TX" + textBoxSms.Text;
-                serialPort3.WriteLine(dataOUT3);
+                SafeWriteLine(serialPort3, dataOUT3);
             }
         }
 
@@ -776,7 +830,7 @@ namespace SerialSplitter
             if (serialPort3.IsOpen)
             {
                 dataOUT3 = "K+" + dif_aec.ToString();
-                serialPort3.WriteLine(dataOUT3);
+                SafeWriteLine(serialPort3, dataOUT3);
                 if (DEBUG) DisplayData(6, dataOUT3);
             }
         }
@@ -784,7 +838,7 @@ namespace SerialSplitter
         private void button5_Click(object sender, EventArgs e) // KV -
         {
             dataOUT3 = "K-" + dif_aec.ToString();
-            serialPort3.WriteLine(dataOUT3);
+            SafeWriteLine(serialPort3, dataOUT3);
             if (DEBUG) DisplayData(6, dataOUT3);
         }
 
@@ -796,7 +850,7 @@ namespace SerialSplitter
                 if (ActualFL == 4) ActualFL = 0;
                 dataOUT2 = "FL" + ActualFL.ToString();
                 buttonIrisOpen.Text = "Filtro " + ActualFL.ToString();
-                serialPort2.WriteLine(dataOUT2);
+                SafeWriteLine(serialPort2, dataOUT2);
                 ActualFL += 1;
             }
         }
@@ -806,10 +860,10 @@ namespace SerialSplitter
             if (serialPort2.IsOpen)
             {
                 dataOUT2 = "IC0";
-                serialPort2.WriteLine(dataOUT2);
+                SafeWriteLine(serialPort2, dataOUT2);
                 Thread.Sleep(100);
                 dataOUT2 = "IC0";
-                serialPort2.WriteLine(dataOUT2);
+                SafeWriteLine(serialPort2, dataOUT2);
             }
 
         }
@@ -819,7 +873,7 @@ namespace SerialSplitter
             if (serialPort2.IsOpen)
             {
                 dataOUT2 = "FL3";
-                serialPort2.WriteLine(dataOUT2);
+                SafeWriteLine(serialPort2, dataOUT2);
             }
         }
 
@@ -828,7 +882,7 @@ namespace SerialSplitter
             if (serialPort2.IsOpen)
             {
                 dataOUT2 = "VC5";
-                serialPort2.WriteLine(dataOUT2);
+                SafeWriteLine(serialPort2, dataOUT2);
             }
         }
 
@@ -837,10 +891,10 @@ namespace SerialSplitter
             if (serialPort2.IsOpen)
             {
                 dataOUT2 = "VC0";
-                serialPort2.WriteLine(dataOUT2);
+                SafeWriteLine(serialPort2, dataOUT2);
                 Thread.Sleep(100);
                 dataOUT2 = "VC0";
-                serialPort2.WriteLine(dataOUT2);
+                SafeWriteLine(serialPort2, dataOUT2);
             }
         }
 
@@ -849,7 +903,7 @@ namespace SerialSplitter
             if (serialPort2.IsOpen)
             {
                 dataOUT2 = "VC-5";
-                serialPort2.WriteLine(dataOUT2);
+                SafeWriteLine(serialPort2, dataOUT2);
             }
         }
 
@@ -858,7 +912,7 @@ namespace SerialSplitter
             if (serialPort2.IsOpen)
             {
                 dataOUT2 = "RO5";
-                serialPort2.WriteLine(dataOUT2);
+                SafeWriteLine(serialPort2, dataOUT2);
             }
         }
 
@@ -867,10 +921,10 @@ namespace SerialSplitter
             if (serialPort2.IsOpen)
             {
                 dataOUT2 = "RO0";
-                serialPort2.WriteLine(dataOUT2);
+                SafeWriteLine(serialPort2, dataOUT2);
                 Thread.Sleep(100);
                 dataOUT2 = "RO0";
-                serialPort2.WriteLine(dataOUT2);
+                SafeWriteLine(serialPort2, dataOUT2);
             }
         }
 
@@ -879,7 +933,7 @@ namespace SerialSplitter
             if (serialPort2.IsOpen)
             {
                 dataOUT2 = "RO-5";
-                serialPort2.WriteLine(dataOUT2);
+                SafeWriteLine(serialPort2, dataOUT2);
             }
         }
 
@@ -897,7 +951,7 @@ namespace SerialSplitter
             {
                 foreach (var cmd in commands)
                 {
-                    serialPort3.WriteLine(cmd);
+                    SafeWriteLine(serialPort3, cmd);
                     if (DEBUG) DisplayData(6, cmd);
                     await Task.Delay(300); // Non-blocking delay
                 }
@@ -960,15 +1014,15 @@ namespace SerialSplitter
                     break;
                 case "Overview":
                     dataOUT2 = "IM0";
-                    serialPort2.WriteLine(dataOUT2);
+                    SafeWriteLine(serialPort2, dataOUT2);
                     break;
                 case "Mag1":
                     dataOUT2 = "IM1";
-                    serialPort2.WriteLine(dataOUT2);
+                    SafeWriteLine(serialPort2, dataOUT2);
                     break;
                 case "Mag2":
                     dataOUT2 = "IM2";
-                    serialPort2.WriteLine(dataOUT2);
+                    SafeWriteLine(serialPort2, dataOUT2);
                     break;
                 default:
                     // Optionally log unknown command
@@ -981,13 +1035,13 @@ namespace SerialSplitter
             if (serialPort3.IsOpen)
             {
                 dataOUT3 = command1;
-                serialPort3.WriteLine(dataOUT3);
+                SafeWriteLine(serialPort3, dataOUT3);
                 Thread.Sleep(300);
                 dataOUT3 = command2;
-                serialPort3.WriteLine(dataOUT3);
+                SafeWriteLine(serialPort3, dataOUT3);
                 Thread.Sleep(300);
                 dataOUT3 = command3;
-                serialPort3.WriteLine(dataOUT3);
+                SafeWriteLine(serialPort3, dataOUT3);
             }
         }
 
@@ -1082,10 +1136,23 @@ namespace SerialSplitter
             }
         }
 
+        // Encola la escritura para que la resuelva el hilo escritor (StartWriter/WriterLoop)
+        // y el llamador (casi siempre el hilo de UI) nunca espere al puerto.
+        private void SafeWriteLine(SerialPort port, string data)
+        {
+            if (port == null) return;
+            _txQueue.Enqueue(new TxItem { Port = port, Data = data });
+        }
+
         private void CloseSerialOnExit()
         {
             try
             {
+                // Frenar el escritor antes de cerrar puertos, para que no queden writes
+                // en vuelo sobre un puerto que se esta cerrando.
+                _writerRunning = false;
+                _writerThread?.Join(600);
+
                 // Cierre seguro de los puertos
                 if (serialPort1 != null && serialPort1.IsOpen) { try { serialPort1.Close(); } catch { } }
                 if (serialPort2 != null && serialPort2.IsOpen) { try { serialPort2.Close(); } catch { } }
@@ -1118,7 +1185,19 @@ namespace SerialSplitter
             {
                 e.Cancel = true;
                 Thread CloseDown = new Thread(new ThreadStart(CloseSerialOnExit));
+                CloseDown.IsBackground = true;
                 CloseDown.Start();
+
+                // Red de seguridad: si SerialPort.Close() queda colgado esperando un
+                // hilo de lectura bloqueado (ver serialPortX_DataReceived), el proceso
+                // nunca terminaria por si solo. Forzar la salida si no cerro a tiempo.
+                Thread watchdog = new Thread(() =>
+                {
+                    Thread.Sleep(3000);
+                    Environment.Exit(1);
+                });
+                watchdog.IsBackground = true;
+                watchdog.Start();
             }
         }
     }
