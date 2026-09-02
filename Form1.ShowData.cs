@@ -13,19 +13,41 @@ namespace SerialSplitter
     {
         private void serialPort1_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
         {
-            dataIN1 = serialPort1.ReadLine();
+            try
+            {
+                dataIN1 = serialPort1.ReadLine();
+            }
+            catch (TimeoutException)
+            {
+                // Linea incompleta dentro del ReadTimeout: se descarta, no hay deadlock.
+                return;
+            }
             this.Invoke(new EventHandler(ShowData1));
         }
 
         private void serialPort2_DataReceived(object sender, System.IO.Ports.SerialDataReceivedEventArgs e)
         {
-            dataIN2 = serialPort2.ReadLine();
+            try
+            {
+                dataIN2 = serialPort2.ReadLine();
+            }
+            catch (TimeoutException)
+            {
+                return;
+            }
             this.Invoke(new EventHandler(ShowData2));
         }
 
         private void serialPort3_DataReceived(object sender, SerialDataReceivedEventArgs e)    // Data received from Generator
         {
-            dataIN3 = serialPort3.ReadLine();
+            try
+            {
+                dataIN3 = serialPort3.ReadLine();
+            }
+            catch (TimeoutException)
+            {
+                return;
+            }
             if (dataIN3.Length > 4) message = dataIN3.Remove(4); else message = "";
             if (dataIN3.Contains("ACK"))
             {
@@ -54,13 +76,13 @@ namespace SerialSplitter
             {
                 AnalogData = Convert.ToInt32(dataIN1.Substring(2));
                 if (DEBUG) DisplayData(1, dataIN1);
-                serialPort1.WriteLine("ACK");
+                SafeWriteLine(serialPort1, "ACK");
                 if (DEBUG) DisplayData(4, "ACK");
             }
             else
             {
                 dataOUT2 = dataIN1;
-                serialPort2.WriteLine(dataOUT2);
+                SafeWriteLine(serialPort2, dataOUT2);
                 if (DEBUG) DisplayData(5, dataOUT2);
             }
         }
@@ -81,7 +103,7 @@ namespace SerialSplitter
                     AnalyzeDataABC(AnalogData, sender, e);
                 }
                 return;
-            } else serialPort1.WriteLine(dataIN2);
+            } else SafeWriteLine(serialPort1, dataIN2);
 
             // Handle specific commands
             if (dataIN2.Contains("FluoroOff") || dataIN2.Contains("CineOff"))
@@ -240,7 +262,7 @@ namespace SerialSplitter
                     if (msgTrimmed == "1")
                     {
                         dataOUT3 = "DB0";
-                        serialPort3.WriteLine(dataOUT3);
+                        SafeWriteLine(serialPort3, dataOUT3);
                         if (DEBUG) DisplayData(6, dataOUT3);
                     }
                     break;
