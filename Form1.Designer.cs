@@ -100,6 +100,9 @@
             this.buttonM2Read = new System.Windows.Forms.Button();
             this.buttonM3Read = new System.Windows.Forms.Button();
             this.label19 = new System.Windows.Forms.Label();
+            this.labelFluoro = new System.Windows.Forms.Label();
+            this.textBoxFluoroTime = new System.Windows.Forms.TextBox();
+            this.buttonFluoroReset = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // serialPort1
@@ -744,13 +747,47 @@
             this.label19.Size = new System.Drawing.Size(25, 25);
             this.label19.TabIndex = 69;
             this.label19.Text = "L";
-            // 
+            //
+            // labelFluoro
+            //
+            this.labelFluoro.AutoSize = true;
+            this.labelFluoro.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelFluoro.Location = new System.Drawing.Point(1090, 8);
+            this.labelFluoro.Name = "labelFluoro";
+            this.labelFluoro.Size = new System.Drawing.Size(53, 16);
+            this.labelFluoro.TabIndex = 70;
+            this.labelFluoro.Text = "Fluoro";
+            //
+            // textBoxFluoroTime
+            //
+            this.textBoxFluoroTime.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBoxFluoroTime.Location = new System.Drawing.Point(1085, 27);
+            this.textBoxFluoroTime.Name = "textBoxFluoroTime";
+            this.textBoxFluoroTime.ReadOnly = true;
+            this.textBoxFluoroTime.Size = new System.Drawing.Size(80, 31);
+            this.textBoxFluoroTime.TabIndex = 71;
+            this.textBoxFluoroTime.Text = "00:00";
+            this.textBoxFluoroTime.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            //
+            // buttonFluoroReset
+            //
+            this.buttonFluoroReset.Location = new System.Drawing.Point(1085, 60);
+            this.buttonFluoroReset.Name = "buttonFluoroReset";
+            this.buttonFluoroReset.Size = new System.Drawing.Size(80, 25);
+            this.buttonFluoroReset.TabIndex = 72;
+            this.buttonFluoroReset.Text = "Reset F";
+            this.buttonFluoroReset.UseVisualStyleBackColor = true;
+            this.buttonFluoroReset.Click += new System.EventHandler(this.buttonFluoroReset_Click);
+            //
             // Form1
-            // 
+            //
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.WindowFrame;
-            this.ClientSize = new System.Drawing.Size(1084, 215);
+            this.ClientSize = new System.Drawing.Size(1165, 215);
+            this.Controls.Add(this.labelFluoro);
+            this.Controls.Add(this.textBoxFluoroTime);
+            this.Controls.Add(this.buttonFluoroReset);
             this.Controls.Add(this.label19);
             this.Controls.Add(this.buttonM3Read);
             this.Controls.Add(this.buttonM2Read);
@@ -899,6 +936,9 @@
         private System.Windows.Forms.Button buttonM2Read;
         private System.Windows.Forms.Button buttonM3Read;
         private System.Windows.Forms.Label label19;
+        private System.Windows.Forms.Label labelFluoro;
+        private System.Windows.Forms.TextBox textBoxFluoroTime;
+        private System.Windows.Forms.Button buttonFluoroReset;
     }
 }
 
