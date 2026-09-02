@@ -61,6 +61,16 @@ namespace SerialSplitter
         System.Windows.Forms.Timer t = null;
         System.Windows.Forms.Timer f = null;
 
+        // --- Contador de fluoroscopia (5 min) con reset manual ---
+        // Acumula SOLO tiempo de fluoroscopia (RX_On && !Cine). Al pasar de 5 min
+        // dispara alarma sonora + visual (parpadeo) hasta que el operador resetea.
+        private readonly Stopwatch _fluoroStopwatch = new Stopwatch();
+        private TimeSpan _fluoroAccumulated = TimeSpan.Zero;
+        private bool _fluoroAlarm = false;
+        private int _fluoroBlinkCounter = 0;
+        private int _fluoroSoundCounter = 0;
+        private const int FluoroAlarmSeconds = 300;   // 5 minutos
+
         // Lock for app path
         private static readonly object _lock = new object();
         private static string _appPath;
@@ -519,6 +529,96 @@ namespace SerialSplitter
             //}
             //if (Demora_SendKV > 0) Demora_SendKV -= 1;
             if (Demora_AEC > 0) Demora_AEC -= 1;
+            UpdateFluoroDisplay();
+        }
+
+        // ================== Contador de fluoroscopia (5 min) ==================
+
+        // Tiempo total acumulado de fluoroscopia = lo guardado + lo que corre ahora.
+        private TimeSpan FluoroTotal()
+        {
+            return _fluoroAccumulated + _fluoroStopwatch.Elapsed;
+        }
+
+        // Llamar al iniciar fluoroscopia real (FluoroOn && !Cine).
+        private void StartFluoroTimer()
+        {
+            if (!_fluoroStopwatch.IsRunning)
+                _fluoroStopwatch.Start();
+        }
+
+        // Llamar al terminar la emision (FluoroOff / CineOff). Consolida lo transcurrido.
+        private void StopFluoroTimer()
+        {
+            if (_fluoroStopwatch.IsRunning)
+            {
+                _fluoroAccumulated += _fluoroStopwatch.Elapsed;
+                _fluoroStopwatch.Reset();
+            }
+        }
+
+        // Reset manual del contador (unico modo de silenciar la alarma).
+        private void buttonFluoroReset_Click(object sender, EventArgs e)
+        {
+            _fluoroAccumulated = TimeSpan.Zero;
+            _fluoroStopwatch.Reset();
+            // Si justo se esta haciendo fluoroscopia, seguir contando desde cero.
+            if (RX_On && !Cine)
+                _fluoroStopwatch.Start();
+            _fluoroAlarm = false;
+            _fluoroBlinkCounter = 0;
+            _fluoroSoundCounter = 0;
+            UpdateFluoroDisplay();
+            logger.LogInfo("Reset del contador de fluoroscopia (5 min) por el operador");
+        }
+
+        // Refresca el display mm:ss y gestiona la alarma. Se llama desde f_Tick (100 ms).
+        private void UpdateFluoroDisplay()
+        {
+            int totalSeconds = (int)FluoroTotal().TotalSeconds;
+            textBoxFluoroTime.Text = string.Format("{0:00}:{1:00}", totalSeconds / 60, totalSeconds % 60);
+
+            if (totalSeconds >= FluoroAlarmSeconds)
+            {
+                if (!_fluoroAlarm)
+                {
+                    _fluoroAlarm = true;
+                    _fluoroSoundCounter = 0;   // que suene de inmediato
+                    logger.LogWarning("Fluoroscopia: 5 minutos acumulados");
+                }
+
+                // Parpadeo visual: alterna cada ~500 ms (f_Tick = 100 ms => 5 ticks).
+                _fluoroBlinkCounter++;
+                if (_fluoroBlinkCounter >= 5)
+                {
+                    _fluoroBlinkCounter = 0;
+                    bool rojo = textBoxFluoroTime.BackColor == Color.Red;
+                    textBoxFluoroTime.BackColor = rojo ? Color.Yellow : Color.Red;
+                    textBoxFluoroTime.ForeColor = rojo ? Color.Black : Color.White;
+                }
+
+                // Alarma sonora repetida cada ~3 s mientras no se resetee.
+                if (_fluoroSoundCounter <= 0)
+                {
+                    System.Media.SystemSounds.Exclamation.Play();
+                    _fluoroSoundCounter = 30;   // 30 * 100 ms = 3 s
+                }
+                else
+                {
+                    _fluoroSoundCounter--;
+                }
+            }
+            else
+            {
+                _fluoroAlarm = false;
+                _fluoroBlinkCounter = 0;
+                // Verde suave mientras cuenta fluoro; gris en cero / inactivo.
+                Color normal = _fluoroStopwatch.IsRunning ? Color.LightGreen : SystemColors.Control;
+                if (textBoxFluoroTime.BackColor != normal)
+                    textBoxFluoroTime.BackColor = normal;
+                if (textBoxFluoroTime.ForeColor != Color.Black)
+                    textBoxFluoroTime.ForeColor = Color.Black;
+            }
         }
 
         bool WaitForACK()
@@ -593,12 +693,12 @@ namespace SerialSplitter
             if (Service == 1)
             {
                 this.Top = 944;
-                this.Size = new Size(1000, 145);
+                this.Size = new Size(1181, 145);
             }
             else
             {
                 this.Top = 984;
-                this.Size = new Size(1000, 105);
+                this.Size = new Size(1181, 105);
             }
 #endif
         }
@@ -656,13 +756,13 @@ namespace SerialSplitter
                         if (Service == 1)
                         {
                             this.Top = 944;
-                            this.Size = new Size(1100, 145);
+                            this.Size = new Size(1181, 145);
                             DEBUG = true;
                         }
                         else
                         {
                             this.Top = 984;
-                            this.Size = new Size(1100, 105);
+                            this.Size = new Size(1181, 105);
                             serialPort2.DtrEnable = false;
                             Thread.Sleep(50);
                             serialPort2.DtrEnable = true;

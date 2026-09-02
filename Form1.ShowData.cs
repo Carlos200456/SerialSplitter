@@ -113,12 +113,14 @@ namespace SerialSplitter
                 AEC_Lock = false;
                 RX_On = false;
                 Demora_SendKV = 20;
+                StopFluoroTimer();   // consolida el tiempo de fluoro (no-op si venia de cine)
             }
             if (dataIN2.Contains("FluoroOn") || dataIN2.Contains("CineOn"))
             {
                 if (dataIN2.Contains("CineOn")) Cine = true; else Cine = false;
                 Demora_AEC = 10;
                 RX_On = true;
+                if (!Cine) StartFluoroTimer();   // el contador de 5 min cuenta SOLO fluoroscopia
             }
             if (dataIN2.Contains("AEC_Locked"))
             {                 
