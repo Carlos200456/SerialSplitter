@@ -972,6 +972,18 @@ namespace SerialSplitter
                 case "CineOff":
                     // No action needed
                     break;
+                case "Overview":
+                    dataOUT2 = "IM0";
+                    SafeWriteLine(serialPort2, dataOUT2);
+                    break;
+                case "Mag1":
+                    dataOUT2 = "IM1";
+                    SafeWriteLine(serialPort2, dataOUT2);
+                    break;
+                case "Mag2":
+                    dataOUT2 = "IM2";
+                    SafeWriteLine(serialPort2, dataOUT2);
+                    break;
                 default:
                     // Optionally log unknown command
                     break;
