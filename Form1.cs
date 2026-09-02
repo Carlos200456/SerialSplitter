@@ -455,6 +455,7 @@ namespace SerialSplitter
             serialPort3.DtrEnable = false;
             await Task.Delay(50);
             serialPort3.DtrEnable = true;
+            serialPort3.RtsEnable = true;    // mantener RTS asertado (como Docklight)
             await Task.Delay(800);
             StartTimer();
         }
