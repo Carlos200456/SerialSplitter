@@ -686,7 +686,7 @@
             // 
             this.labelFluoro.AutoSize = true;
             this.labelFluoro.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelFluoro.Location = new System.Drawing.Point(1069, 6);
+            this.labelFluoro.Location = new System.Drawing.Point(1069, 4);
             this.labelFluoro.Name = "labelFluoro";
             this.labelFluoro.Size = new System.Drawing.Size(84, 16);
             this.labelFluoro.TabIndex = 70;
@@ -695,7 +695,7 @@
             // textBoxFluoroTime
             // 
             this.textBoxFluoroTime.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBoxFluoroTime.Location = new System.Drawing.Point(1071, 25);
+            this.textBoxFluoroTime.Location = new System.Drawing.Point(1071, 23);
             this.textBoxFluoroTime.Name = "textBoxFluoroTime";
             this.textBoxFluoroTime.ReadOnly = true;
             this.textBoxFluoroTime.Size = new System.Drawing.Size(80, 31);
@@ -705,7 +705,7 @@
             // 
             // buttonFluoroReset
             // 
-            this.buttonFluoroReset.Location = new System.Drawing.Point(1071, 58);
+            this.buttonFluoroReset.Location = new System.Drawing.Point(1071, 56);
             this.buttonFluoroReset.Name = "buttonFluoroReset";
             this.buttonFluoroReset.Size = new System.Drawing.Size(80, 25);
             this.buttonFluoroReset.TabIndex = 72;
