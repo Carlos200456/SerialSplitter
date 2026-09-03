@@ -635,7 +635,7 @@
             // textBoxAngC
             // 
             this.textBoxAngC.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBoxAngC.Location = new System.Drawing.Point(1017, 10);
+            this.textBoxAngC.Location = new System.Drawing.Point(1009, 10);
             this.textBoxAngC.Name = "textBoxAngC";
             this.textBoxAngC.Size = new System.Drawing.Size(55, 31);
             this.textBoxAngC.TabIndex = 57;
@@ -645,7 +645,7 @@
             // 
             this.label18.AutoSize = true;
             this.label18.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label18.Location = new System.Drawing.Point(989, 13);
+            this.label18.Location = new System.Drawing.Point(981, 13);
             this.label18.Name = "label18";
             this.label18.Size = new System.Drawing.Size(28, 25);
             this.label18.TabIndex = 58;
@@ -654,7 +654,7 @@
             // textBoxAngL
             // 
             this.textBoxAngL.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBoxAngL.Location = new System.Drawing.Point(1017, 46);
+            this.textBoxAngL.Location = new System.Drawing.Point(1009, 46);
             this.textBoxAngL.Name = "textBoxAngL";
             this.textBoxAngL.Size = new System.Drawing.Size(55, 31);
             this.textBoxAngL.TabIndex = 60;
@@ -742,45 +742,45 @@
             // 
             this.label19.AutoSize = true;
             this.label19.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label19.Location = new System.Drawing.Point(991, 49);
+            this.label19.Location = new System.Drawing.Point(983, 49);
             this.label19.Name = "label19";
             this.label19.Size = new System.Drawing.Size(25, 25);
             this.label19.TabIndex = 69;
             this.label19.Text = "L";
-            //
+            // 
             // labelFluoro
-            //
+            // 
             this.labelFluoro.AutoSize = true;
             this.labelFluoro.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelFluoro.Location = new System.Drawing.Point(1090, 8);
+            this.labelFluoro.Location = new System.Drawing.Point(1074, 8);
             this.labelFluoro.Name = "labelFluoro";
-            this.labelFluoro.Size = new System.Drawing.Size(53, 16);
+            this.labelFluoro.Size = new System.Drawing.Size(84, 16);
             this.labelFluoro.TabIndex = 70;
-            this.labelFluoro.Text = "Fluoro";
-            //
+            this.labelFluoro.Text = "Tiempo RX";
+            // 
             // textBoxFluoroTime
-            //
+            // 
             this.textBoxFluoroTime.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.textBoxFluoroTime.Location = new System.Drawing.Point(1085, 27);
+            this.textBoxFluoroTime.Location = new System.Drawing.Point(1076, 27);
             this.textBoxFluoroTime.Name = "textBoxFluoroTime";
             this.textBoxFluoroTime.ReadOnly = true;
             this.textBoxFluoroTime.Size = new System.Drawing.Size(80, 31);
             this.textBoxFluoroTime.TabIndex = 71;
             this.textBoxFluoroTime.Text = "00:00";
             this.textBoxFluoroTime.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            //
+            // 
             // buttonFluoroReset
-            //
-            this.buttonFluoroReset.Location = new System.Drawing.Point(1085, 60);
+            // 
+            this.buttonFluoroReset.Location = new System.Drawing.Point(1076, 60);
             this.buttonFluoroReset.Name = "buttonFluoroReset";
             this.buttonFluoroReset.Size = new System.Drawing.Size(80, 25);
             this.buttonFluoroReset.TabIndex = 72;
-            this.buttonFluoroReset.Text = "Reset F";
+            this.buttonFluoroReset.Text = "Reset Alarma";
             this.buttonFluoroReset.UseVisualStyleBackColor = true;
             this.buttonFluoroReset.Click += new System.EventHandler(this.buttonFluoroReset_Click);
-            //
+            // 
             // Form1
-            //
+            // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.WindowFrame;
