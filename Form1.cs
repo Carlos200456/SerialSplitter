@@ -118,6 +118,9 @@ namespace SerialSplitter
                                     Serial1DataBits = getBetween(s1, "databits=", -1);
                                     Serial1StopBits = getBetween(s1, "stopbits=", -1);
                                     Serial1Parity = getBetween(s1, "parity=", -1);
+                                    // Solo para name="UDP" (ver Form1.UdpDRA.cs)
+                                    Serial1LocalPort = getBetween(s1, "localport=", -1);
+                                    Serial1RemotePort = getBetween(s1, "remoteport=", -1);
                                     break;
                                 case "SerialPort2":
                                     Serial2PortName = getBetween(s1, "name=", -1);
@@ -245,6 +248,7 @@ namespace SerialSplitter
         {
             public SerialPort Port;
             public string Data;
+            public bool UdpDRA;     // va al DRA.XA por UDP en vez de por Port
         }
 
         private readonly ConcurrentQueue<TxItem> _txQueue = new ConcurrentQueue<TxItem>();
@@ -266,7 +270,9 @@ namespace SerialSplitter
                 {
                     try
                     {
-                        if (item.Port != null && item.Port.IsOpen)
+                        if (item.UdpDRA)
+                            UdpDRASend(item.Data);
+                        else if (item.Port != null && item.Port.IsOpen)
                             item.Port.WriteLine(item.Data);
                     }
                     catch (TimeoutException)
@@ -285,6 +291,11 @@ namespace SerialSplitter
 
         void CheckPortsNames()
         {
+            if (UdpDRAMode && OpenUdpDRA())     // canal DRA.XA por UDP en vez de serialPort1
+            {
+                radioButton1.Checked = true;
+                radioButton1.BackColor = Color.Green;
+            }
             string[] ports = SerialPort.GetPortNames();
             for (int i = 0; i < ports.Length; i++)
             {
@@ -875,6 +886,11 @@ namespace SerialSplitter
         // y el llamador (casi siempre el hilo de UI) nunca espere al puerto.
         private void SafeWriteLine(SerialPort port, string data)
         {
+            if (port == serialPort1 && UdpDRAMode)
+            {
+                _txQueue.Enqueue(new TxItem { UdpDRA = true, Data = data });
+                return;
+            }
             if (port == null) return;
             _txQueue.Enqueue(new TxItem { Port = port, Data = data });
         }
@@ -887,6 +903,7 @@ namespace SerialSplitter
                 // en vuelo sobre un puerto que se esta cerrando.
                 _writerRunning = false;
                 _writerThread?.Join(600);
+                CloseUdpDRA();
 
                 // Cierre seguro de los puertos
                 if (serialPort1 != null && serialPort1.IsOpen) { try { serialPort1.Close(); } catch { } }
@@ -916,7 +933,7 @@ namespace SerialSplitter
             t?.Stop();
             f?.Stop();
 
-            if ((serialPort1?.IsOpen ?? false) || (serialPort2?.IsOpen ?? false) || (serialPort3?.IsOpen ?? false))
+            if ((serialPort1?.IsOpen ?? false) || (serialPort2?.IsOpen ?? false) || (serialPort3?.IsOpen ?? false) || UdpDRAOpen)
             {
                 e.Cancel = true;
                 Thread CloseDown = new Thread(new ThreadStart(CloseSerialOnExit));
