@@ -46,7 +46,7 @@ namespace SerialSplitter
         bool Cine = false;
         bool AEC_ON = true;
         bool RX_On = false;
-        bool AEC_Lock = true;
+        bool AEC_Lock = false;     // false: el ABC regula desde el primer FluoroOn (con true recien regulaba tras el primer FluoroOff)
         public static float VCC = 0.0f;
         int Counter, VHKVOF = 15, VNKVOF = 12, VAKVOF = 12, VEKVOF = 6, VUEKVOF = 6, VFKVOF = 6, CIKVOF = 4, CHKVOF = 4, 
             LOW_Limit, HI_Limit, Cine_LOW_Limit, Cine_HI_Limit, Offset_KV_Cine, AnalogData, Old_AnalogData, ValorMedioCine, 
